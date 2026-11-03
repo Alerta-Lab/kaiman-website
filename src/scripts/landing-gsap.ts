@@ -37,7 +37,7 @@ export function initLandingGsap(root: ParentNode = document): void {
 	});
 	main
 		.querySelectorAll<HTMLElement>(
-			'[data-story-pin], [data-hero-pin], [data-story-stage], [data-reveal-item], [data-parallax-bg], [data-parallax-content] > *, [data-hero-exit], [data-hero-giant], [data-curtain-left], [data-curtain-right], [data-curtain-top], [data-curtain-bottom], [data-origen-layer]',
+			'[data-story-pin], [data-hero-pin], [data-playbooks-pin], [data-playbooks-track], [data-playbooks-card], [data-playbooks-progress], [data-capacity-pin], [data-capacity-track], [data-capacity-card], [data-capacity-progress], [data-story-stage], [data-reveal-item], [data-parallax-bg], [data-parallax-content] > *, [data-hero-exit], [data-hero-giant], [data-curtain-left], [data-curtain-right], [data-curtain-top], [data-curtain-bottom], [data-origen-layer]',
 		)
 		.forEach((node) => {
 			gsap.killTweensOf(node);
@@ -48,7 +48,6 @@ export function initLandingGsap(root: ParentNode = document): void {
 }
 
 function initLandingGsapInner(main: Element, reduce: boolean): void {
-	const chapters = gsap.utils.toArray<HTMLElement>(main.querySelectorAll('[data-chapter]'));
 	const panels = gsap.utils.toArray<HTMLElement>(main.querySelectorAll('[data-panel]'));
 	const stories = gsap.utils.toArray<HTMLElement>(main.querySelectorAll('[data-story]'));
 	const curtainTop = document.querySelector<HTMLElement>('[data-landing-curtain="top"]');
@@ -68,8 +67,15 @@ function initLandingGsapInner(main: Element, reduce: boolean): void {
 		curtainBottom?.remove();
 	};
 
+	let activeChapterId: string | undefined;
+	const railIds = new Set(
+		railItems.map((item) => item.dataset.chapterRailItem).filter((id): id is string => Boolean(id)),
+	);
+
 	const setActiveChapter = (id: string | undefined) => {
-		if (!railItems.length || !id) return;
+		if (!railItems.length || !id || !railIds.has(id)) return;
+		if (activeChapterId === id) return;
+		activeChapterId = id;
 		railItems.forEach((item) => {
 			const active = item.dataset.chapterRailItem === id;
 			item.classList.toggle('is-active', active);
@@ -81,9 +87,11 @@ function initLandingGsapInner(main: Element, reduce: boolean): void {
 	initVideoCursor(main, heroApi);
 	initAudienceSwitcher(main);
 	initHorizontalScrolls(main);
+	initFaqAccordion(main);
 
 	if (reduce) {
 		clearMotion();
+		setActiveChapter(railItems[0]?.dataset.chapterRailItem);
 		return;
 	}
 
@@ -99,18 +107,45 @@ function initLandingGsapInner(main: Element, reduce: boolean): void {
 		});
 	}
 
-	chapters.forEach((chapter) => {
-		if (chapter.dataset.heroCurtain !== undefined || chapter.id === 'demo') return;
-		ScrollTrigger.create({
-			trigger: chapter,
-			start: 'top center',
-			end: 'bottom center',
-			onEnter: () => setActiveChapter(chapter.dataset.chapter),
-			onEnterBack: () => setActiveChapter(chapter.dataset.chapter),
-		});
+	// Hero / demo / origen are driven by the hero curtain scrub.
+	// Post-hero rail chapters use a single scroll probe so pins and sticky
+	// stacks stay in sync (avoids missing producto / clearing on plataforma).
+	const heroOwned = new Set(['hero', 'demo', 'origen']);
+	const postHeroChapters = railItems
+		.map((item) => item.dataset.chapterRailItem)
+		.filter((id): id is string => Boolean(id) && !heroOwned.has(id))
+		.map((id) => ({
+			id,
+			el: main.querySelector<HTMLElement>(`[data-chapter="${id}"]`),
+		}))
+		.filter((entry): entry is { id: string; el: HTMLElement } => Boolean(entry.el));
+
+	const syncPostHeroChapter = () => {
+		const heroSt = ScrollTrigger.getById('hero-curtain');
+		if (heroSt?.isActive) return;
+
+		const line = window.innerHeight * 0.42;
+		let next = postHeroChapters[0]?.id;
+		for (const entry of postHeroChapters) {
+			const rect = entry.el.getBoundingClientRect();
+			if (rect.top <= line) next = entry.id;
+			if (rect.top <= line && rect.bottom > line) {
+				next = entry.id;
+				break;
+			}
+		}
+		if (next) setActiveChapter(next);
+	};
+
+	ScrollTrigger.create({
+		id: 'chapter-rail-sync',
+		start: 0,
+		end: 'max',
+		onUpdate: syncPostHeroChapter,
+		onRefresh: syncPostHeroChapter,
 	});
 
-	if (chapters[0]?.dataset.chapter) setActiveChapter(chapters[0].dataset.chapter);
+	setActiveChapter('hero');
 
 	const scrollToOrigen = () => {
 		const st = ScrollTrigger.getById('hero-curtain');
@@ -231,6 +266,18 @@ function initLandingGsapInner(main: Element, reduce: boolean): void {
 		gsap.set(stages, { opacity: 0, x: 0, y: 36, pointerEvents: 'none' });
 		gsap.set(stages[0], { opacity: 1, x: 0, y: 0, pointerEvents: 'auto' });
 
+		stages.forEach((stage, index) => {
+			const lines = stage.querySelectorAll<HTMLElement>('[data-stage-line]');
+			const fill = stage.querySelector<HTMLElement>('[data-platform-fill]');
+			if (index === 0) {
+				if (lines.length) gsap.set(lines, { opacity: 1, y: 0 });
+				if (fill) gsap.set(fill, { clipPath: 'inset(0 0 0% 0)' });
+				return;
+			}
+			if (lines.length) gsap.set(lines, { opacity: 0, y: 28 });
+			if (fill) gsap.set(fill, { clipPath: 'inset(0 0 100% 0)' });
+		});
+
 		const tl = gsap.timeline({
 			scrollTrigger: {
 				id: `story-${story.id || storyIndex}`,
@@ -250,6 +297,11 @@ function initLandingGsapInner(main: Element, reduce: boolean): void {
 			const prev = stages[index - 1];
 			const stage = stages[index];
 			const at = index * segment;
+			const prevLines = prev.querySelectorAll<HTMLElement>('[data-stage-line]');
+			const prevFill = prev.querySelector<HTMLElement>('[data-platform-fill]');
+			const lines = stage.querySelectorAll<HTMLElement>('[data-stage-line]');
+			const fill = stage.querySelector<HTMLElement>('[data-platform-fill]');
+
 			gsap.set(stage, { x: 0, y: 36, opacity: 0 });
 			tl.to(
 				prev,
@@ -263,6 +315,12 @@ function initLandingGsapInner(main: Element, reduce: boolean): void {
 				},
 				at,
 			);
+			if (prevLines.length) {
+				tl.to(prevLines, { opacity: 0, y: -18, duration: fade, ease: 'none', stagger: 0.04 }, at);
+			}
+			if (prevFill) {
+				tl.to(prevFill, { clipPath: 'inset(0 0 100% 0)', duration: fade, ease: 'none' }, at);
+			}
 			tl.to(
 				stage,
 				{
@@ -275,6 +333,12 @@ function initLandingGsapInner(main: Element, reduce: boolean): void {
 				},
 				at,
 			);
+			if (lines.length) {
+				tl.to(lines, { opacity: 1, y: 0, duration: fade, ease: 'none', stagger: 0.05 }, at);
+			}
+			if (fill) {
+				tl.to(fill, { clipPath: 'inset(0 0 0% 0)', duration: fade, ease: 'none' }, at);
+			}
 			tl.to({}, { duration: Math.max(segment - fade, 0.2) }, at + fade);
 		}
 	});
@@ -296,6 +360,22 @@ function initLandingGsapInner(main: Element, reduce: boolean): void {
 
 	// After hero/story pins so start/end map to the final layout.
 	initShapeWipes(main);
+	initHorizontalTimeline(main, reduce, {
+		id: 'capacity-timeline',
+		section: '[data-capacity-timeline]',
+		pin: '[data-capacity-pin]',
+		track: '[data-capacity-track]',
+		progress: '[data-capacity-progress]',
+		card: '[data-capacity-card]',
+	});
+	initHorizontalTimeline(main, reduce, {
+		id: 'playbooks-timeline',
+		section: '[data-playbooks-timeline]',
+		pin: '[data-playbooks-pin]',
+		track: '[data-playbooks-track]',
+		progress: '[data-playbooks-progress]',
+		card: '[data-playbooks-card]',
+	});
 	requestAnimationFrame(() => {
 		ScrollTrigger.refresh();
 		initStoryTextFills(main);
@@ -738,7 +818,12 @@ function initShapeWipes(main: Element): void {
 	sections.forEach((section, index) => {
 		// Pinned stories + brand sticky timeline own their scroll; clipping the
 		// wrapper breaks pin/scrub and overflow-hidden kills position:sticky.
-		if (section.dataset.story !== undefined || section.dataset.brandTimeline !== undefined) {
+		if (
+			section.dataset.story !== undefined ||
+			section.dataset.brandTimeline !== undefined ||
+			section.dataset.playbooksTimeline !== undefined ||
+			section.dataset.capacityTimeline !== undefined
+		) {
 			gsap.set(section, { clearProps: 'clipPath' });
 			section.style.clipPath = '';
 			return;
@@ -765,14 +850,142 @@ function initShapeWipes(main: Element): void {
 	});
 }
 
+type HorizontalTimelineConfig = {
+	id: string;
+	section: string;
+	pin: string;
+	track: string;
+	progress: string;
+	card: string;
+};
+
+function initHorizontalTimeline(
+	main: Element,
+	reduce: boolean,
+	config: HorizontalTimelineConfig,
+): void {
+	const section = main.querySelector<HTMLElement>(config.section);
+	const pin = section?.querySelector<HTMLElement>(config.pin);
+	const track = section?.querySelector<HTMLElement>(config.track);
+	const progress = section?.querySelector<HTMLElement>(config.progress);
+	const cards = gsap.utils.toArray<HTMLElement>(section?.querySelectorAll(config.card) ?? []);
+	if (!section || !pin || !track || cards.length < 2) return;
+
+	const maxShift = () => Math.max(0, track.scrollWidth - pin.clientWidth);
+
+	gsap.set(track, { x: 0 });
+	gsap.set(cards, { opacity: 1, y: 0 });
+	if (progress) gsap.set(progress, { width: reduce ? '100%' : '0%' });
+	if (reduce) return;
+
+	// Create after story pins so start/end land on the real document flow.
+	ScrollTrigger.create({
+		id: config.id,
+		trigger: section,
+		start: 'top top',
+		end: () => `+=${maxShift() + window.innerHeight * 0.35}`,
+		scrub: 0.55,
+		pin,
+		pinSpacing: true,
+		anticipatePin: 0,
+		invalidateOnRefresh: true,
+		onRefresh: () => {
+			gsap.set(track, { x: 0 });
+			if (progress) gsap.set(progress, { width: '0%' });
+		},
+		onUpdate: (self) => {
+			const shift = maxShift();
+			gsap.set(track, { x: -shift * self.progress });
+			if (progress) gsap.set(progress, { width: `${self.progress * 100}%` });
+		},
+	});
+}
+
+function initFaqAccordion(main: Element): void {
+	const list = main.querySelector<HTMLElement>('[data-faq-list]');
+	if (!list) return;
+
+	const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	const items = gsap.utils.toArray<HTMLDetailsElement>(list.querySelectorAll('details'));
+	const duration = reduce ? 0.01 : 0.32;
+	const ease = 'power3.inOut';
+
+	const panelOf = (details: HTMLDetailsElement) =>
+		details.querySelector<HTMLElement>('[data-faq-panel]');
+
+	const closeItem = (details: HTMLDetailsElement) => {
+		const panel = panelOf(details);
+		if (!details.open) return;
+		if (!panel) {
+			details.open = false;
+			return;
+		}
+		gsap.killTweensOf(panel);
+		gsap.to(panel, {
+			height: 0,
+			duration,
+			ease,
+			onComplete: () => {
+				details.open = false;
+				gsap.set(panel, { clearProps: 'height' });
+			},
+		});
+	};
+
+	const openItem = (details: HTMLDetailsElement) => {
+		const panel = panelOf(details);
+		items.forEach((other) => {
+			if (other !== details) closeItem(other);
+		});
+		if (details.open) return;
+		details.open = true;
+		if (!panel) return;
+		gsap.killTweensOf(panel);
+		gsap.fromTo(
+			panel,
+			{ height: 0 },
+			{
+				height: 'auto',
+				duration,
+				ease,
+			},
+		);
+	};
+
+	items.forEach((details) => {
+		const panel = panelOf(details);
+		if (panel && !details.open) gsap.set(panel, { height: 0 });
+
+		const summary = details.querySelector('summary');
+		summary?.addEventListener('click', (event) => {
+			event.preventDefault();
+			if (details.open) closeItem(details);
+			else openItem(details);
+		});
+
+		// Close from anywhere on the open card (answer body included).
+		details.addEventListener('click', (event) => {
+			if (!details.open) return;
+			const target = event.target as Node | null;
+			if (target && summary?.contains(target)) return;
+			event.preventDefault();
+			closeItem(details);
+		});
+	});
+}
+
 function initVideoCursor(main: Element, heroApi: HeroApi): void {
 	const cursor = document.querySelector<HTMLElement>('[data-video-cursor]');
 	const label = document.querySelector<HTMLElement>('[data-video-cursor-label]');
-	const icon = document.querySelector<HTMLElement>('[data-video-cursor-icon]');
+	const iconPan = document.querySelector<HTMLElement>('[data-video-cursor-icon="pan"]');
+	const iconHand = document.querySelector<HTMLElement>('[data-video-cursor-icon="hand"]');
+	const iconGrab = document.querySelector<HTMLElement>('[data-video-cursor-icon="grab"]');
 	const videos = gsap.utils.toArray<HTMLVideoElement>(main.querySelectorAll('[data-demo-loop]'));
 	const heroHotspot = main.querySelector<HTMLElement>('[data-video-hotspot]');
 	const goTargets = gsap.utils.toArray<HTMLElement>(document.querySelectorAll('[data-cursor-go]'));
-	const panTargets = gsap.utils.toArray<HTMLElement>(main.querySelectorAll('[data-h-scroll]'));
+	const panTargets = gsap.utils.toArray<HTMLElement>(
+		main.querySelectorAll('[data-h-scroll], [data-canvas-pan]'),
+	);
 	if (!cursor) return;
 
 	const playLabel = cursor.dataset.playLabel ?? 'Play';
@@ -781,19 +994,23 @@ function initVideoCursor(main: Element, heroApi: HeroApi): void {
 	const scrollLabel = cursor.dataset.scrollLabel ?? 'Scroll';
 	const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-	type CursorMode = 'scroll' | 'toggle' | 'go' | 'pan';
+	type CursorMode = 'scroll' | 'toggle' | 'go' | 'pan' | 'grab' | 'grabbing';
 
 	const videoModeOf = (): 'scroll' | 'toggle' =>
 		heroHotspot?.dataset.hotspotMode === 'toggle' ? 'toggle' : 'scroll';
 
+	const syncIcons = (mode: CursorMode) => {
+		iconPan?.classList.toggle('hidden', mode !== 'pan');
+		iconHand?.classList.toggle('hidden', mode !== 'grab');
+		iconGrab?.classList.toggle('hidden', mode !== 'grabbing');
+		const iconMode = mode === 'pan' || mode === 'grab' || mode === 'grabbing';
+		if (label) label.classList.toggle('hidden', iconMode);
+	};
+
 	const syncLabel = (mode: CursorMode) => {
-		if (icon) icon.classList.toggle('hidden', mode !== 'pan');
-		if (label) label.classList.toggle('hidden', mode === 'pan');
+		syncIcons(mode);
 		if (!label) return;
-		if (mode === 'pan') {
-			label.textContent = scrollLabel;
-			return;
-		}
+		if (mode === 'pan' || mode === 'grab' || mode === 'grabbing') return;
 		if (mode === 'go') {
 			label.textContent = goLabel;
 			return;
@@ -857,6 +1074,11 @@ function initVideoCursor(main: Element, heroApi: HeroApi): void {
 		scale: cursorScaleHidden,
 	});
 
+	const hasTextSelection = () => {
+		const selection = window.getSelection();
+		return Boolean(selection && !selection.isCollapsed && selection.toString().length > 0);
+	};
+
 	const showCursor = (mode: CursorMode) => {
 		const wasHidden = cursor.dataset.visible !== 'true';
 		const prevMode = cursor.dataset.mode;
@@ -881,7 +1103,10 @@ function initVideoCursor(main: Element, heroApi: HeroApi): void {
 	};
 
 	const hideCursor = () => {
-		if (cursor.dataset.visible !== 'true') return;
+		if (cursor.dataset.visible !== 'true') {
+			document.documentElement.classList.remove('cursor-none');
+			return;
+		}
 		cursor.dataset.visible = 'false';
 		document.documentElement.classList.remove('cursor-none');
 		gsap.to(cursor, {
@@ -893,22 +1118,26 @@ function initVideoCursor(main: Element, heroApi: HeroApi): void {
 	};
 
 	const modeAtPoint = (x: number, y: number): CursorMode | null => {
+		if (hasTextSelection()) return null;
 		const el = document.elementFromPoint(x, y);
 		if (!el) return null;
 		if (heroHotspot && (el === heroHotspot || heroHotspot.contains(el))) return videoModeOf();
 		if (el.closest('[data-cursor-go]')) return 'go';
+		const canvas = el.closest<HTMLElement>('[data-canvas-pan]');
+		if (canvas) return canvas.dataset.dragging === 'true' ? 'grabbing' : 'grab';
 		if (el.closest('[data-h-scroll]')) return 'pan';
 		return null;
 	};
 
-	/** Scroll/pin moves targets under a still pointer; pointerleave often never fires. */
+	/** Hit-test under the real pointer. Scroll/pin + text selection skip pointerleave. */
 	const refreshCursorFromPoint = () => {
 		const mode = modeAtPoint(lastX, lastY);
 		if (!mode) {
-			if (cursor.dataset.visible === 'true') hideCursor();
+			hideCursor();
 			return;
 		}
 		showCursor(mode);
+		if (mode === 'toggle' || mode === 'scroll') syncLabel(mode);
 	};
 
 	const scheduleRefresh = () => {
@@ -919,42 +1148,42 @@ function initVideoCursor(main: Element, heroApi: HeroApi): void {
 		});
 	};
 
-	const moveCursor = (event: PointerEvent) => {
+	const onPointerMove = (event: PointerEvent) => {
 		lastX = event.clientX;
 		lastY = event.clientY;
-		gsap.to(cursor, {
-			x: lastX,
-			y: lastY,
-			duration: 0.45,
-			ease: 'power3.out',
-			overwrite: 'auto',
-		});
+		if (cursor.dataset.visible === 'true') {
+			gsap.to(cursor, {
+				x: lastX,
+				y: lastY,
+				duration: 0.45,
+				ease: 'power3.out',
+				overwrite: 'auto',
+			});
+		} else {
+			gsap.set(cursor, { x: lastX, y: lastY });
+		}
+		scheduleRefresh();
 	};
 
-	if (heroHotspot) {
-		heroHotspot.addEventListener('pointerenter', () => showCursor(videoModeOf()));
-		heroHotspot.addEventListener('pointerleave', hideCursor);
-		heroHotspot.addEventListener('pointermove', (event) => {
-			moveCursor(event);
-			if (cursor.dataset.visible === 'true') syncLabel(videoModeOf());
-		});
-		heroHotspot.addEventListener('click', onHotspotClick);
-	}
+	heroHotspot?.addEventListener('click', onHotspotClick);
 
 	goTargets.forEach((target) => {
 		target.classList.add('cursor-none');
-		target.addEventListener('pointerenter', () => showCursor('go'));
-		target.addEventListener('pointerleave', hideCursor);
-		target.addEventListener('pointermove', moveCursor);
 	});
 
 	panTargets.forEach((target) => {
 		target.classList.add('cursor-none');
-		target.addEventListener('pointerenter', () => showCursor('pan'));
-		target.addEventListener('pointerleave', hideCursor);
-		target.addEventListener('pointermove', moveCursor);
 	});
 
+	// Follow the real pointer globally so the ring never sticks while html has cursor-none.
+	window.addEventListener('pointermove', onPointerMove, { passive: true });
+	window.addEventListener('pointerdown', scheduleRefresh, { passive: true });
+	window.addEventListener('pointerup', scheduleRefresh, { passive: true });
+	window.addEventListener('blur', hideCursor);
+	document.addEventListener('visibilitychange', () => {
+		if (document.hidden) hideCursor();
+	});
+	document.addEventListener('selectionchange', scheduleRefresh);
 	window.addEventListener('scroll', scheduleRefresh, { passive: true });
 	window.addEventListener('resize', scheduleRefresh);
 }

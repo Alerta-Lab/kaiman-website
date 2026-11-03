@@ -1,4 +1,4 @@
-/** Customer-facing plans from kaimanstudio.ai pricing (ES). */
+/** Customer-facing plans from the public Kaiman Studio pricing. */
 export const plans = [
 	{
 		id: 'start',
@@ -11,10 +11,10 @@ export const plans = [
 	{
 		id: 'pro',
 		monthlyUsd: 99,
-		credits: 1200,
+		credits: 1500,
 		seats: 3,
 		storageGb: 3,
-		brands: null,
+		brands: 3,
 	},
 	{
 		id: 'scale',

@@ -82,10 +82,10 @@ export const landing = {
 			'Every business needs to create marketing constantly. Today more than ever, small and mid-size companies especially need to do it to win customers.',
 		body: 'Most people use artificial intelligence to create their posts. But with every new generation, their brand can lose consistency because the AI does not keep essential details present, such as:',
 		points: [
-			{ label: 'Colors', image: '/brand/point-colors.jpg' },
-			{ label: 'Typefaces', image: '/brand/point-type.jpg' },
-			{ label: 'Communication tone', image: '/brand/point-tone.jpg' },
-			{ label: 'Visual style', image: '/brand/point-style.jpg' },
+			{ label: 'Colors', image: '/brand/point-colors.webp' },
+			{ label: 'Typefaces', image: '/brand/point-type.webp' },
+			{ label: 'Communication tone', image: '/brand/point-tone.webp' },
+			{ label: 'Visual style', image: '/brand/point-style.webp' },
 		],
 		consequence:
 			'Without those details, their content starts to look like everyone else’s and loses something fundamental: what makes their brand unique.',
@@ -113,6 +113,24 @@ export const landing = {
 			{
 				title: 'Learns with you',
 				body: 'As you work, your decisions and preferences enrich what Kaiman understands about your business, turning it into a partner that is increasingly ready to work with you.',
+				images: {
+					left: [
+						{
+							src: '/brand/showcase-salsana.webp',
+							alt: 'Salsana brand piece made with Kaiman context',
+						},
+						{
+							src: '/brand/showcase-carlos.webp',
+							alt: 'Carlos brand piece made with Kaiman context',
+						},
+					],
+					right: [
+						{
+							src: '/brand/showcase-martinez.webp',
+							alt: 'Martinez profile with a coherent visual identity',
+						},
+					],
+				},
 			},
 		],
 		understandsLabel: 'Kaiman understands:',
@@ -328,7 +346,9 @@ export const landing = {
 	finder: {
 		title: 'How many pieces do you need each month',
 		intro:
-			'Enter images, videos, scripts, audio, presentations, and websites. The result uses reference credits and points to the plan that covers that volume.',
+			'Enter images, videos, scripts, audio, presentations, and websites. The result is an approximate estimate of credits and of the plan that could cover that volume.',
+		disclaimer:
+			'This estimate is approximate and can vary by tool, the real length of each piece, and current prices on the platform.',
 		image: 'Images',
 		video: 'Video',
 		script: 'Scripts',
@@ -343,13 +363,13 @@ export const landing = {
 		medium: '15 seconds',
 		empty: 'Enter at least one piece to see a plan.',
 		error: 'Use whole numbers between 0 and 500.',
-		creditsLabel: 'Estimated credits per month',
-		planLabel: 'Plan that covers this volume',
+		creditsLabel: 'Estimated credits per month (approximate)',
+		planLabel: 'Reference plan for this volume',
 		unitLabel: 'Reference cost per credit on that plan',
 		enterprise:
-			'This volume exceeds the 2,500 credits of the Premium plan. Enterprise is built to fit.',
+			'This volume exceeds the 2,500 credits of the Business plan. Corporate is built to fit.',
 		assumption:
-			'Calculation reference: 1 credit per image, 1 credit per script, 3 credits per second of edited video (the video slider is in minutes), 2 credits per minute of audio, 5 credits per presentation, and 15 credits per website. The platform script generator currently does not charge credits; the 1 credit per script is used to size the plan.',
+			'Approximate calculation reference: 1 credit per image, 1 credit per script, 3 credits per second of edited video (the video slider is in minutes), 2 credits per minute of audio, 5 credits per presentation, and 15 credits per website. The platform script generator currently does not charge credits; the 1 credit per script is used only to size the plan. Actual usage can vary.',
 		perMonth: 'per month',
 		cta: 'Get this plan',
 	},
@@ -357,7 +377,7 @@ export const landing = {
 		title: 'Better marketing should be within reach for your business.',
 		intro:
 			'Choose the plan that best fits your company’s needs. Every Kaiman plan starts from the same Brand Understanding and gives you access to marketing capabilities designed to help you work better and more efficiently.',
-		perMonth: 'per month',
+		perMonth: 'USD',
 		credits: 'credits',
 		seat: 'seat',
 		seats: 'seats',
@@ -365,40 +385,29 @@ export const landing = {
 		brand: 'brand',
 		brands: 'brands',
 		perCredit: 'per credit',
-		cta: 'Start your free trial',
-		enterpriseTitle: 'Enterprise',
-		enterpriseBody:
-			'Custom pricing. For organizations that need credits, seats, or brands beyond these three plans.',
-		enterpriseCta: 'Email Alerta',
+		cta: 'Register now',
+		popular: 'Most popular',
+		custom: 'Custom',
+		enterpriseCta: 'Book a call',
 		names: {
-			start: 'Basic',
-			pro: 'Medium',
-			scale: 'Premium',
+			start: 'Essential',
+			pro: 'Professional',
+			scale: 'Business',
+			enterprise: 'Corporate',
+		},
+		taglines: {
+			start: 'For individuals getting started with AI-powered marketing.',
+			pro: 'For growing teams ready to go further.',
+			scale: 'For teams that need scale, collaboration, and visibility.',
+			enterprise: 'For organizations with complex needs.',
 		},
 		blurbs: {
-			start: 'One person, one brand, and 500 credits per month.',
-			pro: 'Up to 3 seats and 1,200 credits per month.',
-			scale: 'Up to 5 seats, 5 brands, and 2,500 credits per month.',
+			start: 'Best for solopreneurs looking to work smarter with AI.',
+			pro: 'Best for freelancers or lean marketing teams managing one or more brands.',
+			scale: 'Best for established teams and organizations coordinating marketing efforts.',
+			enterprise:
+				'Custom pricing and allowance. For organizations that need credits, seats, or brands beyond these three plans, or an AI marketing copilot tailored to how they work.',
 		},
-	},
-	packs: {
-		title: 'Extra credits',
-		intro:
-			'If the plan allowance is not enough, the platform sells one-time packs. The credit price in these packs is higher than the monthly plan.',
-		credits: 'credits',
-		perCredit: 'per credit',
-	},
-	rates: {
-		title: 'What a credit covers',
-		intro: 'Reference costs published in the platform catalog. They can change by tool.',
-		rows: [
-			{ name: 'Ad image', detail: '1 credit per image' },
-			{ name: 'Edited video', detail: '3 credits per second' },
-			{ name: 'Audio / voice', detail: '2 credits per minute' },
-			{ name: 'Presentation', detail: '5 credits per piece' },
-			{ name: 'Website', detail: '15 credits per piece' },
-			{ name: 'Script generator', detail: 'No credit charge' },
-		],
 	},
 	playbooks: {
 		title: 'You do not need to know where to start. Kaiman does.',
@@ -428,8 +437,25 @@ export const landing = {
 			},
 		],
 	},
+	blog: {
+		eyebrow: 'Blog',
+		title: 'Latest published articles',
+		body: 'Short reads on product, brand, and artificial intelligence applied to your business marketing.',
+		cta: 'Browse all articles',
+		read: 'Read',
+		empty: 'No published articles yet.',
+	},
+	blog: {
+		eyebrow: 'Blog',
+		title: 'Latest published articles',
+		body: 'Short reads on product, brand, and artificial intelligence applied to your business marketing.',
+		cta: 'Browse all articles',
+		read: 'Read',
+		empty: 'No published articles yet.',
+	},
 	faq: {
 		title: 'Frequently asked questions',
+		lead: 'Answers about the product, plans, and how Kaiman works with your business.',
 		items: [
 			{
 				q: 'Do I need to know marketing to use Kaiman?',
@@ -453,7 +479,7 @@ export const landing = {
 			},
 			{
 				q: 'Can I manage more than one brand or business from my account?',
-				a: 'Yes, depending on the plan. Basic includes 1 brand. Premium includes up to 5 brands. Medium focuses on seats and credits for a small team.',
+				a: 'Yes, depending on the plan. Essential includes 1 brand. Professional includes up to 3 brands. Business includes up to 5 brands. Corporate is defined to fit.',
 			},
 			{
 				q: 'What does the free trial include?',
@@ -469,6 +495,8 @@ export const landing = {
 		title: 'Your business already has a lot to teach Kaiman.',
 		body: 'Start by telling it who you are, what you do, and what you want to achieve. Kaiman will use that knowledge to help you do better marketing, more efficiently.',
 		cta: 'Start your free trial',
+		alertaCta: 'About Alerta',
+		imageAlt: 'Placeholder for closing image',
 		lines: [
 			'You do not need to know marketing.',
 			'You do not need to learn artificial intelligence.',

@@ -1,6 +1,6 @@
 ---
 import { getRelativeLocaleUrl } from 'astro:i18n';
-import { ChevronDown, Languages } from 'lucide-react';
+import { ChevronDown, ChevronUp, Languages } from 'lucide-react';
 import { localeLabels, locales, type Locale } from '../../i18n';
 import { pathWithoutLocale, swapBlogLocalePath } from '../../lib/blog-paths';
 
@@ -9,10 +9,13 @@ interface Props {
 	label: string;
 	/** When set, switch keeps this path (locale-relative, e.g. `/blogs` or `/blogs/slug`). */
 	path?: string;
+	/** `top` opens the list upward (e.g. footer of the Sobre Kaiman menu). */
+	placement?: 'bottom' | 'top';
 }
 
-const { locale, label, path } = Astro.props;
+const { locale, label, path, placement = 'bottom' } = Astro.props;
 const currentPath = path ?? pathWithoutLocale(Astro.url.pathname);
+const dropUp = placement === 'top';
 ---
 
 <details class="group relative">
@@ -22,9 +25,28 @@ const currentPath = path ?? pathWithoutLocale(Astro.url.pathname);
 	>
 		<Languages size={16} aria-hidden="true" />
 		{localeLabels[locale]}
-		<ChevronDown size={16} aria-hidden="true" className="transition-transform duration-300 group-open:rotate-180" />
+		{
+			dropUp ? (
+				<ChevronUp
+					size={16}
+					aria-hidden="true"
+					className="transition-transform duration-300 group-open:rotate-180"
+				/>
+			) : (
+				<ChevronDown
+					size={16}
+					aria-hidden="true"
+					className="transition-transform duration-300 group-open:rotate-180"
+				/>
+			)
+		}
 	</summary>
-	<div class="absolute right-0 z-50 mt-2 min-w-40 rounded-xl bg-ink-200 p-2 shadow-[0_16px_40px_rgba(0,0,0,0.45)]">
+	<div
+		class:list={[
+			'absolute right-0 z-50 min-w-40 rounded-xl bg-ink-200 p-2 shadow-[0_16px_40px_rgba(0,0,0,0.45)]',
+			dropUp ? 'bottom-full mb-2' : 'top-full mt-2',
+		]}
+	>
 		{
 			locales.map((code) => {
 				const href =

@@ -12,9 +12,97 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-03 — Estimaciones de créditos
+
+- Finder y rates: disclaimer visible de que el cálculo es aproximado y puede variar (ES/EN). Corporativo vuelve a card dark.
+
+### 2026-11-03 — Planes Starter / Pro / Business / Enterprise
+
+- Arriba 3 cards (Esencial/Profesional/Empresarial); abajo Corporativo a ancho completo con copy de ajuste a medida (ES/EN).
+- Profesional: 1500 créditos + 3 marcas; badge «Más popular».
+
+### 2026-11-03 — Footer link hover
+
+- Links del footer: hover con underline (sin cambio de color).
+
+### 2026-11-03 — Sección últimos blogs
+
+- Tras Playbooks: `#blog` con 3 posts publicados (`listPublishedPosts`), cards dark + CTA al índice del blog; empty state i18n.
+
+### 2026-11-03 — Capacidad timeline horizontal
+
+- `#capacidad` usa el mismo patrón que Playbooks: pin + carrusel scrub + línea de progreso (`initHorizontalTimeline` compartido).
+
+### 2026-11-03 — Playbooks timeline pin order
+
+- Playbooks ST se crea después de los story pins; `anticipatePin: 0`; progreso = `maxShift` real; pin/plataforma con `bg-ink-100` para no traslapar.
+
+### 2026-11-03 — Playbooks timeline + header border
+
+- FAQ accordion ~0.32s.
+- Header bar: `border border-black-stroke` (#404040).
+- `#playbooks`: pin + carrusel horizontal scrub; línea de progreso; cards numeradas tipo timeline.
+
+### 2026-11-03 — FAQ cierra en toda la card
+
+- Con `details` abierto, un click en el cuerpo de la respuesta también cierra (no solo el `summary`).
+
+### 2026-11-03 — CTA final 2 columnas
+
+- Cierre: copy + CTAs izq. (primario signup, secundario wearealerta.com); der. placeholder de imagen (`final.imageAlt` ES/EN) listo para asset.
+
+### 2026-11-03 — Chapter rail sync
+
+- Rail incluye `plataforma` y etiquetas reales (Producto, Brand Understanding, etc.).
+- Hero/demo/origen siguen el scrub del curtain; el resto usa un probe de scroll (`top ≤ 42vh`) para no perder `producto` ni apagar el indicador en secciones con pin/sticky.
+
+### 2026-11-03 — Recorrido del producto
+
+- Título + texto arriba; hairline `border-white/15`; debajo las 3 cards de slots (sin cambiar copy ni placeholders).
+
+### 2026-11-03 — Plataforma vuelve a 2 columnas
+
+- Se revirtió el carrusel centrado. `#plataforma` otra vez como `data-story`: título fijo izq. + stages der. (intro → 01…05) con fill de título y `data-stage-line`.
+
+### 2026-11-03 — Gutter unificado desde plataforma
+
+- Desde `#plataforma` hasta el CTA final: sin `Container`/`max-w-content`; solo gutter Monument (`px-5 sm:px-8 lg:px-10`) como las secciones superiores. Copy puede seguir en `max-w-copy`.
+
+### 2026-11-03 — Salsana canvas masonry
+
+- «Misma marca, varias piezas»: 2 cols (título izq. / canvas der.); sección `h-svh max-h-svh`; canvas `h-full` sin forzar alto extra.
+- Cursor canvas: mano (`grab`) / mano cerrada al drag (`grabbing`).
+
+### 2026-11-03 — Brand timeline gallery panel
+
+- Paso 03: collage sin crop — izq. 2×16:9, der. 9:16; columnas `flex-[128]/[81]`; Martinez WebP vertical.
+- Cerrar menú: `cursor-pointer`.
+
+### 2026-11-03 — FAQ dos columnas (miligram)
+
+- `#preguntas`: título + lead sticky izq.; acordeón der. con hairlines y `+` a la izquierda (sin cards).
+- Hairline vertical en la columna de preguntas (`lg:border-l`), no en el aside.
+- Una sola `details` abierta; activa `bg-white` + texto ink; altura animada GSAP (~0.55s); textos `select-none`.
+- Mismo gutter/grid Monument (`1fr / 1.05fr`); lead ES/EN en `faq.lead`.
+
+### 2026-11-03 — Gutter full-bleed Monument
+
+- Columna compartida: `px-5 sm:px-8 lg:px-10` (sin `max-w-content`) en Brand Understanding, audiencias y perfiles, alineada al grid de producto/consistencia.
+- Grid 2 cols `1fr / 1.05fr` + hairline vertical en Brand Understanding.
+
+### 2026-11-03 — Brand Understanding sticky stack (miligram)
+
+- Sección sin pin GSAP: columna izq. sticky (eyebrow + título + copy) y paneles der. `lg:sticky top-0` con `bg-ink-100` y z-index creciente para que el siguiente se pegue y empuje/cubra al anterior.
+- Tags «Kaiman entiende» como pills outline en el primer panel; títulos de paso en `font-display` italic.
+
 ### 2026-11-03 — Leads de audiencia en primary
 
 - Perfiles (Martinez/Ana/Carlos/Sofia): `lead` como headline (`font-display`) en `text-primary`.
+
+### 2026-11-03 — Imágenes consistencia optimizadas
+
+- `colors/typography/comunication/visual.png` (~1.4MB c/u) → `public/brand/point-*.webp` (~10–26KB), ancho máx. 1200.
+- PNG pesados eliminados; cards usan `<img>` con esas rutas.
 
 ### 2026-11-03 — Producto/consistencia diagram Monument
 

@@ -92,7 +92,7 @@ export function PlanFinder({ copy, planNames }: PlanFinderProps) {
 	const result = useMemo(() => {
 		if (!planId) return null;
 		if (planId === 'enterprise') {
-			return { name: 'Enterprise', price: null as string | null, unit: null as string | null };
+			return { name: planNames.enterprise, price: null as string | null, unit: null as string | null };
 		}
 		if (!plan) return null;
 		return {
