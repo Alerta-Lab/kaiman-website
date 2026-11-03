@@ -1,4 +1,4 @@
-import { index, pgEnum, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import { index, jsonb, pgEnum, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 
 export const postStatus = pgEnum('post_status', ['draft', 'published']);
 export const contentLocale = pgEnum('content_locale', ['es', 'en']);
@@ -23,6 +23,15 @@ export const sessions = pgTable(
 	(table) => [uniqueIndex('sessions_token_hash_idx').on(table.tokenHash), index('sessions_user_idx').on(table.userId)],
 );
 
+/** Business sector of an article (one per translation group). Tags describe its topics. */
+export const categories = pgTable('categories', {
+	id: uuid('id').defaultRandom().primaryKey(),
+	name: text('name').notNull(),
+	nameEn: text('name_en'),
+	slug: text('slug').notNull().unique(),
+	createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
 export const posts = pgTable(
 	'posts',
 	{
@@ -39,6 +48,8 @@ export const posts = pgTable(
 		seoDescription: text('seo_description').notNull(),
 		coverUrl: text('cover_url'),
 		coverAlt: text('cover_alt'),
+		categoryId: uuid('category_id').references(() => categories.id, { onDelete: 'set null' }),
+		editorial: jsonb('editorial').$type<{ coverCaption: string; coverPrompt: string; bodyAlt: string; bodyCaption: string; bodyPrompt: string; approvedAt: string | null; bodyImageUrl: string | null }>(),
 		publishedAt: timestamp('published_at', { withTimezone: true }),
 		createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 		updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
@@ -48,6 +59,7 @@ export const posts = pgTable(
 		uniqueIndex('posts_group_locale_idx').on(table.translationGroupId, table.locale),
 		index('posts_status_published_idx').on(table.status, table.publishedAt),
 		index('posts_translation_group_idx').on(table.translationGroupId),
+		index('posts_category_idx').on(table.categoryId),
 	],
 );
 
@@ -89,4 +101,5 @@ export const auditLog = pgTable('audit_log', {
 
 export type Post = typeof posts.$inferSelect;
 export type Tag = typeof tags.$inferSelect;
+export type Category = typeof categories.$inferSelect;
 export type ContentLocale = 'es' | 'en';
