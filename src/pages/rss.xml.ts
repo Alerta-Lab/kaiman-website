@@ -2,6 +2,8 @@ import type { APIRoute } from 'astro';
 import { blogPostPath } from '../lib/blog-paths';
 import { listPublishedPosts } from '../server/repositories/posts';
 
+export const prerender = true;
+
 const escape = (value: string) =>
 	value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 

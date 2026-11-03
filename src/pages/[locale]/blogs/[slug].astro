@@ -2,11 +2,24 @@
 import { ArrowLeft } from 'lucide-react';
 import PublicFooter from '../../../components/blog/organisms/PublicFooter.astro';
 import PublicHeader from '../../../components/blog/organisms/PublicHeader.astro';
-import { isLocale, type Locale } from '../../../i18n';
+import { isLocale, locales, type Locale } from '../../../i18n';
 import BlogLayout from '../../../layouts/BlogLayout.astro';
 import { blogCategoryPath, blogIndexPath, blogPostPath } from '../../../lib/blog-paths';
 import { renderMarkdown } from '../../../lib/markdown';
-import { getPublishedPost, getSiblingPost, tagDisplayName } from '../../../server/repositories/posts';
+import { getPublishedPost, getSiblingPost, listPublishedPosts, tagDisplayName } from '../../../server/repositories/posts';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+	const paths: { params: { locale: Locale; slug: string } }[] = [];
+	for (const locale of locales) {
+		const posts = await listPublishedPosts({ locale });
+		for (const post of posts) {
+			paths.push({ params: { locale, slug: post.slug } });
+		}
+	}
+	return paths;
+}
 
 const param = Astro.params.locale;
 if (!param || !isLocale(param)) return Astro.redirect('/es/blogs');

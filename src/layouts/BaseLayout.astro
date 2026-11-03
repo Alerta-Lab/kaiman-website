@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import type { Locale } from '../i18n';
+import { asset } from '../lib/asset';
 
 interface Props {
 	locale: Locale;
@@ -20,8 +21,8 @@ const { locale, title, description } = Astro.props;
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
 		<meta property="og:type" content="website" />
-		<link rel="icon" type="image/png" href="/brand/favicon.png" />
-		<link rel="icon" href="/favicon.ico" />
+		<link rel="icon" type="image/png" href={asset('/brand/favicon.png')} />
+		<link rel="icon" href={asset('/favicon.ico')} />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 	</head>

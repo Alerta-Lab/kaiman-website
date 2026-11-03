@@ -16,6 +16,7 @@ import {
 	plans,
 	signupUrl,
 } from '../../lib/plans';
+import { asset } from '../../lib/asset';
 import { listPublishedPosts } from '../../server/repositories/posts';
 import { PieceGallery } from '../gallery/PieceGallery';
 import { PlanFinder } from '../plan/PlanFinder';
@@ -29,8 +30,8 @@ const { locale } = Astro.props;
 const copy = getLanding(locale);
 const latestPosts = await listPublishedPosts({ limit: 3, locale });
 const blogHref = blogIndexPath(locale);
-const demoPoster = locale === 'en' ? '/video/demo-en-poster.jpg' : '/video/demo-es-poster.jpg';
-const demoVideo = locale === 'en' ? '/video/demo-en.mp4' : '/video/demo-es.mp4';
+const demoPoster = asset(locale === 'en' ? '/video/demo-en-poster.jpg' : '/video/demo-es-poster.jpg');
+const demoVideo = asset(locale === 'en' ? '/video/demo-en.mp4' : '/video/demo-es.mp4');
 
 const gutter = 'px-5 sm:px-8 lg:px-10';
 const panel =
@@ -55,16 +56,16 @@ const chapters = [
 ];
 
 const audiencePhotos: Record<string, string> = {
-	professionals: '/martinez.png',
-	products: '/ana.png',
-	sellers: '/carlos.png',
-	creators: '/sofia.png',
+	professionals: asset('/martinez.png'),
+	products: asset('/ana.png'),
+	sellers: asset('/carlos.png'),
+	creators: asset('/sofia.png'),
 };
 
 const tourMedia = [
-	'/brand/showcase-salsana.webp',
-	locale === 'en' ? '/video/demo-en-poster.jpg' : '/video/demo-es-poster.jpg',
-	'/demos/salsana/pieza-2.webp',
+	asset('/brand/showcase-salsana.webp'),
+	asset(locale === 'en' ? '/video/demo-en-poster.jpg' : '/video/demo-es-poster.jpg'),
+	asset('/demos/salsana/pieza-2.webp'),
 ] as const;
 
 const origenLead = copy.origin.paragraphs[0] ?? '';
@@ -385,7 +386,7 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 									>
 										<div class="aspect-video overflow-hidden bg-ink-200">
 											<img
-												src={point.image}
+												src={asset(point.image)}
 												alt=""
 												width="1200"
 												height="675"
@@ -495,7 +496,7 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 											{step.images.left.map((image) => (
 												<div class="overflow-hidden bg-ink">
 													<img
-														src={image.src}
+														src={asset(image.src)}
 														alt={image.alt}
 														width="1600"
 														height="900"
@@ -509,7 +510,7 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 										<div class="min-w-0 overflow-hidden bg-ink">
 											{step.images.right.map((image) => (
 												<img
-													src={image.src}
+													src={asset(image.src)}
 													alt={image.alt}
 													width="900"
 													height="1600"

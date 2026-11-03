@@ -12,6 +12,12 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-03 — GitHub Pages
+
+- Workflow `.github/workflows/deploy-github-pages.yml` (Astro static, no Jekyll).
+- `pnpm build:pages` + `GITHUB_PAGES=true` → `base: /kaiman-website`, sin adapter Vercel; aparca `/api` y `/admin` durante el build.
+- En Settings → Pages: Source = **GitHub Actions**.
+
 ### 2026-11-03 — Nav con entrada de cortinas
 
 - Enlaces in-page (Sobre Kaiman, Planes, footer, rail): no ancla suave; barras negras cubren, saltan al destino y abren (misma entrada que el load).

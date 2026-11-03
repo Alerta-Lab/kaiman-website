@@ -2,6 +2,8 @@ import type { APIRoute } from 'astro';
 import { blogCategoryPath, blogIndexPath, blogPostPath } from '../lib/blog-paths';
 import { listPublishedPosts, listTags } from '../server/repositories/posts';
 
+export const prerender = true;
+
 const escape = (value: string) => value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 
 export const GET: APIRoute = async ({ site }) => {

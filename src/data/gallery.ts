@@ -1,5 +1,7 @@
 /** Shared media for every locale. Labels come from the dictionaries. */
 
+import { asset } from '../lib/asset';
+
 export type GalleryOrientation = 'portrait' | 'landscape' | 'square';
 
 type GalleryBase = {
@@ -12,25 +14,25 @@ type GalleryBase = {
 const mediaPool: GalleryBase[] = [
 	{
 		kind: 'image',
-		src: '/demos/salsana/pieza-2.webp',
+		src: asset('/demos/salsana/pieza-2.webp'),
 		tool: 'image',
 		altKey: 'imageAlt',
 	},
 	{
 		kind: 'video',
-		src: '/demos/salsana/pieza-1.mp4',
+		src: asset('/demos/salsana/pieza-1.mp4'),
 		tool: 'video',
 		altKey: 'videoAlt',
 	},
 	{
 		kind: 'image',
-		src: '/demos/salsana/pieza-dulce.webp',
+		src: asset('/demos/salsana/pieza-dulce.webp'),
 		tool: 'image',
 		altKey: 'sweetAlt',
 	},
 	{
 		kind: 'video',
-		src: '/demos/salsana/pieza-2.mp4',
+		src: asset('/demos/salsana/pieza-2.mp4'),
 		tool: 'video',
 		altKey: 'videoAlt',
 	},
