@@ -254,93 +254,141 @@ function initLandingGsapInner(main: Element, reduce: boolean): void {
 		});
 	});
 
-	stories.forEach((story, storyIndex) => {
-		const pin = story.querySelector<HTMLElement>('[data-story-pin]');
-		const stages = gsap.utils.toArray<HTMLElement>(story.querySelectorAll('[data-story-stage]'));
-		if (!pin || stages.length < 2) return;
+	const desktop = gsap.matchMedia();
 
-		const segment = 1;
-		// Longer crossfade so stage changes read as opacity, not a hard cut.
-		const fade = 0.55;
-
-		gsap.set(stages, { opacity: 0, x: 0, y: 36, pointerEvents: 'none' });
-		gsap.set(stages[0], { opacity: 1, x: 0, y: 0, pointerEvents: 'auto' });
-
-		stages.forEach((stage, index) => {
-			const lines = stage.querySelectorAll<HTMLElement>('[data-stage-line]');
-			const fill = stage.querySelector<HTMLElement>('[data-platform-fill]');
-			if (index === 0) {
-				if (lines.length) gsap.set(lines, { opacity: 1, y: 0 });
-				if (fill) gsap.set(fill, { clipPath: 'inset(0 0 0% 0)' });
-				return;
-			}
-			if (lines.length) gsap.set(lines, { opacity: 0, y: 28 });
-			if (fill) gsap.set(fill, { clipPath: 'inset(0 0 100% 0)' });
+	// Mobile/tablet: stacked document flow, no pin/scrub (Monument-simple).
+	desktop.add('(max-width: 1023px)', () => {
+		stories.forEach((story) => {
+			const stages = gsap.utils.toArray<HTMLElement>(story.querySelectorAll('[data-story-stage]'));
+			gsap.set(stages, { clearProps: 'all', opacity: 1, x: 0, y: 0, pointerEvents: 'auto' });
+			stages.forEach((stage) => {
+				const lines = stage.querySelectorAll<HTMLElement>('[data-stage-line]');
+				const fill = stage.querySelector<HTMLElement>('[data-platform-fill]');
+				if (lines.length) gsap.set(lines, { clearProps: 'all', opacity: 1, y: 0 });
+				if (fill) gsap.set(fill, { clearProps: 'clipPath', clipPath: 'none' });
+			});
 		});
 
-		const tl = gsap.timeline({
-			scrollTrigger: {
-				id: `story-${story.id || storyIndex}`,
-				trigger: story,
-				start: 'top top',
-				end: () => `+=${stages.length * 100}%`,
-				scrub: 0.95,
-				pin: pin,
-				anticipatePin: 1,
-				invalidateOnRefresh: true,
-			},
+		main.querySelectorAll<HTMLElement>('[data-capacity-track], [data-playbooks-track]').forEach((track) => {
+			gsap.set(track, { clearProps: 'transform', x: 0 });
+		});
+		main.querySelectorAll<HTMLElement>('[data-capacity-progress], [data-playbooks-progress]').forEach((bar) => {
+			gsap.set(bar, { width: '100%' });
+		});
+	});
+
+	// Desktop: pinned story stages + horizontal timelines + shape wipes.
+	desktop.add('(min-width: 1024px)', () => {
+		stories.forEach((story, storyIndex) => {
+			const pin = story.querySelector<HTMLElement>('[data-story-pin]');
+			const stages = gsap.utils.toArray<HTMLElement>(story.querySelectorAll('[data-story-stage]'));
+			if (!pin || stages.length < 2) return;
+
+			const segment = 1;
+			const fade = 0.55;
+
+			gsap.set(stages, { opacity: 0, x: 0, y: 36, pointerEvents: 'none' });
+			gsap.set(stages[0], { opacity: 1, x: 0, y: 0, pointerEvents: 'auto' });
+
+			stages.forEach((stage, index) => {
+				const lines = stage.querySelectorAll<HTMLElement>('[data-stage-line]');
+				const fill = stage.querySelector<HTMLElement>('[data-platform-fill]');
+				if (index === 0) {
+					if (lines.length) gsap.set(lines, { opacity: 1, y: 0 });
+					if (fill) gsap.set(fill, { clipPath: 'inset(0 0 0% 0)' });
+					return;
+				}
+				if (lines.length) gsap.set(lines, { opacity: 0, y: 28 });
+				if (fill) gsap.set(fill, { clipPath: 'inset(0 0 100% 0)' });
+			});
+
+			const tl = gsap.timeline({
+				scrollTrigger: {
+					id: `story-${story.id || storyIndex}`,
+					trigger: story,
+					start: 'top top',
+					end: () => `+=${stages.length * 100}%`,
+					scrub: 0.95,
+					pin: pin,
+					anticipatePin: 1,
+					invalidateOnRefresh: true,
+				},
+			});
+
+			tl.to({}, { duration: segment }, 0);
+
+			for (let index = 1; index < stages.length; index += 1) {
+				const prev = stages[index - 1];
+				const stage = stages[index];
+				const at = index * segment;
+				const prevLines = prev.querySelectorAll<HTMLElement>('[data-stage-line]');
+				const prevFill = prev.querySelector<HTMLElement>('[data-platform-fill]');
+				const lines = stage.querySelectorAll<HTMLElement>('[data-stage-line]');
+				const fill = stage.querySelector<HTMLElement>('[data-platform-fill]');
+
+				gsap.set(stage, { x: 0, y: 36, opacity: 0 });
+				tl.to(
+					prev,
+					{
+						opacity: 0,
+						x: 0,
+						y: -28,
+						pointerEvents: 'none',
+						duration: fade,
+						ease: 'none',
+					},
+					at,
+				);
+				if (prevLines.length) {
+					tl.to(prevLines, { opacity: 0, y: -18, duration: fade, ease: 'none', stagger: 0.04 }, at);
+				}
+				if (prevFill) {
+					tl.to(prevFill, { clipPath: 'inset(0 0 100% 0)', duration: fade, ease: 'none' }, at);
+				}
+				tl.to(
+					stage,
+					{
+						opacity: 1,
+						x: 0,
+						y: 0,
+						pointerEvents: 'auto',
+						duration: fade,
+						ease: 'none',
+					},
+					at,
+				);
+				if (lines.length) {
+					tl.to(lines, { opacity: 1, y: 0, duration: fade, ease: 'none', stagger: 0.05 }, at);
+				}
+				if (fill) {
+					tl.to(fill, { clipPath: 'inset(0 0 0% 0)', duration: fade, ease: 'none' }, at);
+				}
+				tl.to({}, { duration: Math.max(segment - fade, 0.2) }, at + fade);
+			}
 		});
 
-		tl.to({}, { duration: segment }, 0);
+		initShapeWipes(main);
+		initHorizontalTimeline(main, reduce, {
+			id: 'capacity-timeline',
+			section: '[data-capacity-timeline]',
+			pin: '[data-capacity-pin]',
+			track: '[data-capacity-track]',
+			progress: '[data-capacity-progress]',
+			card: '[data-capacity-card]',
+		});
+		initHorizontalTimeline(main, reduce, {
+			id: 'playbooks-timeline',
+			section: '[data-playbooks-timeline]',
+			pin: '[data-playbooks-pin]',
+			track: '[data-playbooks-track]',
+			progress: '[data-playbooks-progress]',
+			card: '[data-playbooks-card]',
+		});
 
-		for (let index = 1; index < stages.length; index += 1) {
-			const prev = stages[index - 1];
-			const stage = stages[index];
-			const at = index * segment;
-			const prevLines = prev.querySelectorAll<HTMLElement>('[data-stage-line]');
-			const prevFill = prev.querySelector<HTMLElement>('[data-platform-fill]');
-			const lines = stage.querySelectorAll<HTMLElement>('[data-stage-line]');
-			const fill = stage.querySelector<HTMLElement>('[data-platform-fill]');
-
-			gsap.set(stage, { x: 0, y: 36, opacity: 0 });
-			tl.to(
-				prev,
-				{
-					opacity: 0,
-					x: 0,
-					y: -28,
-					pointerEvents: 'none',
-					duration: fade,
-					ease: 'none',
-				},
-				at,
-			);
-			if (prevLines.length) {
-				tl.to(prevLines, { opacity: 0, y: -18, duration: fade, ease: 'none', stagger: 0.04 }, at);
-			}
-			if (prevFill) {
-				tl.to(prevFill, { clipPath: 'inset(0 0 100% 0)', duration: fade, ease: 'none' }, at);
-			}
-			tl.to(
-				stage,
-				{
-					opacity: 1,
-					x: 0,
-					y: 0,
-					pointerEvents: 'auto',
-					duration: fade,
-					ease: 'none',
-				},
-				at,
-			);
-			if (lines.length) {
-				tl.to(lines, { opacity: 1, y: 0, duration: fade, ease: 'none', stagger: 0.05 }, at);
-			}
-			if (fill) {
-				tl.to(fill, { clipPath: 'inset(0 0 0% 0)', duration: fade, ease: 'none' }, at);
-			}
-			tl.to({}, { duration: Math.max(segment - fade, 0.2) }, at + fade);
-		}
+		requestAnimationFrame(() => {
+			ScrollTrigger.refresh();
+			initStoryTextFills(main);
+		});
 	});
 
 	if (rail) {
@@ -358,28 +406,7 @@ function initLandingGsapInner(main: Element, reduce: boolean): void {
 		});
 	}
 
-	// After hero/story pins so start/end map to the final layout.
-	initShapeWipes(main);
-	initHorizontalTimeline(main, reduce, {
-		id: 'capacity-timeline',
-		section: '[data-capacity-timeline]',
-		pin: '[data-capacity-pin]',
-		track: '[data-capacity-track]',
-		progress: '[data-capacity-progress]',
-		card: '[data-capacity-card]',
-	});
-	initHorizontalTimeline(main, reduce, {
-		id: 'playbooks-timeline',
-		section: '[data-playbooks-timeline]',
-		pin: '[data-playbooks-pin]',
-		track: '[data-playbooks-track]',
-		progress: '[data-playbooks-progress]',
-		card: '[data-playbooks-card]',
-	});
-	requestAnimationFrame(() => {
-		ScrollTrigger.refresh();
-		initStoryTextFills(main);
-	});
+	requestAnimationFrame(() => ScrollTrigger.refresh());
 }
 
 type HeroApi = {
@@ -692,23 +719,6 @@ function initHorizontalScrolls(main: Element): void {
 		const track = zone.querySelector<HTMLElement>('[data-h-scroll-track]');
 		if (!track) return;
 
-		const wheelTo = gsap.quickTo(track, 'scrollLeft', {
-			duration: 0.4,
-			ease: 'power3.out',
-			overwrite: true,
-		});
-
-		zone.addEventListener(
-			'wheel',
-			(event) => {
-				if (Math.abs(event.deltaY) < Math.abs(event.deltaX)) return;
-				if (track.scrollWidth <= track.clientWidth + 8) return;
-				event.preventDefault();
-				wheelTo(track.scrollLeft + event.deltaY);
-			},
-			{ passive: false },
-		);
-
 		let pointerId: number | null = null;
 		let startX = 0;
 		let origin = 0;
@@ -978,39 +988,38 @@ function initVideoCursor(main: Element, heroApi: HeroApi): void {
 	const cursor = document.querySelector<HTMLElement>('[data-video-cursor]');
 	const label = document.querySelector<HTMLElement>('[data-video-cursor-label]');
 	const iconPan = document.querySelector<HTMLElement>('[data-video-cursor-icon="pan"]');
+	const iconExpand = document.querySelector<HTMLElement>('[data-video-cursor-icon="expand"]');
 	const iconHand = document.querySelector<HTMLElement>('[data-video-cursor-icon="hand"]');
 	const iconGrab = document.querySelector<HTMLElement>('[data-video-cursor-icon="grab"]');
 	const videos = gsap.utils.toArray<HTMLVideoElement>(main.querySelectorAll('[data-demo-loop]'));
 	const heroHotspot = main.querySelector<HTMLElement>('[data-video-hotspot]');
 	const goTargets = gsap.utils.toArray<HTMLElement>(document.querySelectorAll('[data-cursor-go]'));
-	const panTargets = gsap.utils.toArray<HTMLElement>(
-		main.querySelectorAll('[data-h-scroll], [data-canvas-pan]'),
-	);
+	const canvasTargets = gsap.utils.toArray<HTMLElement>(main.querySelectorAll('[data-canvas-pan]'));
 	if (!cursor) return;
 
 	const playLabel = cursor.dataset.playLabel ?? 'Play';
 	const pauseLabel = cursor.dataset.pauseLabel ?? 'Pausa';
 	const goLabel = cursor.dataset.goLabel ?? 'Ir';
-	const scrollLabel = cursor.dataset.scrollLabel ?? 'Scroll';
 	const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-	type CursorMode = 'scroll' | 'toggle' | 'go' | 'pan' | 'grab' | 'grabbing';
+	type CursorMode = 'scroll' | 'toggle' | 'go' | 'expand' | 'grab' | 'grabbing';
 
 	const videoModeOf = (): 'scroll' | 'toggle' =>
 		heroHotspot?.dataset.hotspotMode === 'toggle' ? 'toggle' : 'scroll';
 
 	const syncIcons = (mode: CursorMode) => {
-		iconPan?.classList.toggle('hidden', mode !== 'pan');
+		iconPan?.classList.add('hidden');
+		iconExpand?.classList.toggle('hidden', mode !== 'expand');
 		iconHand?.classList.toggle('hidden', mode !== 'grab');
 		iconGrab?.classList.toggle('hidden', mode !== 'grabbing');
-		const iconMode = mode === 'pan' || mode === 'grab' || mode === 'grabbing';
+		const iconMode = mode === 'expand' || mode === 'grab' || mode === 'grabbing';
 		if (label) label.classList.toggle('hidden', iconMode);
 	};
 
 	const syncLabel = (mode: CursorMode) => {
 		syncIcons(mode);
 		if (!label) return;
-		if (mode === 'pan' || mode === 'grab' || mode === 'grabbing') return;
+		if (mode === 'expand' || mode === 'grab' || mode === 'grabbing') return;
 		if (mode === 'go') {
 			label.textContent = goLabel;
 			return;
@@ -1064,7 +1073,8 @@ function initVideoCursor(main: Element, heroApi: HeroApi): void {
 	let lastY = window.innerHeight / 2;
 	let refreshRaf = 0;
 	const cursorScaleHidden = 0.38;
-	const cursorScaleShown = (mode: CursorMode) => (mode === 'go' ? 0.92 : 1);
+	const cursorScaleShown = (mode: CursorMode) =>
+		mode === 'go' || mode === 'expand' || mode === 'grab' || mode === 'grabbing' ? 0.92 : 1;
 
 	gsap.set(cursor, {
 		xPercent: -50,
@@ -1123,9 +1133,9 @@ function initVideoCursor(main: Element, heroApi: HeroApi): void {
 		if (!el) return null;
 		if (heroHotspot && (el === heroHotspot || heroHotspot.contains(el))) return videoModeOf();
 		if (el.closest('[data-cursor-go]')) return 'go';
+		if (el.closest('[data-cursor-expand]')) return 'expand';
 		const canvas = el.closest<HTMLElement>('[data-canvas-pan]');
 		if (canvas) return canvas.dataset.dragging === 'true' ? 'grabbing' : 'grab';
-		if (el.closest('[data-h-scroll]')) return 'pan';
 		return null;
 	};
 
@@ -1171,7 +1181,7 @@ function initVideoCursor(main: Element, heroApi: HeroApi): void {
 		target.classList.add('cursor-none');
 	});
 
-	panTargets.forEach((target) => {
+	canvasTargets.forEach((target) => {
 		target.classList.add('cursor-none');
 	});
 

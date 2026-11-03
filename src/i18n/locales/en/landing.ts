@@ -327,7 +327,7 @@ export const landing = {
 		sweetAlt: 'Salsana graphic piece, sweet line',
 		videoAlt: 'Salsana video',
 		generate: 'Generate',
-		fullscreen: 'View fullscreen',
+		fullscreen: 'View larger',
 		close: 'Close',
 		tools: {
 			image: 'Image generator',
@@ -336,11 +336,20 @@ export const landing = {
 	},
 	tour: {
 		title: 'Product walkthrough',
-		body: 'These spaces are ready for the real product video and screenshots. You can replace each block when the material is ready.',
+		body: 'Three moments in the Kaiman flow: the brand it already understands, requesting a piece, and the result ready to use.',
 		slots: [
-			{ title: 'Brand profile', note: 'Space for a walkthrough of the saved brand.' },
-			{ title: 'Requesting a piece', note: 'Space for the moment an image or video is requested.' },
-			{ title: 'Finished piece', note: 'Space for the result inside the platform.' },
+			{
+				title: 'Brand profile',
+				note: 'Colors, typography, tone, and references stay saved so every piece starts from the same context.',
+			},
+			{
+				title: 'Requesting a piece',
+				note: 'You ask for an image or video with the brand already loaded; the request inherits what Kaiman knows about your business.',
+			},
+			{
+				title: 'Finished piece',
+				note: 'You get a result aligned with your identity, ready to review, adjust, and publish.',
+			},
 		],
 	},
 	finder: {

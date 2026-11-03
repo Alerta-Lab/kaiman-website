@@ -5,6 +5,7 @@ import {
 	useState,
 	type PointerEvent as ReactPointerEvent,
 } from 'react';
+import { createPortal } from 'react-dom';
 import { galleryItems, type GalleryOrientation } from '../../data/gallery';
 import type { LandingCopy } from '../../i18n/locales/es/landing';
 import { signupUrl } from '../../lib/plans';
@@ -26,6 +27,7 @@ function clamp(value: number, min: number, max: number) {
 
 export function PieceGallery({ copy }: PieceGalleryProps) {
 	const [openId, setOpenId] = useState<string | null>(null);
+	const [portalReady, setPortalReady] = useState(false);
 	const viewportRef = useRef<HTMLDivElement>(null);
 	const boardRef = useRef<HTMLDivElement>(null);
 	const offsetRef = useRef({ x: 0, y: 0 });
@@ -40,6 +42,27 @@ export function PieceGallery({ copy }: PieceGalleryProps) {
 	} | null>(null);
 
 	const openItem = galleryItems.find((item) => item.id === openId);
+
+	useEffect(() => {
+		setPortalReady(true);
+	}, []);
+
+	useEffect(() => {
+		if (!openId) return;
+
+		const previousOverflow = document.body.style.overflow;
+		document.body.style.overflow = 'hidden';
+
+		const onKeyDown = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') setOpenId(null);
+		};
+		window.addEventListener('keydown', onKeyDown);
+
+		return () => {
+			document.body.style.overflow = previousOverflow;
+			window.removeEventListener('keydown', onKeyDown);
+		};
+	}, [openId]);
 
 	const applyTransform = (x: number, y: number) => {
 		const board = boardRef.current;
@@ -148,6 +171,90 @@ export function PieceGallery({ copy }: PieceGalleryProps) {
 		}
 	};
 
+	const arrowSvg = (
+		<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+			<path
+				d="M7.21 5.78h7c1.9 0 2.84 0 3.42.58.58.58.59 1.53.59 3.41v7.02M5.78 18.22 16.85 7.15"
+				fill="none"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	);
+
+	const modal =
+		portalReady && openItem
+			? createPortal(
+					<div
+						className="fixed inset-0 z-[120] flex items-center justify-center p-4 sm:p-6"
+						role="dialog"
+						aria-modal="true"
+						aria-label={copy[openItem.altKey]}
+					>
+						<button
+							type="button"
+							className="absolute inset-0 cursor-pointer bg-ink/85"
+							aria-label={copy.close}
+							onClick={() => setOpenId(null)}
+						/>
+						<div className="relative z-10 flex h-[min(85vh,36rem)] w-[min(92vw,42rem)] flex-col overflow-hidden rounded-xl border border-white/15 bg-ink-200 shadow-[0_24px_64px_rgba(0,0,0,0.45)]">
+							<div className="flex shrink-0 items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
+								<p className="font-display text-xs font-semibold tracking-[0.14em] text-neutral-300 uppercase">
+									{copy.tools[openItem.tool]}
+								</p>
+								<button
+									type="button"
+									className="inline-flex size-10 cursor-pointer items-center justify-center rounded-lg text-white transition-colors duration-300 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+									aria-label={copy.close}
+									onClick={() => setOpenId(null)}
+								>
+									<X size={18} aria-hidden="true" />
+								</button>
+							</div>
+							<div className="relative min-h-0 flex-1 overflow-hidden bg-ink">
+								{openItem.kind === 'video' ? (
+									<video
+										className="absolute inset-0 h-full w-full object-contain"
+										src={openItem.src}
+										controls
+										autoPlay
+										loop
+										playsInline
+									/>
+								) : (
+									<img
+										src={openItem.src}
+										alt={copy[openItem.altKey]}
+										className="absolute inset-0 h-full w-full object-contain"
+									/>
+								)}
+							</div>
+							<div className="flex shrink-0 justify-center border-t border-white/10 px-4 py-4 sm:px-5">
+								<a
+									href={signupUrl}
+									data-cursor-go
+									className="k-btn k-btn-primary"
+									aria-label={copy.generate}
+								>
+									<span className="k-btn-l">
+										<span className="k-btn-rl">
+											<span aria-hidden="true">{copy.generate}</span>
+											<span aria-hidden="true">{copy.generate}</span>
+										</span>
+									</span>
+									<span className="k-btn-i" aria-hidden="true">
+										{arrowSvg}
+									</span>
+								</a>
+							</div>
+						</div>
+					</div>,
+					document.body,
+				)
+			: null;
+
 	return (
 		<>
 			<div
@@ -194,7 +301,8 @@ export function PieceGallery({ copy }: PieceGalleryProps) {
 								</p>
 								<button
 									type="button"
-									className="pointer-events-auto inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-md bg-black/50 text-white transition-transform duration-300 hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+									data-cursor-expand
+									className="pointer-events-auto inline-flex h-7 w-7 cursor-none items-center justify-center rounded-md bg-black/50 text-white transition-transform duration-300 hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
 									aria-label={copy.fullscreen}
 									onClick={(event) => {
 										if (suppressClickRef.current) {
@@ -229,27 +337,7 @@ export function PieceGallery({ copy }: PieceGalleryProps) {
 				</div>
 			</div>
 
-			{openItem ? (
-				<dialog
-					open
-					className="fixed inset-0 z-[70] m-0 flex h-full max-h-none w-full max-w-none items-center justify-center border-0 bg-black/80 p-4"
-					aria-label={copy[openItem.altKey]}
-				>
-					<button
-						type="button"
-						className="absolute top-4 right-4 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg bg-ink-300 text-white"
-						aria-label={copy.close}
-						onClick={() => setOpenId(null)}
-					>
-						<X size={18} aria-hidden="true" />
-					</button>
-					{openItem.kind === 'video' ? (
-						<video className="max-h-[80vh]" src={openItem.src} controls autoPlay loop playsInline />
-					) : (
-						<img src={openItem.src} alt={copy[openItem.altKey]} className="max-h-[80vh]" />
-					)}
-				</dialog>
-			) : null}
+			{modal}
 		</>
 	);
 }

@@ -12,6 +12,38 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-03 — Salsana modal + cursor expand
+
+- Expand abre modal centrado en viewport (portal a `body`), no fullscreen nativo.
+- Hover en expand: cursor custom pasa de hand a icono expand; círculo más pequeño en canvas (grab/expand).
+
+### 2026-11-03 — Cursor sin pan en carruseles
+
+- El círculo custom ya no aparece sobre `[data-h-scroll]` (modo pan). Wheel vertical tampoco se redirige al track: el scroll de página queda libre; el carrusel sigue por drag / gesto nativo.
+
+### 2026-11-03 — Recorrido del producto (v2)
+
+- Copy descriptiva ES/EN (sin placeholders). Pasos con media real (showcase, demo poster, pieza Salsana).
+- &lt; lg: snap carousel; lg: 3 cols + rail 01—02—03. `#recorrido`.
+
+### 2026-11-03 — Footer columnas mobile/tablet
+
+- Contacto a ancho completo; Producto / Recursos / Legal en 2 cols (móvil) y 3 cols (tablet); 4 cols en lg. Copyright fuera de Legal, fila propia.
+
+### 2026-11-03 — Carruseles mobile
+
+- &lt; lg: snap carousel (`data-h-scroll`) en detalles de marca, Brand Understanding, audiencias (foto+título por slide), plataforma, planes, capacidad y playbooks.
+
+### 2026-11-03 — Mobile simple (Monument)
+
+- &lt; lg: stories sin pin/scrub (producto/plataforma/audiencias en flujo); timelines horizontales sin pin (scroll nativo).
+- Desktop (≥1024) conserva pins GSAP.
+
+### 2026-11-03 — Hero + header responsive
+
+- Hero &lt; lg: telón izq. a ancho completo (sin franja de video); demo al scroll.
+- Header &lt; lg: hamburguesa (mismo panel Sobre Kaiman); Sobre Kaiman + Planes solo desde lg.
+
 ### 2026-11-03 — Estimaciones de créditos
 
 - Finder y rates: disclaimer visible de que el cálculo es aproximado y puede variar (ES/EN). Corporativo vuelve a card dark.

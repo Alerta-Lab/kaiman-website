@@ -59,8 +59,8 @@ const legalLinks = [
 			</div>
 		</div>
 
-		<div class="grid gap-12 border-t border-white/10 pt-12 lg:grid-cols-4">
-			<div class="flex flex-col gap-3">
+		<div class="grid grid-cols-2 gap-x-6 gap-y-10 border-t border-white/10 pt-12 sm:grid-cols-3 lg:grid-cols-4 lg:gap-12">
+			<div class="col-span-2 flex flex-col gap-3 sm:col-span-3 lg:col-span-1">
 				<p class="inline-flex items-start gap-2 text-sm text-pretty text-neutral-300">
 					<MapPin size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
 					{copy.footer.address}
@@ -112,11 +112,12 @@ const legalLinks = [
 						{link.label}
 					</a>
 				))}
-				<p class="mt-4 text-sm text-neutral-400">
-					© {year} {copy.footer.studio}. {copy.footer.rights}
-				</p>
 			</nav>
 		</div>
+
+		<p class="text-sm text-neutral-400">
+			© {year} {copy.footer.studio}. {copy.footer.rights}
+		</p>
 	</div>
 </footer>
 

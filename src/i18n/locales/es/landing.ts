@@ -326,7 +326,7 @@ export const landing = {
 		sweetAlt: 'Pieza gráfica de Salsana, línea dulce',
 		videoAlt: 'Video de Salsana',
 		generate: 'Generar',
-		fullscreen: 'Ver en pantalla completa',
+		fullscreen: 'Ver ampliado',
 		close: 'Cerrar',
 		tools: {
 			image: 'Generador de imágenes',
@@ -335,11 +335,20 @@ export const landing = {
 	},
 	tour: {
 		title: 'Recorrido del producto',
-		body: 'Estos espacios quedan listos para el video y las capturas del flujo real. Puedes sustituir cada bloque cuando tengas el material.',
+		body: 'Tres momentos del flujo en Kaiman: la marca que ya entiende, el pedido de una pieza y el resultado listo para usar.',
 		slots: [
-			{ title: 'Ficha de marca', note: 'Espacio para un recorrido de la marca guardada.' },
-			{ title: 'Pedido de una pieza', note: 'Espacio para el momento en que se pide imagen o video.' },
-			{ title: 'Pieza lista', note: 'Espacio para el resultado dentro de la plataforma.' },
+			{
+				title: 'Ficha de marca',
+				note: 'Colores, tipografía, tono y referencias quedan guardados para que cada pieza parta del mismo contexto.',
+			},
+			{
+				title: 'Pedido de una pieza',
+				note: 'Pides imagen o video con la marca ya cargada; el pedido hereda lo que Kaiman ya conoce de tu negocio.',
+			},
+			{
+				title: 'Pieza lista',
+				note: 'Recibes el resultado alineado con tu identidad, listo para revisar, ajustar y publicar.',
+			},
 		],
 	},
 	finder: {
