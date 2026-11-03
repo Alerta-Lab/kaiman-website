@@ -12,6 +12,10 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-03 — 404 al estilo landing
+
+- Fondo ink + radiales, header cápsula, logo Kaiman, display 404 atenuado, CTAs `k-btn` (ES / EN / Blog). Sin look lavanda del blog.
+
 ### 2026-11-03 — GitHub Pages
 
 - Workflow `.github/workflows/deploy-github-pages.yml` (Astro static, no Jekyll).

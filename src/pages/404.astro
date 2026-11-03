@@ -1,76 +1,105 @@
 ---
-import { ArrowRight, BookOpen, Home, Languages } from 'lucide-react';
+import { BookOpen, Home, Languages } from 'lucide-react';
+import Button from '../components/ui/Button.astro';
+import { asset } from '../lib/asset';
 import '../styles/global.css';
+
+const base = import.meta.env.BASE_URL || '/';
+const esHome = `${base}es/`;
+const enHome = `${base}en/`;
+const blogHome = `${base}es/blogs/`;
 ---
 
 <!doctype html>
-<html lang="es" class="h-full">
+<html lang="es" class="h-full overflow-x-clip bg-ink text-white">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="robots" content="noindex" />
-		<meta name="theme-color" content="#6B48E9" />
-		<link rel="icon" href="/favicon.ico" />
+		<meta name="theme-color" content="#212121" />
+		<meta name="description" content="Esta dirección no existe en Kaiman. Vuelve al inicio o abre el blog." />
+		<link rel="icon" type="image/png" href={asset('/brand/favicon.png')} />
+		<link rel="icon" href={asset('/favicon.ico')} />
 		<title>Página no encontrada — Kaiman</title>
-		<meta name="description" content="Esta dirección no existe en Kaiman. Vuelve al inicio o al blog." />
 	</head>
-	<body class="min-h-full bg-primary-100 font-sans text-ink antialiased">
+	<body
+		class="min-h-full overflow-x-clip bg-ink bg-[radial-gradient(ellipse_at_top_left,rgba(107,72,233,0.42),transparent_52%),radial-gradient(ellipse_at_80%_20%,rgba(219,39,119,0.22),transparent_46%),radial-gradient(ellipse_at_bottom,rgba(8,145,178,0.16),transparent_40%)] font-sans font-semibold text-white antialiased"
+	>
 		<a
 			href="#contenido"
-			class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-primary focus:px-3 focus:py-2 focus:text-sm focus:font-bold focus:text-white"
+			class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:rounded-lg focus:bg-primary focus:px-3 focus:py-2 focus:text-sm focus:font-semibold"
 		>
 			Saltar al contenido
 		</a>
 
-		<main id="contenido" class="mx-auto flex min-h-full max-w-7xl flex-col justify-center px-5 py-16 lg:px-8">
-			<div class="max-w-xl animate-[menu-link-in_600ms_var(--ease-brand)_both]">
-				<a href="/es/" class="inline-flex items-center gap-3 font-display text-2xl font-bold tracking-tight text-ink">
+		<header class="fixed inset-x-0 top-4 z-50 px-4">
+			<div
+				class="mx-auto flex max-w-content items-center justify-between gap-3 rounded-2xl border border-black-stroke bg-ink-100/80 px-4 py-2 backdrop-blur-md"
+			>
+				<a href={esHome} class="flex shrink-0 items-center" aria-label="Kaiman">
 					<img
-						src="/logo.png"
-						alt=""
-						width="40"
-						height="40"
-						class="size-10 rounded-lg bg-ink object-contain p-1"
+						src={asset('/kaiman-logo.png')}
+						alt="Kaiman"
+						width="140"
+						height="32"
+						class="h-8 w-auto"
 					/>
-					<span>Kaiman</span>
 				</a>
+				<div class="flex items-center gap-2">
+					<a
+						href={esHome}
+						class="hidden h-10 items-center rounded-lg px-3 font-display text-sm font-semibold text-neutral-200 transition-colors hover:bg-white/10 hover:text-white sm:inline-flex"
+					>
+						Inicio
+					</a>
+					<Button href={blogHome} variant="secondary" size="sm">Blog</Button>
+				</div>
+			</div>
+		</header>
 
-				<p class="mt-10 font-display text-[clamp(4.5rem,14vw,7rem)] font-bold leading-none tracking-[-0.04em] text-primary">
+		<main
+			id="contenido"
+			class="relative mx-auto flex min-h-svh w-full max-w-content flex-col justify-center px-5 pt-28 pb-16 sm:px-8 lg:px-10"
+		>
+			<div
+				class="pointer-events-none absolute inset-x-0 top-24 -z-10 h-px bg-white/10"
+				aria-hidden="true"
+			>
+			</div>
+
+			<div class="flex max-w-3xl flex-col gap-8">
+				<p
+					class="font-display text-[clamp(5rem,18vw,9rem)] leading-none font-semibold tracking-[-0.04em] text-white/[0.08]"
+					aria-hidden="true"
+				>
 					404
 				</p>
 
-				<h1 class="mt-6 font-display text-3xl font-bold tracking-tight text-balance sm:text-4xl">
-					Esta página no está
-				</h1>
-				<p class="mt-4 max-w-prose text-lg font-medium text-pretty text-ink/75">
-					El enlace no corresponde a una sección de Kaiman. Puedes volver al inicio o abrir el blog.
-				</p>
+				<div class="-mt-10 flex flex-col gap-5 sm:-mt-14">
+					<h1
+						class="max-w-[16ch] font-display text-[clamp(2rem,5vw,3.5rem)] leading-[1.05] font-semibold tracking-tight text-balance text-white"
+					>
+						Esta página no está en Kaiman
+					</h1>
+					<p class="max-w-xl text-base text-pretty text-neutral-300 sm:text-lg">
+						El enlace no corresponde a una sección del sitio. Vuelve al inicio en tu idioma o abre el
+						blog.
+					</p>
+				</div>
 
-				<div class="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-					<a
-						href="/es/"
-						class="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-primary px-5 font-bold text-white hover:bg-primary-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-					>
-						<Home aria-hidden="true" size={18} />
-						Inicio
-						<span class="font-medium opacity-80">ES</span>
-					</a>
-					<a
-						href="/en/"
-						class="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border border-primary-700 bg-white px-5 font-bold text-primary-800 hover:bg-primary-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-					>
-						<Languages aria-hidden="true" size={18} />
-						Home
-						<span class="font-medium opacity-80">EN</span>
-					</a>
-					<a
-						href="/es/blogs"
-						class="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border border-primary-200 bg-white px-5 font-bold text-ink hover:bg-primary-100 hover:text-primary-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-					>
-						<BookOpen aria-hidden="true" size={18} />
+				<div class="flex flex-col gap-3 pt-2 sm:flex-row sm:flex-wrap sm:items-center">
+					<Button href={esHome}>
+						<Home slot="leading" size={18} aria-hidden="true" />
+						Inicio ES
+					</Button>
+					<Button href={enHome} variant="secondary">
+						<Languages slot="leading" size={18} aria-hidden="true" />
+						Home EN
+					</Button>
+					<Button href={blogHome} variant="ghost">
+						<BookOpen slot="leading" size={18} aria-hidden="true" />
 						Blog
-						<ArrowRight aria-hidden="true" size={16} />
-					</a>
+					</Button>
 				</div>
 			</div>
 		</main>
