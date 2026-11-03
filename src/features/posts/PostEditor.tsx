@@ -1,9 +1,13 @@
-import { Languages, Save, Sparkles, Upload } from 'lucide-react';
+import { ExternalLink, Eye, Languages, Save, Sparkles, Upload } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Toast, type ToastTone } from '../../components/blog/molecules/Toast';
+import type { ImagePart, ImageProgressEvent } from './image-progress';
+
+type ImageStage = { phase: 'waiting' | 'generating' | 'uploading' | 'uploaded' | 'saved' | 'interrupted'; percentage?: number };
 
 type Initial = {
 	id?: string;
+	updatedAt?: string;
 	title?: string;
 	slug?: string;
 	excerpt?: string;
@@ -15,6 +19,9 @@ type Initial = {
 	coverUrl?: string | null;
 	coverAlt?: string | null;
 	tags?: string[];
+	categoryId?: string | null;
+	hasSibling?: boolean;
+	editorial?: { coverCaption: string; coverPrompt: string; bodyAlt: string; bodyCaption: string; bodyPrompt: string; approvedAt: string | null; bodyImageUrl: string | null } | null;
 };
 
 type Notice = {
@@ -26,7 +33,9 @@ type Notice = {
 const slugify = (value: string) =>
 	value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
-export function PostEditor({ initial = {} }: { initial?: Initial }) {
+type CategoryOption = { id: string; name: string };
+
+export function PostEditor({ initial = {}, categories = [] }: { initial?: Initial; categories?: CategoryOption[] }) {
 	const [data, setData] = useState({
 		title: initial.title ?? '',
 		slug: initial.slug ?? '',
@@ -39,12 +48,29 @@ export function PostEditor({ initial = {} }: { initial?: Initial }) {
 		coverUrl: initial.coverUrl ?? '',
 		coverAlt: initial.coverAlt ?? '',
 		tags: initial.tags?.join(', ') ?? '',
+		categoryId: initial.categoryId ?? '',
 	});
 	const [notice, setNotice] = useState<Notice | null>(null);
 	const [busy, setBusy] = useState(false);
+	const [brief, setBrief] = useState('');
+	const [approved, setApproved] = useState(Boolean(initial.editorial?.approvedAt));
+	const [dirty, setDirty] = useState(false);
+	const [savedRevision, setSavedRevision] = useState(initial.updatedAt ?? '');
+	// Last saved status/slug: the public link must point at what is actually live, not at unsaved edits.
+	const [savedStatus, setSavedStatus] = useState(initial.status ?? 'draft');
+	const [savedSlug, setSavedSlug] = useState(initial.slug ?? '');
+	const [images, setImages] = useState({ coverUrl: initial.coverUrl ?? '', bodyImageUrl: initial.editorial?.bodyImageUrl ?? '' });
+	const [bodyAspect, setBodyAspect] = useState<'9:16' | '3:2'>('9:16');
+	const [imageProgress, setImageProgress] = useState<Record<ImagePart, ImageStage> | null>(null);
+	const [savingImages, setSavingImages] = useState(false);
+	const [editorial, setEditorial] = useState(initial.editorial ? { coverCaption: initial.editorial.coverCaption, coverPrompt: initial.editorial.coverPrompt, bodyAlt: initial.editorial.bodyAlt, bodyCaption: initial.editorial.bodyCaption, bodyPrompt: initial.editorial.bodyPrompt } : null);
 	const fileRef = useRef<HTMLInputElement>(null);
+	const safeFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+		try { return await fetch(input, init); }
+		catch { return Response.json({ error: 'No hay conexión. Revisa tu red e inténtalo de nuevo.' }, { status: 503 }); }
+	};
 
-	const update = (field: keyof typeof data, value: string) => setData((current) => ({ ...current, [field]: value }));
+	const update = (field: keyof typeof data, value: string) => { setDirty(true); setApproved(false); setData((current) => ({ ...current, [field]: value })); };
 	const derivedSlug = useMemo(() => slugify(data.title), [data.title]);
 	const targetLocale = data.locale === 'es' ? 'en' : 'es';
 	const closeNotice = useCallback(() => setNotice(null), []);
@@ -68,12 +94,14 @@ export function PostEditor({ initial = {} }: { initial?: Initial }) {
 		event?.preventDefault();
 		setBusy(true);
 		setNotice(null);
-		const response = await fetch(initial.id ? `/api/admin/posts/${initial.id}` : '/api/admin/posts', {
+		const response = await safeFetch(initial.id ? `/api/admin/posts/${initial.id}` : '/api/admin/posts', {
 			method: initial.id ? 'PUT' : 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
 				...data,
+				...(editorial ? { editorial } : {}),
 				slug: data.slug || derivedSlug,
+				categoryId: data.categoryId || null,
 				tags: data.tags
 					.split(',')
 					.map((tag) => tag.trim())
@@ -87,6 +115,11 @@ export function PostEditor({ initial = {} }: { initial?: Initial }) {
 		}
 		const result = await response.json();
 		setBusy(false);
+		if (result.updatedAt) setSavedRevision(result.updatedAt);
+		setSavedStatus(data.status);
+		setSavedSlug(data.slug || derivedSlug);
+		setDirty(false);
+		if (initial.editorial) setApproved(false);
 		showNotice({ tone: 'success', title: 'Artículo guardado.' });
 		if (!initial.id && result.id) location.href = `/admin/posts/${result.id}`;
 		else if (!initial.id) location.href = '/admin/posts';
@@ -99,7 +132,7 @@ export function PostEditor({ initial = {} }: { initial?: Initial }) {
 		}
 		setBusy(true);
 		showNotice({ tone: 'info', title: `Traduciendo a ${targetLocale.toUpperCase()} con gpt-4o-mini…` });
-		const response = await fetch(`/api/admin/posts/${initial.id}/translate`, { method: 'POST' });
+		const response = await safeFetch(`/api/admin/posts/${initial.id}/translate`, { method: 'POST' });
 		if (!response.ok) {
 			setBusy(false);
 			showNotice(await readError(response));
@@ -111,17 +144,36 @@ export function PostEditor({ initial = {} }: { initial?: Initial }) {
 		if (result.id) location.href = `/admin/posts/${result.id}`;
 	};
 
+	const classify = async () => {
+		if (!initial.id || dirty) {
+			showNotice({ tone: 'info', title: 'Guarda los cambios antes de pedir la categoría y las etiquetas.' });
+			return;
+		}
+		if (!confirm('La IA asignará la categoría y las etiquetas a todas las versiones de este artículo y reemplazará las actuales. ¿Continuar?')) return;
+		setBusy(true);
+		showNotice({ tone: 'info', title: 'Asignando categoría y etiquetas con gpt-4o-mini…' });
+		const response = await safeFetch(`/api/admin/posts/${initial.id}/classify`, { method: 'POST' });
+		if (!response.ok) {
+			setBusy(false);
+			showNotice(await readError(response));
+			return;
+		}
+		location.reload();
+	};
+
 	const importWord = async () => {
 		const file = fileRef.current?.files?.[0];
 		if (!file) {
 			showNotice({ tone: 'info', title: 'Selecciona un documento Word.' });
 			return;
 		}
+		if ((data.title || data.markdown || data.excerpt) && !confirm('La importación reemplazará los campos actuales del editor. ¿Deseas continuar?')) return;
 		setBusy(true);
 		showNotice({ tone: 'info', title: 'Analizando documento…' });
 		const form = new FormData();
 		form.set('document', file);
-		const response = await fetch('/api/admin/import-word', { method: 'POST', body: form });
+		form.set('locale', data.locale);
+		const response = await safeFetch('/api/admin/import-word', { method: 'POST', body: form });
 		if (!response.ok) {
 			setBusy(false);
 			showNotice(await readError(response));
@@ -134,13 +186,98 @@ export function PostEditor({ initial = {} }: { initial?: Initial }) {
 			...result,
 			tags: Array.isArray(result.tags) ? result.tags.join(', ') : current.tags,
 		}));
-		showNotice({ tone: 'success', title: 'Borrador generado. Revísalo antes de publicar.' });
+		setDirty(true); setApproved(false);
+		showNotice({ tone: 'success', title: 'Contenido importado. Revisa los campos y guarda el borrador.' });
+	};
+
+	const generate = async () => {
+		if (brief.trim().length < 10) {
+			showNotice({ tone: 'info', title: 'Describe el artículo con al menos 10 caracteres.' });
+			return;
+		}
+		if ((data.title || data.markdown || data.excerpt) && !confirm('Se abrirá un nuevo borrador y los cambios sin guardar de este editor se perderán. ¿Deseas continuar?')) return;
+		setBusy(true);
+		showNotice({ tone: 'info', title: 'Generando y guardando el borrador…' });
+		const response = await safeFetch('/api/admin/posts/generate', {
+			method: 'POST', headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ brief, locale: data.locale }),
+		});
+		if (!response.ok) {
+			setBusy(false);
+			showNotice(await readError(response));
+			return;
+		}
+		const result = await response.json();
+		location.href = `/admin/posts/${result.id}`;
+	};
+
+	const approve = async () => {
+		if (!initial.id) return;
+		setBusy(true);
+		const response = await safeFetch(`/api/admin/posts/${initial.id}/approve`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ updatedAt: savedRevision }) });
+		setBusy(false);
+		if (!response.ok) { showNotice(await readError(response)); return; }
+		setApproved(true); showNotice({ tone: 'success', title: 'Contenido guardado aceptado. Ya puedes preparar las imágenes.' });
+	};
+	const generateImages = async () => {
+		if (!initial.id) return;
+		setBusy(true); setSavingImages(false);
+		setImageProgress({ cover: { phase: 'waiting' }, body: { phase: 'waiting' } });
+		showNotice({ tone: 'info', title: 'Generando dos imágenes; esto puede tardar.' });
+		try {
+			const response = await safeFetch(`/api/admin/posts/${initial.id}/images`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ bodyAspect }) });
+			if (!response.ok) { setImageProgress(null); showNotice(await readError(response)); return; }
+			if (!response.body) throw new Error('No se pudo recibir el progreso.');
+			const reader = response.body.getReader();
+			const decoder = new TextDecoder();
+			let pending = '';
+			let completed = false;
+			const processLine = (line: string) => {
+				if (!line.trim()) return;
+				const event = JSON.parse(line) as ImageProgressEvent;
+				if (event.type === 'error') throw new Error(event.message);
+				if (event.type === 'generating') setImageProgress((current) => current && ({ ...current, [event.image]: { phase: 'generating' } }));
+				if (event.type === 'uploading') setImageProgress((current) => current && ({ ...current, [event.image]: { phase: 'uploading', percentage: event.percentage } }));
+				if (event.type === 'uploaded') setImageProgress((current) => current && ({ ...current, [event.image]: { phase: 'uploaded', percentage: 100 } }));
+				if (event.type === 'saving') setSavingImages(true);
+				if (event.type === 'complete') {
+					completed = true;
+					setImages({ coverUrl: event.coverUrl, bodyImageUrl: event.bodyImageUrl });
+					setData((current) => ({ ...current, coverUrl: event.coverUrl }));
+					setImageProgress({ cover: { phase: 'saved' }, body: { phase: 'saved' } });
+					setSavingImages(false);
+					showNotice({ tone: 'success', title: 'Imágenes generadas y guardadas.' });
+				}
+			};
+			while (true) {
+				const chunk = await reader.read();
+				pending += decoder.decode(chunk.value, { stream: !chunk.done });
+				const lines = pending.split('\n'); pending = lines.pop() ?? '';
+				for (const line of lines) processLine(line);
+				if (chunk.done) { if (pending.trim()) processLine(pending); break; }
+			}
+			if (!completed) throw new Error('Se perdió la conexión. Actualiza el artículo y revisa si se guardaron las imágenes antes de reintentar.');
+		} catch (error) {
+			setSavingImages(false);
+			setImageProgress((current) => current && ({ cover: { phase: 'interrupted' }, body: { phase: 'interrupted' } }));
+			showNotice({ tone: 'error', title: error instanceof Error ? error.message : 'No se pudo recibir el progreso.' });
+		} finally { setBusy(false); }
+	};
+	const uploadImages = async () => {
+		if (!initial.id) return;
+		setBusy(true); showNotice({ tone: 'info', title: 'Guardando imágenes en Vercel Blob…' });
+		const response = await safeFetch(`/api/admin/posts/${initial.id}/upload-images`, { method: 'POST' });
+		setBusy(false);
+		if (!response.ok) { showNotice(await readError(response)); return; }
+		const result = await response.json();
+		setImages(result); setData((current) => ({ ...current, coverUrl: result.coverUrl }));
+		showNotice({ tone: 'success', title: 'Imágenes guardadas en Vercel Blob.' });
 	};
 
 	const remove = async () => {
 		if (!initial.id || !confirm('¿Eliminar este artículo de forma permanente?')) return;
 		setBusy(true);
-		const response = await fetch(`/api/admin/posts/${initial.id}`, { method: 'DELETE' });
+		const response = await safeFetch(`/api/admin/posts/${initial.id}`, { method: 'DELETE' });
 		if (response.ok) location.href = '/admin/posts';
 		else {
 			setBusy(false);
@@ -162,6 +299,14 @@ export function PostEditor({ initial = {} }: { initial?: Initial }) {
 	const field = 'min-h-11 w-full rounded-lg border border-black-stroke bg-white px-3 py-2';
 	return (
 		<div className="space-y-6">
+			{!initial.id && <section className="rounded-2xl border border-primary-200 bg-primary-100 p-5">
+				<h2 className="font-headline text-xl font-bold">Crear borrador con IA</h2>
+				<p className="mt-1 text-sm text-black/65">Describe el tema y el enfoque. El borrador se guardará en el idioma seleccionado para revisarlo antes de publicar.</p>
+				<label className="mt-4 block font-bold">Instrucciones
+					<textarea className={`${field} mt-2 min-h-24`} maxLength={4000} value={brief} onChange={(event) => setBrief(event.target.value)} />
+				</label>
+				<button type="button" onClick={generate} disabled={busy} className="mt-4 min-h-11 rounded-lg bg-black px-4 font-bold text-white disabled:opacity-50">Generar borrador</button>
+			</section>}
 			<section className="rounded-2xl border border-primary-200 bg-primary-100 p-5">
 				<div className="flex items-center gap-2 font-headline text-xl font-bold">
 					<Sparkles className="text-primary" aria-hidden /> Importar con IA
@@ -209,20 +354,36 @@ export function PostEditor({ initial = {} }: { initial?: Initial }) {
 						</select>
 					</label>
 					<label className="block font-bold">
+						Categoría
+						<select className={`${field} mt-2`} value={data.categoryId} onChange={(e) => update('categoryId', e.target.value)}>
+							<option value="">Sin categoría</option>
+							{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
+						</select>
+						<span className="mt-1 block text-sm font-normal text-black/60">Sector del negocio. Se comparte entre los dos idiomas.</span>
+					</label>
+					<label className="block font-bold">
 						Etiquetas
-						<input className={`${field} mt-2`} placeholder="Diseño, IA" value={data.tags} onChange={(e) => update('tags', e.target.value)} />
+						<input className={`${field} mt-2`} placeholder="Membresías, fidelización" value={data.tags} onChange={(e) => update('tags', e.target.value)} />
+						<span className="mt-1 block text-sm font-normal text-black/60">Temas del artículo, separados por comas.</span>
+					</label>
+					{initial.id && (
+						<button type="button" onClick={classify} disabled={busy || dirty} className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-primary-700 bg-white px-4 font-bold text-primary-800 hover:bg-primary-100 disabled:opacity-50">
+							<Sparkles size={18} aria-hidden /> Sugerir categoría y etiquetas con IA
+						</button>
+					)}
+					<label className="block font-bold">
+						Título SEO <span className="font-normal text-black/50">{data.seoTitle.length} caracteres</span>
+						<input className={`${field} mt-2`} required minLength={3} value={data.seoTitle} onChange={(e) => update('seoTitle', e.target.value)} />
+						<span className="mt-1 block text-sm font-normal text-black/60">Google puede acortar lo que muestra según el espacio disponible.</span>
 					</label>
 					<label className="block font-bold">
-						Título SEO <span className="font-normal text-black/50">{data.seoTitle.length}/60</span>
-						<input className={`${field} mt-2`} required minLength={3} maxLength={60} value={data.seoTitle} onChange={(e) => update('seoTitle', e.target.value)} />
-					</label>
-					<label className="block font-bold">
-						Descripción SEO <span className="font-normal text-black/50">{data.seoDescription.length}/160</span>
-						<textarea className={`${field} mt-2 min-h-28`} required minLength={20} maxLength={160} value={data.seoDescription} onChange={(e) => update('seoDescription', e.target.value)} />
+						Descripción SEO <span className="font-normal text-black/50">{data.seoDescription.length} caracteres</span>
+						<textarea className={`${field} mt-2 min-h-28`} required minLength={20} value={data.seoDescription} onChange={(e) => update('seoDescription', e.target.value)} />
+						<span className="mt-1 block text-sm font-normal text-black/60">Google puede mostrar solo un fragmento; el texto completo se conserva.</span>
 					</label>
 					<label className="block font-bold">
 						URL de portada
-						<input className={`${field} mt-2`} type="url" value={data.coverUrl} onChange={(e) => update('coverUrl', e.target.value)} />
+						<input className={`${field} mt-2`} value={data.coverUrl} onChange={(e) => update('coverUrl', e.target.value)} />
 					</label>
 					<label className="block font-bold">
 						Texto alternativo
@@ -232,6 +393,19 @@ export function PostEditor({ initial = {} }: { initial?: Initial }) {
 						<Save size={18} aria-hidden /> {busy ? 'Guardando…' : 'Guardar'}
 					</button>
 					{initial.id && (
+						<div className="space-y-2">
+							<a href={`/admin/posts/${initial.id}/preview`} target="_blank" rel="noopener" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg border border-primary-700 bg-white px-5 font-bold text-primary-800 hover:bg-primary-100">
+								<Eye size={18} aria-hidden /> Vista previa
+							</a>
+							{savedStatus === 'published' && (
+								<a href={`/${data.locale}/blogs/${savedSlug}`} target="_blank" rel="noopener" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg border border-black/30 bg-white px-5 font-bold hover:bg-black/5">
+									<ExternalLink size={18} aria-hidden /> Ver página publicada
+								</a>
+							)}
+							{dirty && <p className="text-sm text-black/65">La vista previa muestra la última versión guardada. Guarda para ver tus cambios.</p>}
+						</div>
+					)}
+					{initial.id && !initial.hasSibling && (
 						<button type="button" onClick={translate} disabled={busy} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg border border-primary-700 bg-white px-5 font-bold text-primary-800 hover:bg-primary-100 disabled:opacity-50">
 							<Languages size={18} aria-hidden /> Traducir a {targetLocale.toUpperCase()}
 						</button>
@@ -243,6 +417,31 @@ export function PostEditor({ initial = {} }: { initial?: Initial }) {
 					)}
 				</aside>
 			</form>
+			{initial.id && initial.editorial && <section className="rounded-2xl border border-primary-200 bg-white p-6">
+				<h2 className="font-headline text-xl font-bold">Revisión de imágenes</h2>
+				<p className="mt-2">Guarda los cambios antes de aceptar el contenido. Los prompts permanecen privados.</p>
+				{editorial && (Object.entries({ coverCaption: 'Pie de portada', coverPrompt: 'Prompt privado de portada', bodyAlt: 'Texto alternativo interior', bodyCaption: 'Pie interior', bodyPrompt: 'Prompt privado interior' }) as [keyof typeof editorial, string][]).map(([field, label]) => <label key={field} className="mt-3 block font-bold">{label}<textarea className={`${field === 'bodyPrompt' ? 'min-h-24' : 'min-h-16'} mt-1 w-full rounded-lg border border-black/30 p-2 font-normal`} value={editorial[field]} onChange={(event) => { setDirty(true); setApproved(false); setEditorial({ ...editorial, [field]: event.target.value }); }} /></label>)}
+				<button type="button" disabled={busy || approved || dirty || data.status !== 'draft'} onClick={approve} className="mt-4 min-h-11 rounded-lg bg-primary px-4 font-bold text-white disabled:opacity-50">{approved ? 'Contenido aceptado' : 'Aceptar contenido guardado'}</button>
+				{dirty && <p className="mt-2">Guarda los cambios para aceptar el contenido.</p>}
+				{approved && <div className="mt-4 space-y-3">
+					<p>Generar crea dos imágenes con OpenAI y consume créditos. Se guardan en Vercel Blob y pueden verse por cualquier persona que tenga su enlace, incluso mientras el artículo sea borrador.</p>
+					{images.coverUrl.startsWith('/blog-generated/') && images.bodyImageUrl.startsWith('/blog-generated/') && <button type="button" disabled={busy || dirty} onClick={uploadImages} className="min-h-11 rounded-lg border border-primary-700 px-4 font-bold text-primary-800 disabled:opacity-50">Subir imágenes locales a Blob sin regenerar</button>}
+					<label className="block font-bold">Formato de imagen interior <select value={bodyAspect} onChange={(event) => setBodyAspect(event.target.value as '9:16' | '3:2')} className="ml-2 rounded-lg border border-black/30 p-2"><option value="9:16">Vertical 9:16</option><option value="3:2">Horizontal 3:2</option></select></label>
+					<button type="button" disabled={busy || dirty} onClick={generateImages} className="min-h-11 rounded-lg border border-primary-700 px-4 font-bold text-primary-800 disabled:opacity-50">{images.coverUrl || images.bodyImageUrl ? 'Regenerar ambas imágenes' : 'Generar portada e imagen interior'}</button>
+					{(images.coverUrl || images.bodyImageUrl) && <p className="text-sm">Regenerar crea y cobra dos imágenes nuevas; las anteriores se conservan en la biblioteca de medios.</p>}
+					{imageProgress && <div aria-live="polite" className="space-y-3 rounded-lg border border-primary-200 p-4">
+						{(['cover', 'body'] as const).map((part) => {
+							const state = imageProgress[part];
+							const label = part === 'cover' ? 'Portada' : 'Imagen interior';
+							const status = state.phase === 'waiting' ? 'Esperando' : state.phase === 'generating' ? 'Generando imagen' : state.phase === 'uploading' ? `Subiendo a Blob: ${state.percentage ?? 0} %` : state.phase === 'uploaded' ? 'Subida; pendiente de guardar' : state.phase === 'saved' ? 'Guardada' : 'Proceso interrumpido; revisa el artículo antes de reintentar';
+							return <div key={part}><p><strong>{label}:</strong> {status}</p>{state.phase === 'uploading' && <progress className="w-full" max={100} value={state.percentage ?? 0} aria-label={`Subida de ${label}`} />}</div>;
+						})}
+						{savingImages && <p>Guardando las imágenes en el artículo…</p>}
+					</div>}
+					{images.coverUrl && <img src={images.coverUrl} alt="Vista previa de portada" className="max-w-md rounded-lg" />}
+					{images.bodyImageUrl && <img src={images.bodyImageUrl} alt="Vista previa de imagen interior" className="max-w-md rounded-lg" />}
+				</div>}
+			</section>}
 			<Toast
 				open={Boolean(notice)}
 				tone={notice?.tone}

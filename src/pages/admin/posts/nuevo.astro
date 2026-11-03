@@ -1,8 +1,12 @@
 ---
 import { PostEditor } from '../../../features/posts/PostEditor';
 import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { listCategories } from '../../../server/repositories/posts';
+
+const categories = await listCategories();
 ---
 
 <AdminLayout title="Nuevo artículo">
-	<PostEditor client:load />
+	<a href="/admin/importar" class="mb-6 inline-flex min-h-11 items-center rounded-lg border border-primary-700 px-4 font-bold text-primary-800">Revisar Word con varios artículos</a>
+	<PostEditor client:load categories={categories.map(({ id, name }) => ({ id, name }))} />
 </AdminLayout>

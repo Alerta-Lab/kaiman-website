@@ -2,6 +2,7 @@ import { put } from '@vercel/blob';
 import type { APIRoute } from 'astro';
 import { requireDb } from '../../../server/db/client';
 import { media } from '../../../server/db/schema';
+import { getEnv } from '../../../server/env';
 
 export const POST: APIRoute = async ({ request }) => {
 	const form = await request.formData();
@@ -13,7 +14,7 @@ export const POST: APIRoute = async ({ request }) => {
 	if (!alt) return Response.json({ error: 'El texto alternativo es obligatorio.' }, { status: 400 });
 	const blob = await put(`images/${crypto.randomUUID()}-${image.name}`, image, {
 		access: 'public',
-		token: import.meta.env.BLOB_READ_WRITE_TOKEN,
+		token: getEnv('BLOB_READ_WRITE_TOKEN'),
 	});
 	const [record] = await requireDb().insert(media).values({
 		url: blob.url,

@@ -32,7 +32,7 @@ export async function translatePostContent(source: PostWithTags, targetLocale: C
 			{
 				role: 'system',
 				content:
-					'You translate Kaiman Studio blog posts. Keep Markdown structure, headings, links, and code fences intact. Return only JSON with keys: title, excerpt, markdown, seoTitle, seoDescription, coverAlt, tags (array of short tag names in the target language). Preserve brand names Kaiman and Kaiman Studio. Do not invent facts.',
+					'You translate Kaiman Studio blog posts. Keep Markdown structure, headings, links, code fences and the exact placeholder [IMAGEN_INTERIOR] intact. Return only JSON with keys: title, excerpt, markdown, seoTitle, seoDescription, coverAlt, tags (array of short tag names in the target language). Preserve brand names Kaiman and Kaiman Studio. Do not invent facts.',
 			},
 			{
 				role: 'user',
