@@ -1,9 +1,9 @@
 ---
 import { ArrowUpRight } from 'lucide-react';
 import type { Locale } from '../../../i18n';
-import { blogCategoryPath, blogPostPath } from '../../../lib/blog-paths';
+import { blogCategoryPath, blogPostPath, blogTagPath } from '../../../lib/blog-paths';
 import type { PostWithTags } from '../../../server/repositories/posts';
-import { tagDisplayName } from '../../../server/repositories/posts';
+import { categoryDisplayName, tagDisplayName } from '../../../server/repositories/posts';
 
 interface Props {
 	post: PostWithTags;
@@ -15,10 +15,15 @@ const readLabel = locale === 'en' ? 'Read' : 'Leer';
 ---
 
 <article class="group relative flex h-full flex-col border-b border-primary-200 py-gap-block first:pt-0 last:border-b-0 md:border md:border-primary-200 md:rounded-xl md:bg-white md:p-gap-block md:transition-colors md:hover:border-primary-400 md:hover:bg-primary-100/40">
+	{post.category && (
+		<a href={blogCategoryPath(locale, post.category.slug)} class="relative z-10 mb-2 self-start text-sm font-bold uppercase tracking-wide text-primary-800 hover:text-primary">
+			{categoryDisplayName(post.category, locale)}
+		</a>
+	)}
 	<div class="mb-gap-control flex flex-wrap gap-gap-chip">
-		{post.tags.map((tag) => (
+		{post.tags.slice(0, 3).map((tag) => (
 			<a
-				href={blogCategoryPath(locale, tag.slug)}
+				href={blogTagPath(locale, tag.slug)}
 				class="relative z-10 rounded-md bg-primary-100 px-2.5 py-1 text-sm font-bold text-primary-800 hover:bg-primary-200"
 			>
 				{tagDisplayName(tag, locale)}

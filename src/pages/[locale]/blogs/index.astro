@@ -7,14 +7,14 @@ import PublicFooter from '../../../components/blog/organisms/PublicFooter.astro'
 import PublicHeader from '../../../components/blog/organisms/PublicHeader.astro';
 import { isLocale, type Locale } from '../../../i18n';
 import BlogLayout from '../../../layouts/BlogLayout.astro';
-import { blogIndexPath } from '../../../lib/blog-paths';
-import { listPublishedPosts } from '../../../server/repositories/posts';
+import { blogCategoryPath, blogIndexPath } from '../../../lib/blog-paths';
+import { categoryDisplayName, listPublishedCategories, listPublishedPosts } from '../../../server/repositories/posts';
 
 const param = Astro.params.locale;
 if (!param || !isLocale(param)) return Astro.redirect('/es/blogs');
 const locale = param as Locale;
 
-const posts = await listPublishedPosts({ limit: 12, locale });
+const [posts, categories] = await Promise.all([listPublishedPosts({ limit: 12, locale }), listPublishedCategories(locale)]);
 const canonical = new URL(blogIndexPath(locale), Astro.site).toString();
 const alternateEs = new URL(blogIndexPath('es'), Astro.site).toString();
 const alternateEn = new URL(blogIndexPath('en'), Astro.site).toString();
@@ -31,6 +31,7 @@ const copy =
 				signup: 'Sign up',
 				explore: 'Browse articles',
 				latest: 'Latest articles',
+				byCategory: 'Browse by business type',
 				latestSupport: 'Short, practical reads on product, design, and artificial intelligence.',
 				empty: 'No published articles yet.',
 			}
@@ -43,6 +44,7 @@ const copy =
 				signup: 'Registrarse',
 				explore: 'Explorar artículos',
 				latest: 'Últimos artículos',
+				byCategory: 'Explorar por tipo de negocio',
 				latestSupport: 'Lecturas cortas y aplicables sobre producto, diseño e inteligencia artificial.',
 				empty: 'Todavía no hay artículos publicados.',
 			};
@@ -83,6 +85,15 @@ const copy =
 				<Headline as="h2" size="4xl">{copy.latest}</Headline>
 				<Text class="mt-gap-control text-black/75">{copy.latestSupport}</Text>
 			</div>
+			{categories.length > 0 && (
+				<nav aria-label={copy.byCategory} class="mb-gap-page flex flex-wrap gap-gap-chip">
+					{categories.map((category) => (
+						<a href={blogCategoryPath(locale, category.slug)} class="inline-flex min-h-11 items-center rounded-full border border-primary-300 bg-white px-4 font-bold text-primary-800 hover:border-primary hover:bg-primary-100">
+							{categoryDisplayName(category, locale)}
+						</a>
+					))}
+				</nav>
+			)}
 			{posts.length === 0 ? (
 				<p class="rounded-xl bg-primary-100 p-gap-block font-bold text-primary-900">{copy.empty}</p>
 			) : (

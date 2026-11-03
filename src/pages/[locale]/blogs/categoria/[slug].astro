@@ -6,41 +6,46 @@ import PublicFooter from '../../../../components/blog/organisms/PublicFooter.ast
 import PublicHeader from '../../../../components/blog/organisms/PublicHeader.astro';
 import { isLocale, type Locale } from '../../../../i18n';
 import BlogLayout from '../../../../layouts/BlogLayout.astro';
-import { blogCategoryPath } from '../../../../lib/blog-paths';
-import { listPublishedPosts, tagDisplayName } from '../../../../server/repositories/posts';
+import { blogCategoryPath, blogTagPath } from '../../../../lib/blog-paths';
+import { categoryDisplayName, getCategoryBySlug, listPublishedPosts } from '../../../../server/repositories/posts';
 
 const param = Astro.params.locale;
 if (!param || !isLocale(param)) return Astro.redirect('/es/blogs');
 const locale = param as Locale;
 const slug = Astro.params.slug ?? '';
 
-const posts = await listPublishedPosts({ tag: slug, locale });
-const tag = posts[0]?.tags.find((item) => item.slug === slug);
-const name = tag ? tagDisplayName(tag, locale) : slug.replaceAll('-', ' ');
+const category = await getCategoryBySlug(slug);
+// Before categories existed, tags lived under /categoria/: keep those links working.
+if (!category) return Astro.redirect(blogTagPath(locale, slug), 301);
+
+const posts = await listPublishedPosts({ category: slug, locale });
+const name = categoryDisplayName(category, locale);
 const canonical = new URL(blogCategoryPath(locale, slug), Astro.site).toString();
+const alternateEs = new URL(blogCategoryPath('es', slug), Astro.site).toString();
+const alternateEn = new URL(blogCategoryPath('en', slug), Astro.site).toString();
 Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=86400');
 
 const copy =
 	locale === 'en'
 		? {
 				title: `${name} — Kaiman Blog`,
-				description: `Articles tagged ${name} on Kaiman Blog.`,
-				support: `Articles tagged with ${name}.`,
+				description: `AI marketing articles for ${name.toLowerCase()} on Kaiman Blog.`,
+				support: `AI marketing ideas and guides for ${name.toLowerCase()}.`,
 				empty: 'No articles in this category yet.',
 			}
 		: {
 				title: `${name} — Kaiman Blog`,
-				description: `Artículos de ${name} en Kaiman Blog.`,
-				support: `Artículos etiquetados con ${name}.`,
+				description: `Artículos de marketing con IA para ${name.toLowerCase()} en Kaiman Blog.`,
+				support: `Ideas y guías de marketing con IA para ${name.toLowerCase()}.`,
 				empty: 'Todavía no hay artículos en esta categoría.',
 			};
 ---
 
-<BlogLayout title={copy.title} description={copy.description} locale={locale} canonical={canonical}>
+<BlogLayout title={copy.title} description={copy.description} locale={locale} canonical={canonical} alternateEs={alternateEs} alternateEn={alternateEn}>
 	<PublicHeader locale={locale} />
 	<main id="contenido" class="mx-auto min-h-[70vh] max-w-7xl px-5 py-16 lg:px-8">
 		<header class="max-w-2xl border-b border-primary-200 pb-gap-page">
-			<Headline as="h1" size="6xl" class="capitalize">{name}</Headline>
+			<Headline as="h1" size="6xl">{name}</Headline>
 			<Text class="mt-gap-control text-black/75">{copy.support}</Text>
 		</header>
 		{posts.length === 0 ? (
