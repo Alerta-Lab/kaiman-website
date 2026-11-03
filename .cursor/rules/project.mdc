@@ -1,0 +1,31 @@
+---
+description: Core conventions for landing-kaiman (Astro landing, structure, workflow)
+alwaysApply: true
+---
+
+# landing-kaiman
+
+Astro multilanguage landing for Kaiman. Stack: Astro, Tailwind CSS v4, TypeScript strict, i18next + Astro i18n routing, pnpm.
+
+## Structure
+
+- `src/pages/[locale]/` — locale-prefixed routes (`es`, `en`; more later)
+- `src/components/layout/` — shell UI (header, footer)
+- `src/components/sections/` — page sections
+- `src/components/common/` — shared presentational pieces
+- `src/i18n/` — locales, dictionaries, helpers
+- `src/styles/global.css` — Tailwind entry + tokens only
+- `docs/design-learning.md` — living design log (update on visual/copy changes)
+
+## Hard rules
+
+1. **Tailwind only** for styling. No `<style>` blocks, no CSS modules, no custom CSS except tokens in `global.css` / `tailwind.config.ts` or rare one-off cases documented in `docs/design-learning.md`.
+2. **Copy**: neutral, descriptive, clear, informative. No hype, slogans, or marketing accentuation.
+3. **i18n**: never hardcode user-facing strings in components. Add keys under `src/i18n/locales/{locale}/` for every locale.
+4. **TypeScript**: prefer typed dictionaries and `satisfies`; avoid `any`.
+5. After design or copy changes, append an entry to `docs/design-learning.md`.
+
+## Commands
+
+- `pnpm dev` — local server
+- `pnpm build` — production build

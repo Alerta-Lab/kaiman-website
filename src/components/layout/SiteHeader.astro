@@ -1,0 +1,174 @@
+---
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import { LogIn, X } from 'lucide-react';
+import { getLanding, type Locale } from '../../i18n';
+import { blogIndexPath } from '../../lib/blog-paths';
+import { loginUrl, signupUrl } from '../../lib/plans';
+import Button from '../ui/Button.astro';
+import LanguageMenu from './LanguageMenu.astro';
+
+interface Props {
+	locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getLanding(locale);
+const home = getRelativeLocaleUrl(locale, '/');
+const plansHref = `${home}#planes`;
+
+const menuLinks = [
+	{ href: `${home}#origen`, label: copy.nav.how },
+	{ href: `${home}#brand-understanding`, label: copy.nav.brand },
+	{ href: `${home}#playbooks`, label: copy.nav.playbooks },
+	{ href: `${home}#preguntas`, label: copy.nav.faq },
+	{ href: blogIndexPath(locale), label: copy.nav.blog },
+];
+---
+
+<header
+	data-site-header
+	class="fixed inset-x-0 top-4 z-[60] px-4 transition-opacity duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] data-[demo-hidden=true]:pointer-events-none data-[demo-hidden=true]:opacity-0"
+>
+	<div
+		class="mx-auto flex max-w-content items-center justify-between gap-3 rounded-2xl bg-ink-100/80 px-4 py-2 backdrop-blur-md"
+	>
+		<div class="flex min-w-0 items-center gap-2 sm:gap-3">
+			<a href={home} class="flex shrink-0 items-center" aria-current="page">
+				<img
+					src="/kaiman-logo.png"
+					alt={copy.meta.title}
+					width="140"
+					height="32"
+					class="h-8 w-auto"
+				/>
+			</a>
+			<button
+				type="button"
+				class="inline-flex h-10 items-center gap-2 rounded-lg px-3 text-sm font-display font-semibold text-neutral-200 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+				data-menu-button
+				data-open="false"
+				data-open-label={copy.nav.openMenu}
+				data-close-label={copy.nav.closeMenu}
+				aria-expanded="false"
+				aria-controls="site-menu"
+				aria-label={copy.nav.openMenu}
+			>
+				{copy.nav.menu}
+			</button>
+			<a
+				href={plansHref}
+				class="inline-flex h-10 items-center rounded-lg px-3 text-sm font-display font-semibold text-neutral-200 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+			>
+				{copy.nav.plans}
+			</a>
+		</div>
+
+		<div class="flex items-center gap-2">
+			<div class="hidden items-center gap-2 md:flex">
+				<LanguageMenu locale={locale} label={copy.nav.language} />
+				<Button href={loginUrl} variant="ghost" size="sm">
+					<LogIn slot="leading" size={16} aria-hidden="true" />
+					{copy.nav.login}
+				</Button>
+				<Button href={signupUrl} size="sm">{copy.nav.signup}</Button>
+			</div>
+		</div>
+	</div>
+</header>
+
+<div
+	id="site-menu"
+	data-menu-panel
+	data-open="false"
+	class="pointer-events-none fixed inset-0 z-[80] flex flex-col bg-ink px-6 pt-24 pb-10 opacity-0 sm:px-10"
+	style="clip-path: circle(0% at 8rem 2.5rem); transition: clip-path 620ms cubic-bezier(0.22,1,0.36,1), opacity 320ms ease;"
+	aria-hidden="true"
+>
+	<div class="mx-auto flex w-full max-w-content items-start justify-between gap-6">
+		<p class="font-display text-sm font-semibold tracking-[0.16em] text-neutral-400 uppercase">{copy.nav.menu}</p>
+		<button
+			type="button"
+			data-menu-close
+			class="inline-flex items-center gap-2 rounded-lg px-3 py-2 font-display text-sm font-semibold text-white transition-colors hover:bg-white/10"
+			aria-label={copy.nav.closeMenu}
+		>
+			{copy.nav.closeMenu}
+			<X size={18} aria-hidden="true" />
+		</button>
+	</div>
+
+	<nav class="mx-auto flex w-full max-w-content flex-1 flex-col justify-center gap-2 py-10" aria-label={copy.nav.home}>
+		{
+			menuLinks.map((link, index) => (
+				<a
+					href={link.href}
+					data-menu-link
+					class="group flex items-baseline gap-5 border-b border-white/10 py-4 transition-colors first:pt-0 last:border-b-0"
+					style="opacity:0; transform: translateY(16px);"
+				>
+					<span class="font-display text-sm font-semibold tabular-nums text-primary-400">
+						{String(index + 1).padStart(2, '0')}
+					</span>
+					<span class="font-display text-3xl font-semibold tracking-tight text-white/45 transition-colors group-hover:text-white sm:text-5xl lg:text-6xl">
+						{link.label}
+					</span>
+				</a>
+			))
+		}
+	</nav>
+
+	<div class="mx-auto flex w-full max-w-content flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+		<div class="flex flex-wrap gap-3">
+			<Button href={signupUrl}>{copy.nav.signup}</Button>
+			<Button href={loginUrl} variant="secondary">{copy.nav.login}</Button>
+			<Button href={plansHref} variant="secondary">{copy.nav.plans}</Button>
+		</div>
+		<LanguageMenu locale={locale} label={copy.nav.language} />
+	</div>
+</div>
+
+<script>
+	const button = document.querySelector('[data-menu-button]');
+	const panel = document.querySelector('[data-menu-panel]');
+	const closeBtn = document.querySelector('[data-menu-close]');
+	const openLabel = button?.getAttribute('data-open-label') ?? '';
+	const closeLabel = button?.getAttribute('data-close-label') ?? openLabel;
+
+	function setOpen(open: boolean) {
+		if (!(button instanceof HTMLButtonElement) || !(panel instanceof HTMLElement)) return;
+		button.dataset.open = open ? 'true' : 'false';
+		button.setAttribute('aria-expanded', String(open));
+		button.setAttribute('aria-label', open ? closeLabel : openLabel);
+		panel.dataset.open = open ? 'true' : 'false';
+		panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+		panel.classList.toggle('pointer-events-none', !open);
+		panel.classList.toggle('pointer-events-auto', open);
+		panel.style.opacity = open ? '1' : '0';
+		panel.style.clipPath = open ? 'circle(160% at 8rem 2.5rem)' : 'circle(0% at 8rem 2.5rem)';
+		document.body.classList.toggle('overflow-hidden', open);
+
+		panel.querySelectorAll('[data-menu-link]').forEach((link, index) => {
+			if (!(link instanceof HTMLElement)) return;
+			link.style.opacity = open ? '1' : '0';
+			link.style.transform = open ? 'translateY(0)' : 'translateY(16px)';
+			link.style.transition = open
+				? `opacity 480ms cubic-bezier(0.22,1,0.36,1) ${140 + index * 55}ms, transform 480ms cubic-bezier(0.22,1,0.36,1) ${140 + index * 55}ms`
+				: 'opacity 180ms ease, transform 180ms ease';
+		});
+	}
+
+	button?.addEventListener('click', () => {
+		const open = button.getAttribute('aria-expanded') === 'true';
+		setOpen(!open);
+	});
+
+	closeBtn?.addEventListener('click', () => setOpen(false));
+
+	panel?.querySelectorAll('a').forEach((link) => {
+		link.addEventListener('click', () => setOpen(false));
+	});
+
+	document.addEventListener('keydown', (event) => {
+		if (event.key === 'Escape') setOpen(false);
+	});
+</script>

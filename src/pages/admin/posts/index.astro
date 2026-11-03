@@ -1,0 +1,29 @@
+---
+import { Pencil, Plus } from 'lucide-react';
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { listAllPosts } from '../../../server/repositories/posts';
+
+const posts = await listAllPosts();
+---
+
+<AdminLayout title="Artículos">
+	<div class="mb-6 flex justify-end">
+		<a href="/admin/posts/nuevo" class="inline-flex min-h-11 items-center gap-2 rounded-lg bg-primary px-4 font-bold text-white"><Plus aria-hidden="true" size={18} /> Nuevo artículo</a>
+	</div>
+	<div class="overflow-x-auto rounded-2xl border border-black/10 bg-white">
+		<table class="w-full min-w-[44rem] text-left">
+			<thead class="bg-primary-100 text-sm"><tr><th class="p-4">Título</th><th class="p-4">Idioma</th><th class="p-4">Estado</th><th class="p-4">Actualizado</th><th class="p-4"><span class="sr-only">Acciones</span></th></tr></thead>
+			<tbody>
+				{posts.map((post) => (
+					<tr class="border-t border-black/10">
+						<td class="p-4 font-bold">{post.title}</td>
+						<td class="p-4 font-bold uppercase text-primary-800">{post.locale}</td>
+						<td class="p-4"><span class:list={['rounded-full px-3 py-1 text-sm font-bold', post.status === 'published' ? 'bg-success-100 text-success-700' : 'bg-warning/30']}>{post.status === 'published' ? 'Publicado' : 'Borrador'}</span></td>
+						<td class="p-4">{new Intl.DateTimeFormat('es', { dateStyle: 'medium' }).format(post.updatedAt)}</td>
+						<td class="p-4"><a href={`/admin/posts/${post.id}`} class="inline-flex min-h-11 items-center gap-2 rounded-lg px-3 font-bold text-primary hover:bg-primary-100"><Pencil aria-hidden="true" size={17} /> Editar</a></td>
+					</tr>
+				))}
+			</tbody>
+		</table>
+	</div>
+</AdminLayout>

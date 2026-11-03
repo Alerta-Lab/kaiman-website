@@ -1,0 +1,81 @@
+---
+import '../styles/global.css';
+import type { Locale } from '../i18n';
+
+interface Props {
+	title: string;
+	description: string;
+	locale?: Locale;
+	image?: string | null;
+	canonical?: string;
+	noindex?: boolean;
+	type?: 'website' | 'article';
+	alternateEs?: string | null;
+	alternateEn?: string | null;
+}
+
+const {
+	title,
+	description,
+	locale = 'es',
+	image,
+	canonical = new URL(Astro.url.pathname, Astro.site).toString(),
+	noindex = false,
+	type = 'website',
+	alternateEs = null,
+	alternateEn = null,
+} = Astro.props;
+const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
+const defaultImage = new URL('/og-default.png', Astro.site).toString();
+const socialImage = image || defaultImage;
+---
+
+<!doctype html>
+<html lang={locale}>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<link rel="icon" href="/favicon.ico" sizes="any" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+		<link rel="shortcut icon" href="/favicon.ico" />
+		<meta name="theme-color" content="#6B48E9" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
+		{alternateEs && <link rel="alternate" hreflang="es" href={alternateEs} />}
+		{alternateEn && <link rel="alternate" hreflang="en" href={alternateEn} />}
+		{(alternateEs || alternateEn) && (
+			<link rel="alternate" hreflang="x-default" href={alternateEs ?? alternateEn!} />
+		)}
+		<meta name="robots" content={noindex ? 'noindex,nofollow' : 'index,follow,max-image-preview:large'} />
+		<meta property="og:type" content={type} />
+		<meta property="og:locale" content={locale === 'en' ? 'en_US' : 'es_ES'} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:image" content={socialImage} />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:image" content={socialImage} />
+		<link rel="alternate" type="application/rss+xml" title="Kaiman Blog" href="/rss.xml" />
+		{gaId && (
+			<>
+				<script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
+				<script is:inline define:vars={{ gaId }}>
+					window.dataLayer = window.dataLayer || [];
+					function gtag(){dataLayer.push(arguments);}
+					gtag('js', new Date());
+					gtag('config', gaId, { anonymize_ip: true });
+				</script>
+			</>
+		)}
+	</head>
+	<body class="blog-surface min-h-screen bg-white font-body font-semibold text-black antialiased">
+		<a class="sr-only z-50 bg-white p-3 focus:not-sr-only focus:fixed focus:left-4 focus:top-4" href="#contenido">
+			{locale === 'en' ? 'Skip to content' : 'Saltar al contenido'}
+		</a>
+		<slot />
+	</body>
+</html>

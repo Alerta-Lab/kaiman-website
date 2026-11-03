@@ -1,0 +1,97 @@
+---
+import { ArrowLeft } from 'lucide-react';
+import PublicFooter from '../../../components/blog/organisms/PublicFooter.astro';
+import PublicHeader from '../../../components/blog/organisms/PublicHeader.astro';
+import { isLocale, type Locale } from '../../../i18n';
+import BlogLayout from '../../../layouts/BlogLayout.astro';
+import { blogCategoryPath, blogIndexPath, blogPostPath } from '../../../lib/blog-paths';
+import { renderMarkdown } from '../../../lib/markdown';
+import { getPublishedPost, getSiblingPost, tagDisplayName } from '../../../server/repositories/posts';
+
+const param = Astro.params.locale;
+if (!param || !isLocale(param)) return Astro.redirect('/es/blogs');
+const locale = param as Locale;
+const slug = Astro.params.slug ?? '';
+
+const post = await getPublishedPost(slug, locale);
+if (!post) return Astro.redirect(`/${locale}/blogs`);
+
+const otherLocale: Locale = locale === 'es' ? 'en' : 'es';
+const sibling = await getSiblingPost(post.translationGroupId, otherLocale);
+const siblingPublished = sibling?.status === 'published' ? sibling : null;
+
+const html = await renderMarkdown(post.markdown);
+const canonical = new URL(blogPostPath(locale, post.slug), Astro.site).toString();
+const alternateEs =
+	locale === 'es'
+		? canonical
+		: siblingPublished
+			? new URL(blogPostPath('es', siblingPublished.slug), Astro.site).toString()
+			: new URL(blogIndexPath('es'), Astro.site).toString();
+const alternateEn =
+	locale === 'en'
+		? canonical
+		: siblingPublished
+			? new URL(blogPostPath('en', siblingPublished.slug), Astro.site).toString()
+			: new URL(blogIndexPath('en'), Astro.site).toString();
+
+const jsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'BlogPosting',
+	headline: post.title,
+	description: post.seoDescription,
+	inLanguage: locale,
+	datePublished: post.publishedAt?.toISOString(),
+	dateModified: post.updatedAt.toISOString(),
+	mainEntityOfPage: canonical,
+	image: post.coverUrl || undefined,
+	author: { '@type': 'Organization', name: 'Kaiman Studio' },
+};
+Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=86400');
+
+const backLabel = locale === 'en' ? 'Back to blog' : 'Volver al blog';
+---
+
+<BlogLayout
+	title={post.seoTitle}
+	description={post.seoDescription}
+	locale={locale}
+	image={post.coverUrl}
+	canonical={canonical}
+	type="article"
+	alternateEs={alternateEs}
+	alternateEn={alternateEn}
+>
+	<PublicHeader locale={locale} />
+	<main id="contenido" class="bg-white">
+		<article class="mx-auto max-w-3xl px-5 py-14 md:py-20">
+			<a href={blogIndexPath(locale)} class="mb-gap-page inline-flex min-h-11 items-center gap-2 font-bold text-primary-800 hover:text-primary">
+				<ArrowLeft aria-hidden="true" size={18} /> {backLabel}
+			</a>
+			<div class="mb-gap-block flex flex-wrap gap-gap-chip">
+				{post.tags.map((tag) => (
+					<a href={blogCategoryPath(locale, tag.slug)} class="rounded-md bg-primary-100 px-2.5 py-1 text-sm font-bold text-primary-800 hover:bg-primary-200">
+						{tagDisplayName(tag, locale)}
+					</a>
+				))}
+			</div>
+			<h1 class="font-headline text-4xl font-bold leading-[1.05] tracking-tight text-black md:text-6xl">{post.title}</h1>
+			<p class="mt-gap-block max-w-[42rem] text-xl leading-relaxed text-black/75">{post.excerpt}</p>
+			{post.coverUrl && (
+				<img
+					src={post.coverUrl}
+					alt={post.coverAlt ?? ''}
+					width="1200"
+					height="675"
+					class="mt-gap-page aspect-video w-full rounded-xl object-cover"
+				/>
+			)}
+			<div
+				class="prose prose-lg mt-12 max-w-none prose-headings:font-headline prose-headings:tracking-tight prose-a:font-bold prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-p:text-black/80"
+				set:html={html}
+			/>
+		</article>
+		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+	</main>
+	<PublicFooter locale={locale} />
+</BlogLayout>

@@ -1,0 +1,96 @@
+---
+import { ArrowRight, LogIn, UserPlus } from 'lucide-react';
+import Headline from '../../../components/blog/atoms/Headline.astro';
+import Text from '../../../components/blog/atoms/Text.astro';
+import PostCard from '../../../components/blog/molecules/PostCard.astro';
+import PublicFooter from '../../../components/blog/organisms/PublicFooter.astro';
+import PublicHeader from '../../../components/blog/organisms/PublicHeader.astro';
+import { isLocale, type Locale } from '../../../i18n';
+import BlogLayout from '../../../layouts/BlogLayout.astro';
+import { blogIndexPath } from '../../../lib/blog-paths';
+import { listPublishedPosts } from '../../../server/repositories/posts';
+
+const param = Astro.params.locale;
+if (!param || !isLocale(param)) return Astro.redirect('/es/blogs');
+const locale = param as Locale;
+
+const posts = await listPublishedPosts({ limit: 12, locale });
+const canonical = new URL(blogIndexPath(locale), Astro.site).toString();
+const alternateEs = new URL(blogIndexPath('es'), Astro.site).toString();
+const alternateEn = new URL(blogIndexPath('en'), Astro.site).toString();
+Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=86400');
+
+const copy =
+	locale === 'en'
+		? {
+				title: 'Kaiman Blog — Ideas to create better',
+				description: 'Design, technology, and AI to turn ideas into memorable products.',
+				headline: 'Design, technology, and AI without the noise.',
+				support: 'Concrete lessons for useful experiences, product launches, and working with artificial intelligence.',
+				login: 'Log in',
+				signup: 'Sign up',
+				explore: 'Browse articles',
+				latest: 'Latest articles',
+				latestSupport: 'Short, practical reads on product, design, and artificial intelligence.',
+				empty: 'No published articles yet.',
+			}
+		: {
+				title: 'Kaiman Blog — Ideas para crear mejor',
+				description: 'Diseño, tecnología e inteligencia artificial para convertir ideas en productos memorables.',
+				headline: 'Diseño, tecnología e IA sin el ruido.',
+				support: 'Aprendizajes concretos para diseñar experiencias útiles, lanzar productos y trabajar con inteligencia artificial.',
+				login: 'Iniciar sesión',
+				signup: 'Registrarse',
+				explore: 'Explorar artículos',
+				latest: 'Últimos artículos',
+				latestSupport: 'Lecturas cortas y aplicables sobre producto, diseño e inteligencia artificial.',
+				empty: 'Todavía no hay artículos publicados.',
+			};
+---
+
+<BlogLayout title={copy.title} description={copy.description} locale={locale} canonical={canonical} alternateEs={alternateEs} alternateEn={alternateEn}>
+	<PublicHeader locale={locale} />
+	<main id="contenido">
+		<section class="relative overflow-hidden border-b border-primary-200 bg-primary-100">
+			<div class="pointer-events-none absolute inset-y-0 right-0 hidden w-1/2 bg-primary-200 lg:block" aria-hidden="true"></div>
+			<div class="pointer-events-none absolute inset-y-0 right-0 hidden w-1/3 bg-primary-300 lg:block" aria-hidden="true"></div>
+			<div class="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white to-transparent" aria-hidden="true"></div>
+			<div class="relative mx-auto flex min-h-[78vh] max-w-7xl flex-col justify-end gap-gap-page px-5 py-16 lg:justify-center lg:px-8 lg:py-24">
+				<div class="motion-fade flex items-center gap-4">
+					<img src="/logo.png" alt="" width="72" height="72" class="size-14 rounded-2xl bg-black object-contain p-2 sm:size-16 md:size-[4.5rem]" />
+					<p class="font-headline text-5xl font-bold tracking-tight text-primary-800 sm:text-6xl md:text-7xl">Kaiman</p>
+				</div>
+				<div class="motion-fade-up max-w-3xl">
+					<Headline as="h1" size="6xl" class="text-black">{copy.headline}</Headline>
+					<Text size="lg" class="mt-gap-block max-w-[40rem] text-black/75">{copy.support}</Text>
+					<div class="mt-gap-page flex flex-wrap gap-gap-control">
+						<a href="https://app.kaimanstudio.ai/auth/login" class="inline-flex min-h-12 items-center gap-2 rounded-lg border border-primary-700 bg-white px-5 font-bold text-primary-800 hover:bg-primary-100">
+							<LogIn aria-hidden="true" size={18} /> {copy.login}
+						</a>
+						<a href="https://app.kaimanstudio.ai/auth/register" class="inline-flex min-h-12 items-center gap-2 rounded-lg bg-primary px-5 font-bold text-white hover:bg-primary-700">
+							<UserPlus aria-hidden="true" size={18} /> {copy.signup}
+						</a>
+						<a href="#articulos" class="inline-flex min-h-12 items-center gap-2 rounded-lg px-5 font-bold text-primary-800 hover:bg-primary-200/70">
+							{copy.explore} <ArrowRight aria-hidden="true" size={18} />
+						</a>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section id="articulos" class="mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-20">
+			<div class="mb-gap-page max-w-2xl">
+				<Headline as="h2" size="4xl">{copy.latest}</Headline>
+				<Text class="mt-gap-control text-black/75">{copy.latestSupport}</Text>
+			</div>
+			{posts.length === 0 ? (
+				<p class="rounded-xl bg-primary-100 p-gap-block font-bold text-primary-900">{copy.empty}</p>
+			) : (
+				<div class="grid gap-gap-block md:grid-cols-2 lg:grid-cols-3 lg:gap-gap-page">
+					{posts.map((post) => <PostCard post={post} locale={locale} />)}
+				</div>
+			)}
+		</section>
+	</main>
+	<PublicFooter locale={locale} />
+</BlogLayout>

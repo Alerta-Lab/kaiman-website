@@ -1,0 +1,13 @@
+---
+description: Tailwind-only styling rules for landing-kaiman
+globs: src/**/*.{astro,css,ts}
+alwaysApply: true
+---
+
+# Styling
+
+- Use **Tailwind utility classes** on markup for all layout, spacing, color, and typography.
+- Theme tokens live in `tailwind.config.ts` and `@theme` in `src/styles/global.css`.
+- Do **not** add `<style>` blocks, CSS modules, or one-off `.css` files for components.
+- Custom CSS is allowed only for unavoidable cases (third-party embeds, browser bugs). Document each case in `docs/design-learning.md`.
+- Prefer semantic token classes (`bg-surface`, `text-brand`) over raw palette jumps when a token exists.

@@ -1,0 +1,13 @@
+---
+description: Neutral, descriptive product copy standards
+globs: src/i18n/**/*.ts
+alwaysApply: true
+---
+
+# Copy
+
+- Tone: neutral, descriptive, clear, informative.
+- No marketing accentuation: no hype adjectives, slogans, urgency tricks, or exaggerated claims.
+- Prefer concrete facts about what the product does and who it helps.
+- Keep ES and EN meaning aligned; do not invent benefits in one locale only.
+- When copy changes, log a short note in `docs/design-learning.md`.

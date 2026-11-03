@@ -1,0 +1,35 @@
+---
+import { ImagePlus } from 'lucide-react';
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { listMedia } from '../../server/repositories/media';
+
+const items = await listMedia();
+---
+
+<AdminLayout title="Imágenes">
+	<form id="upload-media" class="grid max-w-2xl gap-4 rounded-2xl border border-black/10 bg-white p-6 sm:grid-cols-2">
+		<label class="font-bold">Imagen<input name="image" type="file" accept="image/*" required class="mt-2 block min-h-11 w-full rounded-lg border border-black-stroke p-2" /></label>
+		<label class="font-bold">Texto alternativo<input name="alt" required class="mt-2 block min-h-11 w-full rounded-lg border border-black-stroke px-3" /></label>
+		<button class="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary px-4 font-bold text-white sm:col-span-2"><ImagePlus aria-hidden="true" size={18} /> Subir imagen</button>
+		<p id="status" aria-live="polite" class="text-sm font-bold sm:col-span-2"></p>
+	</form>
+	<ul class="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+		{items.map((item) => <li class="overflow-hidden rounded-xl border border-black/10 bg-white"><img src={item.url} alt={item.alt ?? ''} class="aspect-video w-full object-cover" /><div class="p-3"><p class="truncate font-bold">{item.filename}</p><button type="button" data-url={item.url} class="mt-2 text-sm font-bold text-primary hover:underline">Copiar URL</button></div></li>)}
+	</ul>
+	<script>
+		const form = document.querySelector<HTMLFormElement>('#upload-media');
+		const status = document.querySelector('#status');
+		form?.addEventListener('submit', async (event) => {
+			event.preventDefault();
+			if (status) status.textContent = 'Subiendo…';
+			const response = await fetch('/api/admin/media', { method: 'POST', body: new FormData(form) });
+			const result = await response.json();
+			if (!response.ok) { if (status) status.textContent = result.error; return; }
+			location.reload();
+		});
+		document.querySelectorAll<HTMLButtonElement>('[data-url]').forEach((button) => button.addEventListener('click', async () => {
+			await navigator.clipboard.writeText(button.dataset.url ?? '');
+			button.textContent = 'URL copiada';
+		}));
+	</script>
+</AdminLayout>

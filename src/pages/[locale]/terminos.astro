@@ -1,0 +1,24 @@
+---
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import SiteHeader from '../../components/layout/SiteHeader.astro';
+import { getLanding, isLocale, locales, type Locale } from '../../i18n';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export function getStaticPaths() {
+	return locales.map((locale) => ({ params: { locale } }));
+}
+
+const param = Astro.params.locale;
+if (!param || !isLocale(param)) return Astro.redirect('/es/');
+const locale = param as Locale;
+const copy = getLanding(locale);
+---
+
+<BaseLayout locale={locale} title={`${copy.terms.title} · ${copy.meta.title}`} description={copy.terms.body}>
+	<SiteHeader locale={locale} />
+	<main id="contenido" class="mx-auto max-w-copy px-4 pt-24 pb-16 sm:px-6">
+		<h1 class="text-4xl font-semibold text-balance">{copy.terms.title}</h1>
+		<p class="mt-6 text-lg text-pretty text-neutral-300">{copy.terms.body}</p>
+	</main>
+	<SiteFooter locale={locale} />
+</BaseLayout>

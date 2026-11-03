@@ -1,0 +1,64 @@
+---
+import { Search } from 'lucide-react';
+import Headline from '../../../components/blog/atoms/Headline.astro';
+import PostCard from '../../../components/blog/molecules/PostCard.astro';
+import PublicFooter from '../../../components/blog/organisms/PublicFooter.astro';
+import PublicHeader from '../../../components/blog/organisms/PublicHeader.astro';
+import { isLocale, type Locale } from '../../../i18n';
+import BlogLayout from '../../../layouts/BlogLayout.astro';
+import { blogSearchPath } from '../../../lib/blog-paths';
+import { listPublishedPosts } from '../../../server/repositories/posts';
+
+const param = Astro.params.locale;
+if (!param || !isLocale(param)) return Astro.redirect('/es/blogs/buscar');
+const locale = param as Locale;
+
+const query = Astro.url.searchParams.get('q')?.trim() ?? '';
+const posts = query ? await listPublishedPosts({ query, locale }) : [];
+const copy =
+	locale === 'en'
+		? {
+				title: 'Search — Kaiman Blog',
+				description: 'Search articles on design, technology, and artificial intelligence.',
+				heading: 'Search',
+				placeholder: 'Design, AI, product…',
+				button: 'Search',
+				label: 'Search articles',
+				results: (n: number, q: string) => `${n} result(s) for “${q}”`,
+			}
+		: {
+				title: 'Buscar — Kaiman Blog',
+				description: 'Busca artículos de diseño, tecnología e inteligencia artificial.',
+				heading: 'Buscar',
+				placeholder: 'Diseño, IA, producto…',
+				button: 'Buscar',
+				label: 'Buscar artículos',
+				results: (n: number, q: string) => `${n} resultado(s) para “${q}”`,
+			};
+---
+
+<BlogLayout title={copy.title} description={copy.description} locale={locale} noindex>
+	<PublicHeader locale={locale} />
+	<main id="contenido" class="mx-auto min-h-[70vh] max-w-5xl px-5 py-16">
+		<Headline as="h1" size="6xl">{copy.heading}</Headline>
+		<form role="search" action={blogSearchPath(locale)} method="get" class="mt-gap-page flex flex-col gap-gap-control sm:flex-row">
+			<label class="sr-only" for="q">{copy.label}</label>
+			<input
+				id="q"
+				name="q"
+				value={query}
+				autofocus
+				placeholder={copy.placeholder}
+				class="min-h-12 flex-1 rounded-lg border border-black-stroke bg-white px-4 font-medium text-black placeholder:text-black/55"
+			/>
+			<button class="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-primary px-5 font-bold text-white hover:bg-primary-700">
+				<Search aria-hidden="true" size={19} /> {copy.button}
+			</button>
+		</form>
+		{query && <p class="mt-gap-page font-bold text-primary-900">{copy.results(posts.length, query)}</p>}
+		<div class="mt-gap-block grid gap-gap-block md:grid-cols-2">
+			{posts.map((post) => <PostCard post={post} locale={locale} />)}
+		</div>
+	</main>
+	<PublicFooter locale={locale} />
+</BlogLayout>

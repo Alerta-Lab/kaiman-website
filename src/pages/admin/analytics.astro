@@ -1,0 +1,36 @@
+---
+import { Eye, Users, Waypoints } from 'lucide-react';
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { getAnalyticsSummary } from '../../server/analytics';
+
+const startDate = Astro.url.searchParams.get('start') ?? '28daysAgo';
+const endDate = Astro.url.searchParams.get('end') ?? 'today';
+let data = null;
+let error = '';
+try { data = await getAnalyticsSummary(startDate, endDate); } catch (cause) { error = cause instanceof Error ? cause.message : 'No se pudieron cargar las métricas.'; }
+---
+
+<AdminLayout title="Analítica">
+	<form class="mb-6 flex flex-wrap items-end gap-3 rounded-xl bg-white p-4">
+		<label class="font-bold">Desde<input type="date" name="start" class="mt-1 block min-h-11 rounded-lg border border-black-stroke px-3" /></label>
+		<label class="font-bold">Hasta<input type="date" name="end" class="mt-1 block min-h-11 rounded-lg border border-black-stroke px-3" /></label>
+		<button class="min-h-11 rounded-lg bg-primary px-4 font-bold text-white">Aplicar</button>
+	</form>
+	{!data && !error && <p class="rounded-xl bg-warning/30 p-5">Configura GA4_PROPERTY_ID y GOOGLE_SERVICE_ACCOUNT_JSON para ver métricas reales.</p>}
+	{error && <p role="alert" class="rounded-xl bg-error-100 p-5 text-error-700">{error}</p>}
+	{data && (
+		<>
+			<div class="grid gap-4 sm:grid-cols-3">
+				{[
+					{ label: 'Usuarios', value: data.users, icon: Users },
+					{ label: 'Sesiones', value: data.sessions, icon: Waypoints },
+					{ label: 'Vistas', value: data.views, icon: Eye },
+				].map(({ label, value, icon: Icon }) => <article class="rounded-2xl bg-white p-6"><Icon className="text-primary" aria-hidden="true" /><p class="mt-4 text-sm font-bold text-black/55">{label}</p><p class="font-headline text-4xl font-bold">{value.toLocaleString('es')}</p></article>)}
+			</div>
+			<div class="mt-6 grid gap-6 xl:grid-cols-2">
+				<section class="rounded-2xl bg-white p-6"><h2 class="font-headline text-2xl font-bold">Páginas principales</h2><ol class="mt-4 divide-y divide-black/10">{data.topPages.map((page) => <li class="flex justify-between gap-4 py-3"><span class="truncate">{page.title}</span><strong>{page.views}</strong></li>)}</ol></section>
+				<section class="rounded-2xl bg-white p-6"><h2 class="font-headline text-2xl font-bold">Canales</h2><ol class="mt-4 divide-y divide-black/10">{data.sources.map((source) => <li class="flex justify-between gap-4 py-3"><span>{source.source}</span><strong>{source.sessions}</strong></li>)}</ol></section>
+			</div>
+		</>
+	)}
+</AdminLayout>

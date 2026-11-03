@@ -1,0 +1,43 @@
+---
+import { ArrowUpRight } from 'lucide-react';
+import type { Locale } from '../../../i18n';
+import { blogCategoryPath, blogPostPath } from '../../../lib/blog-paths';
+import type { PostWithTags } from '../../../server/repositories/posts';
+import { tagDisplayName } from '../../../server/repositories/posts';
+
+interface Props {
+	post: PostWithTags;
+	locale: Locale;
+}
+
+const { post, locale } = Astro.props;
+const readLabel = locale === 'en' ? 'Read' : 'Leer';
+---
+
+<article class="group relative flex h-full flex-col border-b border-primary-200 py-gap-block first:pt-0 last:border-b-0 md:border md:border-primary-200 md:rounded-xl md:bg-white md:p-gap-block md:transition-colors md:hover:border-primary-400 md:hover:bg-primary-100/40">
+	<div class="mb-gap-control flex flex-wrap gap-gap-chip">
+		{post.tags.map((tag) => (
+			<a
+				href={blogCategoryPath(locale, tag.slug)}
+				class="relative z-10 rounded-md bg-primary-100 px-2.5 py-1 text-sm font-bold text-primary-800 hover:bg-primary-200"
+			>
+				{tagDisplayName(tag, locale)}
+			</a>
+		))}
+	</div>
+	<h2 class="font-headline text-2xl font-bold leading-tight tracking-tight text-black md:text-[1.75rem]">
+		<a href={blogPostPath(locale, post.slug)} class="after:absolute after:inset-0">
+			{post.title}
+		</a>
+	</h2>
+	<p class="mt-gap-control max-w-prose flex-1 leading-relaxed text-black/75">{post.excerpt}</p>
+	<div class="mt-gap-block flex items-center justify-between text-sm font-bold text-primary-800">
+		<time datetime={post.publishedAt?.toISOString()}>
+			{new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(post.publishedAt ?? post.createdAt)}
+		</time>
+		<span class="inline-flex items-center gap-1 text-primary" aria-hidden="true">
+			{readLabel}
+			<ArrowUpRight className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" size={18} />
+		</span>
+	</div>
+</article>

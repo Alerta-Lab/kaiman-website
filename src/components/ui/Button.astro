@@ -1,0 +1,70 @@
+---
+interface Props {
+	href?: string;
+	variant?: 'primary' | 'secondary' | 'ghost';
+	size?: 'md' | 'sm';
+	type?: 'button' | 'submit';
+	class?: string;
+	ariaLabel?: string;
+	plan?: string;
+	/** Arrow cell like Webdrift primary. Defaults on for primary md. */
+	arrow?: boolean;
+}
+
+const {
+	href,
+	variant = 'primary',
+	size = 'md',
+	type = 'button',
+	class: className,
+	ariaLabel,
+	plan,
+	arrow,
+} = Astro.props;
+
+const labelHtml = (await Astro.slots.render('default')).trim();
+const plainLabel = labelHtml
+	.replace(/<[^>]*>/g, ' ')
+	.replace(/\s+/g, ' ')
+	.trim();
+const accessibleLabel = ariaLabel ?? plainLabel;
+const hasLeading = Astro.slots.has('leading');
+const showArrow = arrow ?? (variant === 'primary' && size === 'md');
+
+const classes = [
+	'k-btn',
+	variant === 'primary' && 'k-btn-primary',
+	variant === 'secondary' && 'k-btn-secondary',
+	variant === 'ghost' && 'k-btn-ghost',
+	size === 'sm' && 'k-btn-sm',
+	className,
+];
+
+const arrowSvg = `<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.21 5.78h7c1.9 0 2.84 0 3.42.58.58.58.59 1.53.59 3.41v7.02M5.78 18.22 16.85 7.15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+---
+
+{
+	href ? (
+		<a href={href} class:list={classes} aria-label={accessibleLabel} data-plan={plan} data-cursor-go>
+			<span class="k-btn-l">
+				{hasLeading ? <span class="k-btn-leading"><slot name="leading" /></span> : null}
+				<span class="k-btn-rl">
+					<span aria-hidden="true" set:html={labelHtml} />
+					<span aria-hidden="true" set:html={labelHtml} />
+				</span>
+			</span>
+			{showArrow ? <span class="k-btn-i" aria-hidden="true" set:html={arrowSvg} /> : null}
+		</a>
+	) : (
+		<button type={type} class:list={classes} aria-label={accessibleLabel} data-cursor-go>
+			<span class="k-btn-l">
+				{hasLeading ? <span class="k-btn-leading"><slot name="leading" /></span> : null}
+				<span class="k-btn-rl">
+					<span aria-hidden="true" set:html={labelHtml} />
+					<span aria-hidden="true" set:html={labelHtml} />
+				</span>
+			</span>
+			{showArrow ? <span class="k-btn-i" aria-hidden="true" set:html={arrowSvg} /> : null}
+		</button>
+	)
+}

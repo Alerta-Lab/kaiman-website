@@ -1,0 +1,14 @@
+---
+interface Props {
+	as?: 'p' | 'span' | 'div';
+	size?: 'sm' | 'base' | 'lg';
+	class?: string;
+}
+
+const { as: Tag = 'p', size = 'base', class: className = '' } = Astro.props;
+const sizes = { sm: 'text-sm', base: 'text-base', lg: 'text-lg' };
+---
+
+<Tag class:list={['font-body font-semibold leading-relaxed', sizes[size], className]}>
+	<slot />
+</Tag>

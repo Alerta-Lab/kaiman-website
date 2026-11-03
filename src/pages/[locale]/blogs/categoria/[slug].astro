@@ -1,0 +1,55 @@
+---
+import Headline from '../../../../components/blog/atoms/Headline.astro';
+import Text from '../../../../components/blog/atoms/Text.astro';
+import PostCard from '../../../../components/blog/molecules/PostCard.astro';
+import PublicFooter from '../../../../components/blog/organisms/PublicFooter.astro';
+import PublicHeader from '../../../../components/blog/organisms/PublicHeader.astro';
+import { isLocale, type Locale } from '../../../../i18n';
+import BlogLayout from '../../../../layouts/BlogLayout.astro';
+import { blogCategoryPath } from '../../../../lib/blog-paths';
+import { listPublishedPosts, tagDisplayName } from '../../../../server/repositories/posts';
+
+const param = Astro.params.locale;
+if (!param || !isLocale(param)) return Astro.redirect('/es/blogs');
+const locale = param as Locale;
+const slug = Astro.params.slug ?? '';
+
+const posts = await listPublishedPosts({ tag: slug, locale });
+const tag = posts[0]?.tags.find((item) => item.slug === slug);
+const name = tag ? tagDisplayName(tag, locale) : slug.replaceAll('-', ' ');
+const canonical = new URL(blogCategoryPath(locale, slug), Astro.site).toString();
+Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=86400');
+
+const copy =
+	locale === 'en'
+		? {
+				title: `${name} — Kaiman Blog`,
+				description: `Articles tagged ${name} on Kaiman Blog.`,
+				support: `Articles tagged with ${name}.`,
+				empty: 'No articles in this category yet.',
+			}
+		: {
+				title: `${name} — Kaiman Blog`,
+				description: `Artículos de ${name} en Kaiman Blog.`,
+				support: `Artículos etiquetados con ${name}.`,
+				empty: 'Todavía no hay artículos en esta categoría.',
+			};
+---
+
+<BlogLayout title={copy.title} description={copy.description} locale={locale} canonical={canonical}>
+	<PublicHeader locale={locale} />
+	<main id="contenido" class="mx-auto min-h-[70vh] max-w-7xl px-5 py-16 lg:px-8">
+		<header class="max-w-2xl border-b border-primary-200 pb-gap-page">
+			<Headline as="h1" size="6xl" class="capitalize">{name}</Headline>
+			<Text class="mt-gap-control text-black/75">{copy.support}</Text>
+		</header>
+		{posts.length === 0 ? (
+			<p class="mt-gap-page rounded-xl bg-primary-100 p-gap-block font-bold text-primary-900">{copy.empty}</p>
+		) : (
+			<div class="mt-gap-page grid gap-gap-block md:grid-cols-2 lg:grid-cols-3 lg:gap-gap-page">
+				{posts.map((post) => <PostCard post={post} locale={locale} />)}
+			</div>
+		)}
+	</main>
+	<PublicFooter locale={locale} />
+</BlogLayout>

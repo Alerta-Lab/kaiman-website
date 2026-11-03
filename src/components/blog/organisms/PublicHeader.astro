@@ -1,0 +1,81 @@
+---
+import { ChevronDown, Languages, LogIn, Search, UserPlus } from 'lucide-react';
+import { localeLabels, locales, type Locale } from '../../../i18n';
+import { blogIndexPath, blogSearchPath, swapBlogLocalePath } from '../../../lib/blog-paths';
+
+interface Props {
+	locale: Locale;
+}
+
+const { locale } = Astro.props;
+const home = blogIndexPath(locale);
+const search = blogSearchPath(locale);
+const copy =
+	locale === 'en'
+		? { search: 'Search articles', login: 'Log in', signup: 'Sign up', language: 'Language' }
+		: { search: 'Buscar artículos', login: 'Iniciar sesión', signup: 'Registrarse', language: 'Idioma' };
+---
+
+<header class="border-b border-primary-200 bg-white">
+	<nav aria-label={locale === 'en' ? 'Main navigation' : 'Navegación principal'} class="mx-auto flex max-w-7xl items-center justify-between gap-gap-control px-5 py-4 lg:px-8">
+		<a href={home} class="inline-flex items-center gap-3 font-headline text-2xl font-bold tracking-tight text-black">
+			<img src="/logo.png" alt="" width="40" height="40" class="size-10 rounded-lg bg-black object-contain p-1" />
+			<span>Kaiman <span class="text-primary">Blog</span></span>
+		</a>
+		<div class="flex items-center gap-gap-tight">
+			<details class="group relative">
+				<summary
+					class="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-lg px-3 text-sm font-bold text-primary-800 marker:content-none hover:bg-primary-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [&::-webkit-details-marker]:hidden"
+					aria-label={copy.language}
+				>
+					<Languages aria-hidden="true" size={18} />
+					<span>{localeLabels[locale]}</span>
+					<ChevronDown
+						aria-hidden="true"
+						size={16}
+						className="transition-transform duration-200 group-open:rotate-180"
+					/>
+				</summary>
+				<div class="absolute right-0 z-50 mt-2 min-w-40 rounded-lg border border-primary-200 bg-white p-2">
+					{
+						locales.map((code) => {
+							const href = swapBlogLocalePath(Astro.url.pathname, code);
+							return (
+								<a
+									href={href}
+									hreflang={code}
+									class:list={[
+										'flex min-h-11 items-center rounded-lg px-3 text-sm font-bold',
+										code === locale ? 'bg-primary text-white' : 'text-primary-800 hover:bg-primary-100',
+									]}
+									aria-current={code === locale ? 'true' : undefined}
+								>
+									{localeLabels[code]}
+								</a>
+							);
+						})
+					}
+				</div>
+			</details>
+			<a
+				aria-label={copy.search}
+				href={search}
+				class="inline-flex size-11 items-center justify-center rounded-lg text-black hover:bg-primary-100 hover:text-primary-800"
+			>
+				<Search aria-hidden="true" size={20} />
+			</a>
+			<a
+				href="https://app.kaimanstudio.ai/auth/login"
+				class="hidden min-h-11 items-center gap-2 rounded-lg px-4 font-bold text-black hover:bg-primary-100 sm:inline-flex"
+			>
+				<LogIn aria-hidden="true" size={18} /> {copy.login}
+			</a>
+			<a
+				href="https://app.kaimanstudio.ai/auth/register"
+				class="inline-flex min-h-11 items-center gap-2 rounded-lg bg-primary px-4 font-bold text-white hover:bg-primary-700"
+			>
+				<UserPlus aria-hidden="true" size={18} /> {copy.signup}
+			</a>
+		</div>
+	</nav>
+</header>

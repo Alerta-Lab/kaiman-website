@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font",
+        "value": "menlo",
+        "createdAt": "2026-11-02T17:50:07.524Z",
+        "reason": "pre-existing sw-copy__num monospace for scene index numerals, not brand display type"
+      }
+    ]
+  }
+}

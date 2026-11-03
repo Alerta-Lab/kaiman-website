@@ -1,0 +1,8 @@
+---
+import { PostEditor } from '../../../features/posts/PostEditor';
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+---
+
+<AdminLayout title="Nuevo artículo">
+	<PostEditor client:load />
+</AdminLayout>

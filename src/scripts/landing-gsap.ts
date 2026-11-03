@@ -1,0 +1,960 @@
+import gsap from 'gsap';
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+type RevealDir = 'left' | 'right' | 'up';
+
+function revealFrom(dir: RevealDir): { x: number; y: number } {
+	if (dir === 'left') return { x: -80, y: 28 };
+	if (dir === 'right') return { x: 80, y: 28 };
+	return { x: 0, y: 56 };
+}
+
+function resolveDir(panel: HTMLElement, index: number): RevealDir {
+	const attr = panel.dataset.reveal as RevealDir | undefined;
+	if (attr === 'left' || attr === 'right' || attr === 'up') return attr;
+	const cycle = index % 3;
+	if (cycle === 0) return 'left';
+	if (cycle === 1) return 'right';
+	return 'up';
+}
+
+/** Soft chapter scroll + Monument-style hero curtain + magnetic video cursor. */
+export function initLandingGsap(root: ParentNode = document): void {
+	const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	const main = root instanceof Element ? root : document.getElementById('contenido');
+	if (!main) return;
+
+	// Tear down prior ScrollTriggers + unwrap leftover pin-spacers (HMR / re-mount).
+	ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+	main.querySelectorAll('.pin-spacer').forEach((spacer) => {
+		const parent = spacer.parentElement;
+		if (!parent) return;
+		while (spacer.firstChild) parent.insertBefore(spacer.firstChild, spacer);
+		spacer.remove();
+	});
+	main
+		.querySelectorAll<HTMLElement>(
+			'[data-story-pin], [data-hero-pin], [data-story-stage], [data-reveal-item], [data-parallax-bg], [data-parallax-content] > *, [data-hero-exit], [data-hero-giant], [data-curtain-left], [data-curtain-right], [data-curtain-top], [data-curtain-bottom], [data-origen-layer]',
+		)
+		.forEach((node) => {
+			gsap.killTweensOf(node);
+			gsap.set(node, { clearProps: 'all' });
+		});
+
+	initLandingGsapInner(main, reduce);
+}
+
+function initLandingGsapInner(main: Element, reduce: boolean): void {
+	const chapters = gsap.utils.toArray<HTMLElement>(main.querySelectorAll('[data-chapter]'));
+	const panels = gsap.utils.toArray<HTMLElement>(main.querySelectorAll('[data-panel]'));
+	const stories = gsap.utils.toArray<HTMLElement>(main.querySelectorAll('[data-story]'));
+	const curtainTop = document.querySelector<HTMLElement>('[data-landing-curtain="top"]');
+	const curtainBottom = document.querySelector<HTMLElement>('[data-landing-curtain="bottom"]');
+	const rail = document.querySelector<HTMLElement>('[data-chapter-rail]');
+	const railItems = gsap.utils.toArray<HTMLElement>(document.querySelectorAll('[data-chapter-rail-item]'));
+
+	const clearMotion = () => {
+		main
+			.querySelectorAll<HTMLElement>(
+				'[data-reveal-item], [data-parallax-content] > *, [data-story-stage], [data-hero-exit], [data-hero-giant]',
+			)
+			.forEach((node) => {
+				gsap.set(node, { clearProps: 'all', opacity: 1, y: 0, x: 0, scale: 1 });
+			});
+		curtainTop?.remove();
+		curtainBottom?.remove();
+	};
+
+	const setActiveChapter = (id: string | undefined) => {
+		if (!railItems.length || !id) return;
+		railItems.forEach((item) => {
+			const active = item.dataset.chapterRailItem === id;
+			item.classList.toggle('is-active', active);
+			item.setAttribute('aria-current', active ? 'true' : 'false');
+		});
+	};
+
+	const heroApi = initHeroCurtain(main, reduce, setActiveChapter);
+	initVideoCursor(main, heroApi);
+	initAudienceSwitcher(main);
+	initHorizontalScrolls(main);
+
+	if (reduce) {
+		clearMotion();
+		return;
+	}
+
+	if (curtainTop && curtainBottom) {
+		gsap.to([curtainTop, curtainBottom], {
+			height: 0,
+			duration: 1.2,
+			ease: 'power2.inOut',
+			onComplete: () => {
+				curtainTop.remove();
+				curtainBottom.remove();
+			},
+		});
+	}
+
+	chapters.forEach((chapter) => {
+		if (chapter.dataset.heroCurtain !== undefined || chapter.id === 'demo') return;
+		ScrollTrigger.create({
+			trigger: chapter,
+			start: 'top center',
+			end: 'bottom center',
+			onEnter: () => setActiveChapter(chapter.dataset.chapter),
+			onEnterBack: () => setActiveChapter(chapter.dataset.chapter),
+		});
+	});
+
+	if (chapters[0]?.dataset.chapter) setActiveChapter(chapters[0].dataset.chapter);
+
+	const scrollToOrigen = () => {
+		const st = ScrollTrigger.getById('hero-curtain');
+		if (!st) {
+			main.querySelector<HTMLElement>('#origen')?.scrollIntoView({ behavior: 'smooth' });
+			return;
+		}
+		gsap.to(window, {
+			duration: 1.2,
+			ease: 'power2.inOut',
+			scrollTo: st.end,
+		});
+	};
+
+	railItems.forEach((item) => {
+		item.addEventListener('click', (event) => {
+			event.preventDefault();
+			const id = item.dataset.chapterRailItem;
+			if (id === 'demo') {
+				heroApi.scrollToDemo();
+				return;
+			}
+			if (id === 'origen') {
+				scrollToOrigen();
+				return;
+			}
+			if (id === 'hero') {
+				gsap.to(window, { duration: 0.9, ease: 'power2.inOut', scrollTo: 0 });
+				return;
+			}
+			const target = id ? main.querySelector<HTMLElement>(`[data-chapter="${id}"]`) : null;
+			target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		});
+	});
+
+	document.querySelectorAll('a[href$="#origen"]').forEach((link) => {
+		link.addEventListener('click', (event) => {
+			event.preventDefault();
+			scrollToOrigen();
+		});
+	});
+
+	if (window.location.hash === '#origen') {
+		requestAnimationFrame(() => scrollToOrigen());
+	}
+
+	panels.forEach((panel, index) => {
+		const bg = panel.querySelector<HTMLElement>('[data-parallax-bg]');
+		const marked = panel.querySelectorAll<HTMLElement>('[data-reveal-item]');
+		const fallback = panel.querySelectorAll<HTMLElement>('[data-parallax-content] > *');
+		const items = marked.length ? marked : fallback;
+		const motion = panel.dataset.motion ?? 'styled';
+
+		if (bg) {
+			gsap.fromTo(
+				bg,
+				{ yPercent: -6 },
+				{
+					yPercent: 6,
+					ease: 'none',
+					scrollTrigger: {
+						trigger: panel,
+						start: 'top bottom',
+						end: 'bottom top',
+						scrub: 1.2,
+					},
+				},
+			);
+		}
+
+		if (!items.length) return;
+
+		if (motion === 'plain') {
+			gsap.set(items, { opacity: 0, y: 28 });
+			gsap.to(items, {
+				opacity: 1,
+				y: 0,
+				duration: 0.7,
+				stagger: 0.06,
+				ease: 'power2.out',
+				scrollTrigger: {
+					trigger: panel,
+					start: 'top 78%',
+					toggleActions: 'play none none reverse',
+				},
+			});
+			return;
+		}
+
+		const dir = resolveDir(panel, index);
+		const from = revealFrom(dir);
+		gsap.set(items, { opacity: 0, x: from.x, y: from.y });
+		gsap.to(items, {
+			opacity: 1,
+			x: 0,
+			y: 0,
+			duration: 1.05,
+			stagger: 0.1,
+			ease: 'power3.out',
+			scrollTrigger: {
+				trigger: panel,
+				start: 'top 72%',
+				end: 'top 38%',
+				toggleActions: 'play none none reverse',
+			},
+		});
+	});
+
+	stories.forEach((story, storyIndex) => {
+		const pin = story.querySelector<HTMLElement>('[data-story-pin]');
+		const stages = gsap.utils.toArray<HTMLElement>(story.querySelectorAll('[data-story-stage]'));
+		if (!pin || stages.length < 2) return;
+
+		const segment = 1;
+		// Longer crossfade so stage changes read as opacity, not a hard cut.
+		const fade = 0.55;
+
+		gsap.set(stages, { opacity: 0, x: 0, y: 36, pointerEvents: 'none' });
+		gsap.set(stages[0], { opacity: 1, x: 0, y: 0, pointerEvents: 'auto' });
+
+		const tl = gsap.timeline({
+			scrollTrigger: {
+				id: `story-${story.id || storyIndex}`,
+				trigger: story,
+				start: 'top top',
+				end: () => `+=${stages.length * 100}%`,
+				scrub: 0.95,
+				pin: pin,
+				anticipatePin: 1,
+				invalidateOnRefresh: true,
+			},
+		});
+
+		tl.to({}, { duration: segment }, 0);
+
+		for (let index = 1; index < stages.length; index += 1) {
+			const prev = stages[index - 1];
+			const stage = stages[index];
+			const at = index * segment;
+			gsap.set(stage, { x: 0, y: 36, opacity: 0 });
+			tl.to(
+				prev,
+				{
+					opacity: 0,
+					x: 0,
+					y: -28,
+					pointerEvents: 'none',
+					duration: fade,
+					ease: 'none',
+				},
+				at,
+			);
+			tl.to(
+				stage,
+				{
+					opacity: 1,
+					x: 0,
+					y: 0,
+					pointerEvents: 'auto',
+					duration: fade,
+					ease: 'none',
+				},
+				at,
+			);
+			tl.to({}, { duration: Math.max(segment - fade, 0.2) }, at + fade);
+		}
+	});
+
+	if (rail) {
+		gsap.set(rail, { opacity: 0, x: 12 });
+		ScrollTrigger.create({
+			start: 'top -40',
+			onUpdate: (self) => {
+				gsap.to(rail, {
+					opacity: self.scroll() > 80 ? 1 : 0,
+					x: self.scroll() > 80 ? 0 : 12,
+					duration: 0.35,
+					overwrite: 'auto',
+				});
+			},
+		});
+	}
+
+	// After hero/story pins so start/end map to the final layout.
+	initShapeWipes(main);
+	requestAnimationFrame(() => {
+		ScrollTrigger.refresh();
+		initStoryTextFills(main);
+	});
+}
+
+type HeroApi = {
+	scrollToDemo: () => void;
+	getProgress: () => number;
+};
+
+function initHeroCurtain(
+	main: Element,
+	reduce: boolean,
+	setActiveChapter: (id: string | undefined) => void,
+): HeroApi {
+	const hero = main.querySelector<HTMLElement>('[data-hero-curtain]');
+	const pin = hero?.querySelector<HTMLElement>('[data-hero-pin]');
+	const left = hero?.querySelector<HTMLElement>('[data-curtain-left]');
+	const right = hero?.querySelector<HTMLElement>('[data-curtain-right]');
+	const top = hero?.querySelector<HTMLElement>('[data-curtain-top]');
+	const bottom = hero?.querySelector<HTMLElement>('[data-curtain-bottom]');
+	const exitsUp = gsap.utils.toArray<HTMLElement>(hero?.querySelectorAll('[data-hero-exit="up"]') ?? []);
+	const exitsLeft = gsap.utils.toArray<HTMLElement>(hero?.querySelectorAll('[data-hero-exit="left"]') ?? []);
+	const giant = hero?.querySelector<HTMLElement>('[data-hero-giant]');
+	const hotspot = hero?.querySelector<HTMLElement>('[data-video-hotspot]');
+	const origenLayer = hero?.querySelector<HTMLElement>('[data-origen-layer]');
+	const siteHeader = document.querySelector<HTMLElement>('[data-site-header]');
+
+	let progress = 0;
+
+	const setHeaderForDemo = (hidden: boolean) => {
+		if (!siteHeader) return;
+		siteHeader.dataset.demoHidden = hidden ? 'true' : 'false';
+	};
+
+	const scrollToDemo = () => {
+		const st = ScrollTrigger.getById('hero-curtain');
+		if (!st) {
+			const demo = main.querySelector<HTMLElement>('#demo');
+			demo?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			return;
+		}
+		const videoScroll = st.start + (st.end - st.start) * 0.42;
+		// autoKill must stay false: the pin/scrub nudges scroll and would cancel the tween.
+		gsap.killTweensOf(window);
+		gsap.to(window, {
+			duration: 0.5,
+			ease: 'power3.out',
+			scrollTo: { y: videoScroll, autoKill: false },
+			overwrite: true,
+			onUpdate: () => {
+				// Keep curtain in sync with the programmatic scroll (bypass scrub lag).
+				st.getTween()?.progress(1);
+			},
+		});
+	};
+
+	const api: HeroApi = {
+		scrollToDemo,
+		getProgress: () => progress,
+	};
+
+	if (!hero || !pin || reduce) return api;
+
+	if (origenLayer) {
+		gsap.set(origenLayer, {
+			opacity: 1,
+			clipPath: 'polygon(50% 0%, 50% 0%, 50% 100%, 50% 100%)',
+		});
+	}
+
+	const tl = gsap.timeline({
+		scrollTrigger: {
+			id: 'hero-curtain',
+			trigger: hero,
+			start: 'top top',
+			end: '+=320%',
+			scrub: 1.15,
+			pin: pin,
+			anticipatePin: 1,
+			invalidateOnRefresh: true,
+			onUpdate: (self) => {
+				progress = self.progress;
+				if (self.progress < 0.3) setActiveChapter('hero');
+				else if (self.progress < 0.68) setActiveChapter('demo');
+				else setActiveChapter('origen');
+				// Hide header while the full-bleed demo video is in focus.
+				setHeaderForDemo(self.progress > 0.3 && self.progress < 0.68);
+				if (hotspot) {
+					const openVideo = self.progress > 0.32 && self.progress < 0.7;
+					hotspot.dataset.hotspotMode = openVideo ? 'toggle' : 'scroll';
+					hotspot.style.pointerEvents = self.progress > 0.72 ? 'none' : 'auto';
+				}
+			},
+			onLeave: () => setHeaderForDemo(false),
+			onLeaveBack: () => setHeaderForDemo(false),
+		},
+	});
+
+	tl.to(
+		left,
+		{
+			clipPath: 'polygon(0% 0%, 38% 8%, 24% 100%, 0% 100%)',
+			duration: 0.5,
+			ease: 'none',
+		},
+		0,
+	);
+	tl.to(
+		right,
+		{
+			clipPath: 'polygon(55% 0%, 100% 0%, 100% 100%, 18% 100%)',
+			xPercent: 12,
+			duration: 0.5,
+			ease: 'none',
+		},
+		0,
+	);
+	tl.to(
+		top,
+		{
+			yPercent: -35,
+			clipPath: 'polygon(0% 0%, 100% 0%, 100% 55%, 0% 100%)',
+			duration: 0.5,
+			ease: 'none',
+		},
+		0,
+	);
+	tl.to(
+		bottom,
+		{
+			yPercent: 35,
+			clipPath: 'polygon(0% 45%, 100% 0%, 100% 100%, 0% 100%)',
+			duration: 0.5,
+			ease: 'none',
+		},
+		0,
+	);
+	// autoAlpha (not opacity): hides + visibility:hidden so exited CTAs cannot hover/click off-screen.
+	tl.to(exitsUp, { y: -160, autoAlpha: 0, duration: 0.42, ease: 'none', stagger: 0.04 }, 0.02);
+	tl.to(exitsLeft, { x: -120, autoAlpha: 0, duration: 0.42, ease: 'none', stagger: 0.05 }, 0.04);
+	tl.to(giant, { yPercent: -28, opacity: 0.22, scale: 1.06, duration: 0.5, ease: 'none' }, 0);
+
+	if (hotspot) {
+		tl.to(
+			hotspot,
+			{
+				clipPath: 'polygon(8% 14%, 94% 8%, 96% 86%, 4% 90%)',
+				duration: 0.5,
+				ease: 'none',
+			},
+			0,
+		);
+	}
+
+	tl.to(
+		left,
+		{
+			xPercent: -108,
+			clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
+			duration: 0.35,
+			ease: 'none',
+		},
+		0.5,
+	);
+	tl.to(
+		right,
+		{
+			xPercent: 120,
+			opacity: 0,
+			duration: 0.35,
+			ease: 'none',
+		},
+		0.5,
+	);
+	tl.to(top, { yPercent: -110, duration: 0.35, ease: 'none' }, 0.5);
+	tl.to(bottom, { yPercent: 110, duration: 0.35, ease: 'none' }, 0.5);
+	tl.to(giant, { yPercent: -70, opacity: 0, duration: 0.3, ease: 'none' }, 0.5);
+
+	if (hotspot) {
+		tl.to(
+			hotspot,
+			{
+				clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
+				duration: 0.35,
+				ease: 'none',
+			},
+			0.5,
+		);
+	}
+
+	// Hold full-bleed video.
+	tl.to({}, { duration: 0.28 }, 0.85);
+
+	// Phase 3: black curtain closes over video → origen (Webdrift-style fill).
+	const closeAt = 1.15;
+	tl.to(
+		[left, right, top, bottom].filter(Boolean),
+		{ backgroundColor: '#000000', duration: 0.01, ease: 'none' },
+		closeAt,
+	);
+	tl.to(
+		left,
+		{
+			xPercent: 0,
+			width: '100%',
+			clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
+			duration: 0.45,
+			ease: 'none',
+		},
+		closeAt,
+	);
+	tl.to(
+		right,
+		{
+			xPercent: 0,
+			opacity: 0,
+			duration: 0.35,
+			ease: 'none',
+		},
+		closeAt,
+	);
+	tl.to(top, { yPercent: 0, duration: 0.45, ease: 'none' }, closeAt);
+	tl.to(bottom, { yPercent: 0, duration: 0.45, ease: 'none' }, closeAt);
+
+	if (origenLayer) {
+		tl.to(
+			origenLayer,
+			{
+				opacity: 1,
+				clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
+				duration: 0.5,
+				ease: 'none',
+			},
+			closeAt,
+		);
+		// One united fill, top → bottom (clip bottom edge down).
+		const fillMask = origenLayer.querySelector<HTMLElement>('[data-text-fill-mask]');
+		if (fillMask) {
+			gsap.set(fillMask, { clipPath: 'inset(0 0 100% 0)' });
+			tl.to(
+				fillMask,
+				{
+					clipPath: 'inset(0 0 0% 0)',
+					duration: 0.85,
+					ease: 'none',
+				},
+				closeAt + 0.35,
+			);
+			// After fill: drop the overlay mask so the base text is selectable.
+			const solidAt = closeAt + 1.2;
+			tl.set(fillMask, { autoAlpha: 0 }, solidAt);
+			tl.set(
+				origenLayer,
+				{
+					pointerEvents: 'auto',
+					attr: { 'aria-hidden': 'false', 'data-solid': 'true' },
+				},
+				solidAt,
+			);
+			tl.set(
+				origenLayer,
+				{
+					pointerEvents: 'none',
+					attr: { 'aria-hidden': 'true', 'data-solid': 'false' },
+				},
+				0,
+			);
+		}
+	}
+
+	if (hotspot) {
+		tl.to(hotspot, { autoAlpha: 0, duration: 0.2, ease: 'none' }, closeAt);
+	}
+
+	tl.to({}, { duration: 0.45 }, closeAt + 0.85);
+
+	return api;
+}
+
+function initAudienceSwitcher(main: Element): void {
+	const root = main.querySelector<HTMLElement>('[data-audience-switcher]');
+	if (!root) return;
+	const links = gsap.utils.toArray<HTMLElement>(root.querySelectorAll('[data-audience-link]'));
+	const photos = gsap.utils.toArray<HTMLElement>(root.querySelectorAll('[data-audience-photo]'));
+
+	const activate = (id: string) => {
+		links.forEach((link) => {
+			const active = link.dataset.audienceLink === id;
+			link.classList.toggle('text-white', active);
+			link.classList.toggle('text-white/45', !active);
+		});
+		photos.forEach((photo) => {
+			const active = photo.dataset.audiencePhoto === id;
+			photo.classList.toggle('opacity-100', active);
+			photo.classList.toggle('opacity-0', !active);
+			photo.setAttribute('aria-hidden', active ? 'false' : 'true');
+		});
+	};
+
+	links.forEach((link) => {
+		const id = link.dataset.audienceLink;
+		if (!id) return;
+		link.addEventListener('pointerenter', () => activate(id));
+		link.addEventListener('focus', () => activate(id));
+	});
+}
+
+function initHorizontalScrolls(main: Element): void {
+	const zones = gsap.utils.toArray<HTMLElement>(main.querySelectorAll('[data-h-scroll]'));
+
+	zones.forEach((zone) => {
+		const track = zone.querySelector<HTMLElement>('[data-h-scroll-track]');
+		if (!track) return;
+
+		const wheelTo = gsap.quickTo(track, 'scrollLeft', {
+			duration: 0.4,
+			ease: 'power3.out',
+			overwrite: true,
+		});
+
+		zone.addEventListener(
+			'wheel',
+			(event) => {
+				if (Math.abs(event.deltaY) < Math.abs(event.deltaX)) return;
+				if (track.scrollWidth <= track.clientWidth + 8) return;
+				event.preventDefault();
+				wheelTo(track.scrollLeft + event.deltaY);
+			},
+			{ passive: false },
+		);
+
+		let pointerId: number | null = null;
+		let startX = 0;
+		let origin = 0;
+
+		const onPointerDown = (event: PointerEvent) => {
+			if (event.pointerType === 'mouse' && event.button !== 0) return;
+			if (track.scrollWidth <= track.clientWidth + 8) return;
+			pointerId = event.pointerId;
+			startX = event.clientX;
+			origin = track.scrollLeft;
+			gsap.killTweensOf(track);
+			track.classList.add('cursor-grabbing');
+			try {
+				track.setPointerCapture(event.pointerId);
+			} catch {
+				/* ignore */
+			}
+		};
+
+		const onPointerMove = (event: PointerEvent) => {
+			if (pointerId !== event.pointerId) return;
+			event.preventDefault();
+			track.scrollLeft = origin - (event.clientX - startX);
+		};
+
+		const onPointerUp = (event: PointerEvent) => {
+			if (pointerId !== event.pointerId) return;
+			pointerId = null;
+			track.classList.remove('cursor-grabbing');
+			try {
+				track.releasePointerCapture(event.pointerId);
+			} catch {
+				/* ignore */
+			}
+		};
+
+		track.addEventListener('pointerdown', onPointerDown);
+		track.addEventListener('pointermove', onPointerMove, { passive: false });
+		track.addEventListener('pointerup', onPointerUp);
+		track.addEventListener('pointercancel', onPointerUp);
+		track.addEventListener('lostpointercapture', () => {
+			pointerId = null;
+			track.classList.remove('cursor-grabbing');
+		});
+	});
+}
+
+/** Fill muted titles top → bottom as their story stage scrolls into focus. */
+function initStoryTextFills(main: Element): void {
+	const stories = gsap.utils.toArray<HTMLElement>(main.querySelectorAll('[data-story]'));
+	stories.forEach((story, storyIndex) => {
+		const masks = gsap.utils.toArray<HTMLElement>(story.querySelectorAll('[data-text-fill-mask]'));
+		if (!masks.length) return;
+		const st = ScrollTrigger.getById(`story-${story.id || storyIndex}`);
+		if (!st) return;
+
+		masks.forEach((mask) => gsap.set(mask, { clipPath: 'inset(0 0 100% 0)' }));
+		ScrollTrigger.create({
+			trigger: story,
+			start: () => st.start,
+			end: () => st.start + (st.end - st.start) * 0.45,
+			scrub: 0.7,
+			onUpdate: (self) => {
+				const bottom = (1 - self.progress) * 100;
+				masks.forEach((mask) => {
+					gsap.set(mask, { clipPath: `inset(0 0 ${bottom}% 0)` });
+				});
+			},
+		});
+	});
+}
+
+/**
+ * Monument-style letter open: the section itself starts as an inset card
+ * and the clip expands outward to the full frame. No accent fill — only the
+ * section background/content, so nothing reads as a colored “hueco”.
+ */
+function initShapeWipes(main: Element): void {
+	const full = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)';
+	// Inset cards that open outward (letter). Margins show ink-100, not a fill color.
+	const closedShapes = [
+		'polygon(10% 16%, 90% 12%, 93% 84%, 7% 88%)',
+		'polygon(8% 14%, 92% 16%, 90% 86%, 10% 84%)',
+		'polygon(12% 13%, 88% 10%, 91% 87%, 9% 90%)',
+		'polygon(9% 18%, 91% 14%, 94% 82%, 6% 86%)',
+		'polygon(11% 12%, 89% 15%, 92% 88%, 8% 85%)',
+	];
+	const midShapes = [
+		'polygon(4% 7%, 96% 5%, 97% 93%, 3% 95%)',
+		'polygon(3% 6%, 97% 7%, 96% 94%, 4% 93%)',
+		'polygon(5% 5%, 95% 4%, 96% 95%, 4% 96%)',
+		'polygon(4% 8%, 96% 6%, 98% 92%, 2% 94%)',
+		'polygon(5% 5%, 95% 6%, 96% 95%, 4% 94%)',
+	];
+
+	// Drop any leftover accent layers from earlier iterations.
+	main.querySelectorAll('[data-shape-surface]').forEach((node) => node.remove());
+
+	const sections = gsap.utils
+		.toArray<HTMLElement>(main.querySelectorAll(':scope > section'))
+		.filter((section) => {
+			if (section.dataset.heroCurtain !== undefined) return false;
+			if (section.dataset.snapVideo !== undefined) return false;
+			return (section.offsetHeight || 0) > 80;
+		});
+
+	sections.forEach((section, index) => {
+		// Pinned stories + brand sticky timeline own their scroll; clipping the
+		// wrapper breaks pin/scrub and overflow-hidden kills position:sticky.
+		if (section.dataset.story !== undefined || section.dataset.brandTimeline !== undefined) {
+			gsap.set(section, { clearProps: 'clipPath' });
+			section.style.clipPath = '';
+			return;
+		}
+
+		const closed = closedShapes[index % closedShapes.length];
+		const mid = midShapes[index % midShapes.length];
+
+		section.classList.add('relative', 'overflow-hidden');
+		gsap.set(section, { clipPath: closed, force3D: true });
+
+		const tl = gsap.timeline({
+			scrollTrigger: {
+				trigger: section,
+				start: 'top 88%',
+				end: 'top 24%',
+				scrub: 0.7,
+				invalidateOnRefresh: true,
+			},
+		});
+
+		tl.fromTo(section, { clipPath: closed }, { clipPath: mid, duration: 0.4, ease: 'none' }, 0);
+		tl.to(section, { clipPath: full, duration: 0.6, ease: 'none' }, 0.4);
+	});
+}
+
+function initVideoCursor(main: Element, heroApi: HeroApi): void {
+	const cursor = document.querySelector<HTMLElement>('[data-video-cursor]');
+	const label = document.querySelector<HTMLElement>('[data-video-cursor-label]');
+	const icon = document.querySelector<HTMLElement>('[data-video-cursor-icon]');
+	const videos = gsap.utils.toArray<HTMLVideoElement>(main.querySelectorAll('[data-demo-loop]'));
+	const heroHotspot = main.querySelector<HTMLElement>('[data-video-hotspot]');
+	const goTargets = gsap.utils.toArray<HTMLElement>(document.querySelectorAll('[data-cursor-go]'));
+	const panTargets = gsap.utils.toArray<HTMLElement>(main.querySelectorAll('[data-h-scroll]'));
+	if (!cursor) return;
+
+	const playLabel = cursor.dataset.playLabel ?? 'Play';
+	const pauseLabel = cursor.dataset.pauseLabel ?? 'Pausa';
+	const goLabel = cursor.dataset.goLabel ?? 'Ir';
+	const scrollLabel = cursor.dataset.scrollLabel ?? 'Scroll';
+	const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+	type CursorMode = 'scroll' | 'toggle' | 'go' | 'pan';
+
+	const videoModeOf = (): 'scroll' | 'toggle' =>
+		heroHotspot?.dataset.hotspotMode === 'toggle' ? 'toggle' : 'scroll';
+
+	const syncLabel = (mode: CursorMode) => {
+		if (icon) icon.classList.toggle('hidden', mode !== 'pan');
+		if (label) label.classList.toggle('hidden', mode === 'pan');
+		if (!label) return;
+		if (mode === 'pan') {
+			label.textContent = scrollLabel;
+			return;
+		}
+		if (mode === 'go') {
+			label.textContent = goLabel;
+			return;
+		}
+		if (mode === 'scroll') {
+			label.textContent = playLabel;
+			return;
+		}
+		const anyPlaying = videos.some((video) => !video.paused && !video.ended);
+		label.textContent = anyPlaying ? pauseLabel : playLabel;
+	};
+
+	const setPlaying = (shouldPlay: boolean) => {
+		videos.forEach((video) => {
+			if (shouldPlay) void video.play().catch(() => {});
+			else video.pause();
+		});
+		syncLabel('toggle');
+	};
+
+	videos.forEach((video) => {
+		video.addEventListener('play', () => {
+			if (cursor.dataset.mode === 'toggle') syncLabel('toggle');
+		});
+		video.addEventListener('pause', () => {
+			if (cursor.dataset.mode === 'toggle') syncLabel('toggle');
+		});
+		video.muted = true;
+		video.loop = true;
+		video.playsInline = true;
+		void video.play().catch(() => {});
+	});
+
+	const onHotspotClick = (event: Event) => {
+		event.preventDefault();
+		if (videoModeOf() === 'scroll') {
+			heroApi.scrollToDemo();
+			return;
+		}
+		const anyPlaying = videos.some((video) => !video.paused && !video.ended);
+		setPlaying(!anyPlaying);
+	};
+
+	if (!finePointer) {
+		cursor.hidden = true;
+		heroHotspot?.addEventListener('click', onHotspotClick);
+		return;
+	}
+
+	let lastX = window.innerWidth / 2;
+	let lastY = window.innerHeight / 2;
+	let refreshRaf = 0;
+	const cursorScaleHidden = 0.38;
+	const cursorScaleShown = (mode: CursorMode) => (mode === 'go' ? 0.92 : 1);
+
+	gsap.set(cursor, {
+		xPercent: -50,
+		yPercent: -50,
+		x: lastX,
+		y: lastY,
+		scale: cursorScaleHidden,
+	});
+
+	const showCursor = (mode: CursorMode) => {
+		const wasHidden = cursor.dataset.visible !== 'true';
+		const prevMode = cursor.dataset.mode;
+		cursor.dataset.visible = 'true';
+		cursor.dataset.mode = mode;
+		document.documentElement.classList.add('cursor-none');
+		syncLabel(mode);
+		if (wasHidden) {
+			gsap.fromTo(
+				cursor,
+				{ scale: cursorScaleHidden },
+				{ scale: cursorScaleShown(mode), duration: 0.75, ease: 'power2.out', overwrite: 'auto' },
+			);
+		} else if (prevMode !== mode) {
+			gsap.to(cursor, {
+				scale: cursorScaleShown(mode),
+				duration: 0.35,
+				ease: 'power2.out',
+				overwrite: 'auto',
+			});
+		}
+	};
+
+	const hideCursor = () => {
+		if (cursor.dataset.visible !== 'true') return;
+		cursor.dataset.visible = 'false';
+		document.documentElement.classList.remove('cursor-none');
+		gsap.to(cursor, {
+			scale: cursorScaleHidden,
+			duration: 0.4,
+			ease: 'power2.in',
+			overwrite: 'auto',
+		});
+	};
+
+	const modeAtPoint = (x: number, y: number): CursorMode | null => {
+		const el = document.elementFromPoint(x, y);
+		if (!el) return null;
+		if (heroHotspot && (el === heroHotspot || heroHotspot.contains(el))) return videoModeOf();
+		if (el.closest('[data-cursor-go]')) return 'go';
+		if (el.closest('[data-h-scroll]')) return 'pan';
+		return null;
+	};
+
+	/** Scroll/pin moves targets under a still pointer; pointerleave often never fires. */
+	const refreshCursorFromPoint = () => {
+		const mode = modeAtPoint(lastX, lastY);
+		if (!mode) {
+			if (cursor.dataset.visible === 'true') hideCursor();
+			return;
+		}
+		showCursor(mode);
+	};
+
+	const scheduleRefresh = () => {
+		if (refreshRaf) return;
+		refreshRaf = requestAnimationFrame(() => {
+			refreshRaf = 0;
+			refreshCursorFromPoint();
+		});
+	};
+
+	const moveCursor = (event: PointerEvent) => {
+		lastX = event.clientX;
+		lastY = event.clientY;
+		gsap.to(cursor, {
+			x: lastX,
+			y: lastY,
+			duration: 0.45,
+			ease: 'power3.out',
+			overwrite: 'auto',
+		});
+	};
+
+	if (heroHotspot) {
+		heroHotspot.addEventListener('pointerenter', () => showCursor(videoModeOf()));
+		heroHotspot.addEventListener('pointerleave', hideCursor);
+		heroHotspot.addEventListener('pointermove', (event) => {
+			moveCursor(event);
+			if (cursor.dataset.visible === 'true') syncLabel(videoModeOf());
+		});
+		heroHotspot.addEventListener('click', onHotspotClick);
+	}
+
+	goTargets.forEach((target) => {
+		target.classList.add('cursor-none');
+		target.addEventListener('pointerenter', () => showCursor('go'));
+		target.addEventListener('pointerleave', hideCursor);
+		target.addEventListener('pointermove', moveCursor);
+	});
+
+	panTargets.forEach((target) => {
+		target.classList.add('cursor-none');
+		target.addEventListener('pointerenter', () => showCursor('pan'));
+		target.addEventListener('pointerleave', hideCursor);
+		target.addEventListener('pointermove', moveCursor);
+	});
+
+	window.addEventListener('scroll', scheduleRefresh, { passive: true });
+	window.addEventListener('resize', scheduleRefresh);
+}

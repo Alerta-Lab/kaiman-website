@@ -1,0 +1,47 @@
+---
+import { BarChart3, FileText, Image, LayoutDashboard, LogOut, Tags } from 'lucide-react';
+import BlogLayout from './BlogLayout.astro';
+
+interface Props { title: string }
+const { title } = Astro.props;
+const links = [
+	{ href: '/admin', label: 'Resumen', icon: LayoutDashboard },
+	{ href: '/admin/posts', label: 'Artículos', icon: FileText },
+	{ href: '/admin/tags', label: 'Etiquetas', icon: Tags },
+	{ href: '/admin/media', label: 'Imágenes', icon: Image },
+	{ href: '/admin/analytics', label: 'Analítica', icon: BarChart3 },
+];
+---
+
+<BlogLayout title={`${title} — Admin Kaiman`} description="Panel de administración de Kaiman Blog." noindex>
+	<div class="min-h-screen bg-primary-100 lg:grid lg:grid-cols-[15.5rem_1fr]">
+		<aside class="border-b border-black-stroke bg-black-panel p-5 text-white lg:min-h-screen lg:border-b-0 lg:border-r">
+			<a href="/admin" class="inline-flex items-center gap-3 font-headline text-xl font-bold tracking-tight">
+				<img src="/logo.png" alt="" width="36" height="36" class="size-9 rounded-md bg-black object-contain p-0.5" />
+				<span>Kaiman <span class="text-primary-300">Admin</span></span>
+			</a>
+			<nav aria-label="Panel administrativo" class="mt-8 flex gap-2 overflow-x-auto lg:flex-col">
+				{links.map(({ href, label, icon: Icon }) => (
+					<a
+						href={href}
+						aria-current={Astro.url.pathname === href || (href !== '/admin' && Astro.url.pathname.startsWith(href)) ? 'page' : undefined}
+						class="flex min-h-11 items-center gap-3 rounded-lg px-3 font-bold text-white/90 hover:bg-black-capsule aria-[current=page]:bg-primary aria-[current=page]:text-white"
+					>
+						<Icon aria-hidden="true" size={19} /> {label}
+					</a>
+				))}
+			</nav>
+			<form action="/api/auth/logout" method="post" class="mt-8">
+				<button class="flex min-h-11 w-full items-center gap-3 rounded-lg px-3 font-bold text-white/80 hover:bg-black-capsule hover:text-white">
+					<LogOut aria-hidden="true" size={19} /> Salir
+				</button>
+			</form>
+		</aside>
+		<main id="contenido" class="min-w-0 p-5 lg:p-10">
+			<header class="mb-gap-page border-b border-primary-200 pb-gap-block">
+				<h1 class="font-headline text-4xl font-bold tracking-tight text-black">{title}</h1>
+			</header>
+			<slot />
+		</main>
+	</div>
+</BlogLayout>

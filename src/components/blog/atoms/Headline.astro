@@ -1,0 +1,14 @@
+---
+interface Props {
+	as?: 'h1' | 'h2' | 'h3';
+	size?: 'xl' | '2xl' | '4xl' | '6xl';
+	class?: string;
+}
+
+const { as: Tag = 'h2', size = '2xl', class: className = '' } = Astro.props;
+const sizes = { xl: 'text-xl', '2xl': 'text-2xl', '4xl': 'text-4xl', '6xl': 'text-5xl md:text-6xl' };
+---
+
+<Tag class:list={['font-headline font-bold leading-tight tracking-tight', sizes[size], className]}>
+	<slot />
+</Tag>

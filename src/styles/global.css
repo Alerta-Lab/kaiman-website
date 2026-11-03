@@ -1,0 +1,411 @@
+@import '@fontsource/space-grotesk/500.css';
+@import '@fontsource/space-grotesk/600.css';
+@import '@fontsource/space-grotesk/700.css';
+@import '@fontsource/quicksand/400.css';
+@import '@fontsource/quicksand/500.css';
+@import '@fontsource/quicksand/600.css';
+@import '@fontsource/quicksand/700.css';
+@import 'tailwindcss';
+@config '../../tailwind.config.ts';
+
+@theme {
+	--font-sans: 'Quicksand', ui-sans-serif, system-ui, sans-serif;
+	--font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+	--ease-brand: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Range thumbs cannot be drawn with utilities alone. */
+.piece-slider {
+	appearance: none;
+	height: 8px;
+	border-radius: 999px;
+	outline: none;
+}
+
+.piece-slider::-webkit-slider-thumb {
+	appearance: none;
+	width: 20px;
+	height: 20px;
+	border-radius: 999px;
+	background: #fff;
+	box-shadow: 0 0 0 4px #6b48e9;
+	cursor: pointer;
+}
+
+.piece-slider::-moz-range-thumb {
+	width: 20px;
+	height: 20px;
+	border: 0;
+	border-radius: 999px;
+	background: #fff;
+	box-shadow: 0 0 0 4px #6b48e9;
+	cursor: pointer;
+}
+
+#scroll-world {
+	--sw-bg: #000000;
+	--sw-ink: #ffffff;
+	--sw-ink-soft: #d4d4d4;
+	--sw-accent: #8b74f0;
+	--sw-font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+	--sw-font-body: 'Quicksand', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Unlayered, so these beat the engine's @layer sw defaults. */
+#scroll-world .sw-sky__glow {
+	background:
+		radial-gradient(60% 42% at 78% 18%, color-mix(in srgb, #6b48e9 34%, transparent), transparent 70%),
+		radial-gradient(40% 32% at 12% 80%, color-mix(in srgb, #db2777 16%, transparent), transparent 72%);
+}
+
+#scroll-world .sw-copylayer::before {
+	width: min(70vw, 860px);
+	background: linear-gradient(
+		90deg,
+		#000 0%,
+		rgba(0, 0, 0, 0.96) 48%,
+		rgba(0, 0, 0, 0.9) 72%,
+		transparent 100%
+	);
+}
+
+#scroll-world .sw-copy {
+	max-height: calc(100dvh - 7.5rem);
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 0.6rem;
+}
+
+#scroll-world .sw-copy__title,
+#scroll-world .sw-copy__body {
+	color: #fff;
+	text-shadow: 0 2px 12px rgba(0, 0, 0, 0.55);
+}
+
+#scroll-world .sw-copy__title {
+	margin: 0;
+	font-size: clamp(1.65rem, 2.6vw, 2.6rem);
+	line-height: 1.05;
+}
+
+#scroll-world .sw-copy__body {
+	margin: 0;
+	font-size: clamp(0.95rem, 1.15vw, 1.05rem);
+	line-height: 1.45;
+	max-width: 38ch;
+}
+
+#scroll-world .sw-copy__eyebrow {
+	margin-top: 0;
+	font-size: 0.72rem;
+}
+
+#scroll-world .sw-copy__tags,
+#scroll-world .sw-copy__cta {
+	margin: 0;
+}
+
+#scroll-world .sw-copy__num {
+	color: #e5e5e5;
+}
+
+@media (max-width: 860px) {
+	#scroll-world .sw-copy {
+		max-height: none;
+		justify-content: flex-end;
+		gap: 0.75rem;
+	}
+
+	#scroll-world .sw-copy__title {
+		font-size: clamp(1.9rem, 7.5vw, 2.7rem);
+	}
+
+	#scroll-world .sw-copy__body {
+		max-width: none;
+		font-size: clamp(0.98rem, 3.6vw, 1.1rem);
+	}
+}
+
+#scroll-world .sw-btn--primary {
+	color: #fff;
+	background: #6b48e9;
+}
+
+#scroll-world .sw-route__label {
+	color: #181818;
+	background: rgba(255, 255, 255, 0.94);
+}
+
+#scroll-world .sw-route__dot i {
+	background: #fff;
+	box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.55);
+}
+
+#scroll-world .sw-route__dot.is-active i {
+	background: #c4b5fd;
+	box-shadow: 0 0 0 5px rgba(107, 72, 233, 0.45);
+}
+
+@media (max-width: 860px) {
+	#scroll-world .sw-copylayer::before {
+		top: auto;
+		bottom: 0;
+		width: 100%;
+		height: 72%;
+		background: linear-gradient(0deg, #000 12%, rgba(0, 0, 0, 0.88) 46%, transparent 100%);
+	}
+}
+
+@keyframes menu-link-in {
+	from {
+		opacity: 0;
+		transform: translateY(24px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.menu-link {
+	animation: menu-link-in 500ms var(--ease-brand) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.menu-link {
+		animation: none;
+	}
+}
+
+/* Blog / admin reading surface (Quiet Signal) */
+.blog-surface :focus-visible {
+	outline: 2px solid #6b48e9;
+	outline-offset: 4px;
+}
+
+.blog-surface ::selection {
+	background: #d8d7fd;
+	color: #212121;
+}
+
+.motion-fade-up {
+	animation: blog-fade-up 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.motion-fade {
+	animation: blog-fade 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes blog-fade-up {
+	from {
+		opacity: 0;
+		transform: translateY(0.75rem);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes blog-fade {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.motion-fade-up,
+	.motion-fade {
+		animation: none;
+	}
+}
+
+/*
+ * Webdrift-like CTA (documented exception to Tailwind-only):
+ * wipe fill (::before) + text roll need pseudo/overflow choreography utilities cannot express cleanly.
+ */
+.k-btn {
+	--k-btn-bg: #6b48e9;
+	--k-btn-fg: #ffffff;
+	--k-btn-fill: #ffffff;
+	--k-btn-fill-fg: #000000;
+	--k-btn-line: transparent;
+	--k-btn-ease: cubic-bezier(0.16, 1, 0.3, 1);
+	position: relative;
+	isolation: isolate;
+	display: inline-flex;
+	align-items: stretch;
+	overflow: hidden;
+	height: 3.25rem;
+	background: var(--k-btn-bg);
+	color: var(--k-btn-fg);
+	box-shadow: inset 0 0 0 1px var(--k-btn-line);
+	font-family: var(--font-display);
+	font-size: 1rem;
+	font-weight: 600;
+	letter-spacing: -0.01em;
+	line-height: 1;
+	text-decoration: none;
+	transition: color 0.5s var(--k-btn-ease);
+}
+
+.k-btn::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	background: var(--k-btn-fill);
+	transform: scaleY(0);
+	transform-origin: 50% 100%;
+	transition: transform 0.55s var(--k-btn-ease);
+}
+
+.k-btn:hover,
+.k-btn:focus-visible {
+	color: var(--k-btn-fill-fg);
+	outline: none;
+}
+
+.k-btn:focus-visible {
+	outline: 2px solid #6b48e9;
+	outline-offset: 2px;
+}
+
+@media (hover: hover) {
+	.k-btn:hover::before,
+	.k-btn:focus-visible::before {
+		transform: scaleY(1);
+		transform-origin: 50% 100%;
+	}
+}
+
+.k-btn:focus-visible::before {
+	transform: scaleY(1);
+	transform-origin: 50% 100%;
+}
+
+.k-btn-primary {
+	--k-btn-bg: #6b48e9;
+	--k-btn-fg: #ffffff;
+	--k-btn-fill: #ffffff;
+	--k-btn-fill-fg: #000000;
+}
+
+.k-btn-secondary {
+	--k-btn-bg: transparent;
+	--k-btn-fg: #ffffff;
+	--k-btn-fill: #6b48e9;
+	--k-btn-fill-fg: #ffffff;
+	--k-btn-line: rgb(255 255 255 / 0.22);
+}
+
+.k-btn-ghost {
+	--k-btn-bg: transparent;
+	--k-btn-fg: #ffffff;
+	--k-btn-fill: rgb(255 255 255 / 0.1);
+	--k-btn-fill-fg: #ffffff;
+	--k-btn-line: transparent;
+}
+
+.k-btn-sm {
+	height: 2.5rem;
+	font-size: 0.875rem;
+}
+
+.k-btn-l {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0 1.35rem;
+	white-space: nowrap;
+}
+
+.k-btn-sm .k-btn-l {
+	padding: 0 0.9rem;
+}
+
+.k-btn-leading {
+	display: inline-flex;
+	flex-shrink: 0;
+}
+
+.k-btn-rl {
+	display: grid;
+	overflow: hidden;
+	height: 1.3em;
+	line-height: 1.3em;
+}
+
+.k-btn-rl > span {
+	display: block;
+	grid-area: 1 / 1;
+	white-space: nowrap;
+	transition: transform 0.55s var(--k-btn-ease);
+}
+
+.k-btn-rl > span + span {
+	transform: translateY(105%);
+}
+
+@media (hover: hover) {
+	.k-btn:hover .k-btn-rl > span:first-child,
+	.k-btn:focus-visible .k-btn-rl > span:first-child {
+		transform: translateY(-105%);
+	}
+
+	.k-btn:hover .k-btn-rl > span + span,
+	.k-btn:focus-visible .k-btn-rl > span + span {
+		transform: none;
+	}
+}
+
+.k-btn:focus-visible .k-btn-rl > span:first-child {
+	transform: translateY(-105%);
+}
+
+.k-btn:focus-visible .k-btn-rl > span + span {
+	transform: none;
+}
+
+.k-btn-i {
+	position: relative;
+	display: flex;
+	width: 3.25rem;
+	flex-shrink: 0;
+	align-items: center;
+	justify-content: center;
+	border-left: 1px solid color-mix(in srgb, currentColor 26%, transparent);
+	overflow: hidden;
+}
+
+.k-btn-sm .k-btn-i {
+	width: 2.5rem;
+}
+
+.k-btn-i svg {
+	transition: transform 0.55s var(--k-btn-ease);
+}
+
+@media (hover: hover) {
+	.k-btn:hover .k-btn-i svg,
+	.k-btn:focus-visible .k-btn-i svg {
+		transform: translate(3px, -3px);
+	}
+}
+
+.k-btn:focus-visible .k-btn-i svg {
+	transform: translate(3px, -3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.k-btn,
+	.k-btn::before,
+	.k-btn-rl > span,
+	.k-btn-i svg {
+		transition: none;
+	}
+}

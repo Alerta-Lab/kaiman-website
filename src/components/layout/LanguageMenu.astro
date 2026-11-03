@@ -1,0 +1,50 @@
+---
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import { ChevronDown, Languages } from 'lucide-react';
+import { localeLabels, locales, type Locale } from '../../i18n';
+import { pathWithoutLocale, swapBlogLocalePath } from '../../lib/blog-paths';
+
+interface Props {
+	locale: Locale;
+	label: string;
+	/** When set, switch keeps this path (locale-relative, e.g. `/blogs` or `/blogs/slug`). */
+	path?: string;
+}
+
+const { locale, label, path } = Astro.props;
+const currentPath = path ?? pathWithoutLocale(Astro.url.pathname);
+---
+
+<details class="group relative">
+	<summary
+		class="flex cursor-pointer list-none items-center gap-2 rounded-lg px-3 py-2 text-sm font-display font-semibold text-white marker:content-none hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [&::-webkit-details-marker]:hidden"
+		aria-label={label}
+	>
+		<Languages size={16} aria-hidden="true" />
+		{localeLabels[locale]}
+		<ChevronDown size={16} aria-hidden="true" className="transition-transform duration-300 group-open:rotate-180" />
+	</summary>
+	<div class="absolute right-0 z-50 mt-2 min-w-40 rounded-xl bg-ink-200 p-2 shadow-[0_16px_40px_rgba(0,0,0,0.45)]">
+		{
+			locales.map((code) => {
+				const href =
+					currentPath.startsWith('/blogs')
+						? swapBlogLocalePath(`/${locale}${currentPath === '/' ? '' : currentPath}`, code)
+						: getRelativeLocaleUrl(code, currentPath === '/' ? '/' : currentPath);
+				return (
+					<a
+						href={href}
+						hreflang={code}
+						class:list={[
+							'flex rounded-lg px-3 py-2 text-sm font-semibold',
+							code === locale ? 'bg-primary text-white' : 'text-neutral-200 hover:bg-white/10',
+						]}
+						aria-current={code === locale ? 'true' : undefined}
+					>
+						{localeLabels[code]}
+					</a>
+				);
+			})
+		}
+	</div>
+</details>

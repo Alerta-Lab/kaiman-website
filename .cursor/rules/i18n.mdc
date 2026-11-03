@@ -1,0 +1,14 @@
+---
+description: Multilanguage (es/en expandable) conventions
+globs: src/**/*.{astro,ts}
+alwaysApply: true
+---
+
+# i18n
+
+- Locales: `es` (default), `en`. Add new codes in `src/i18n/config.ts`, Astro `i18n.locales`, and a folder under `src/i18n/locales/`.
+- Routes are prefixed: `/es/...`, `/en/...` (`prefixDefaultLocale: true`).
+- User-facing copy goes in locale dictionaries (`src/i18n/locales/{locale}/`), not inline in components.
+- Keep English dictionaries structurally aligned with Spanish (`satisfies CommonMessages` or shared types).
+- Use `getRelativeLocaleUrl` for internal links. Language switcher must cover every configured locale.
+- Runtime helper: `i18next` via `src/i18n/ui.ts`; prefer `getCommon(locale)` for typed section copy in Astro.

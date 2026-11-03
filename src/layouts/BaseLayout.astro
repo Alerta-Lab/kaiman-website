@@ -1,0 +1,68 @@
+---
+import '../styles/global.css';
+import type { Locale } from '../i18n';
+
+interface Props {
+	locale: Locale;
+	title: string;
+	description: string;
+}
+
+const { locale, title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang={locale} class="h-full overflow-x-clip scroll-smooth bg-ink text-white">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="description" content={description} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:type" content="website" />
+		<link rel="icon" type="image/png" href="/brand/favicon.png" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+	</head>
+	<body
+		class="min-h-full overflow-x-clip bg-ink bg-[radial-gradient(ellipse_at_top_left,rgba(107,72,233,0.42),transparent_52%),radial-gradient(ellipse_at_80%_20%,rgba(219,39,119,0.22),transparent_46%),radial-gradient(ellipse_at_bottom,rgba(8,145,178,0.16),transparent_40%)] font-sans font-semibold text-white antialiased"
+	>
+		<a
+			href="#contenido"
+			class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:rounded-lg focus:bg-primary focus:px-3 focus:py-2 focus:text-sm focus:font-semibold"
+		>
+			{locale === 'en' ? 'Skip to content' : 'Saltar al contenido'}
+		</a>
+		<slot />
+		<script>
+			import { writePlanCookie } from '../lib/plan-handoff';
+
+			document.addEventListener('click', (event) => {
+				const node = event.target instanceof Element ? event.target.closest('[data-plan]') : null;
+				if (!(node instanceof HTMLElement) || !node.dataset.plan) return;
+				writePlanCookie(node.dataset.plan);
+			});
+		</script>
+		<script>
+			const nodes = document.querySelectorAll('[data-reveal]');
+			const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+			if (reduce) {
+				nodes.forEach((node) => node.setAttribute('data-state', 'in'));
+			} else {
+				const observer = new IntersectionObserver(
+					(entries) => {
+						entries.forEach((entry) => {
+							if (!entry.isIntersecting) return;
+							entry.target.setAttribute('data-state', 'in');
+							observer.unobserve(entry.target);
+						});
+					},
+					{ threshold: 0.18 },
+				);
+				nodes.forEach((node) => observer.observe(node));
+			}
+		</script>
+	</body>
+</html>
