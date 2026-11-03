@@ -2,18 +2,18 @@
 
 ## Flujo de contenido
 
-El panel valida todos los campos con Zod y persiste Markdown canónico en Neon. Las etiquetas se normalizan y crean al guardar. Las imágenes públicas viven en Vercel Blob; los documentos Word importados se guardan temporalmente en Blob privado, se analizan con OpenAI y se eliminan al terminar.
+El panel valida los datos de entrada con Zod y persiste Markdown y datos editoriales en Neon. Las etiquetas se normalizan y crean al guardar. Las imágenes generadas se guardan en Vercel Blob público. La vista previa nueva de Word procesa el `.docx` en el servidor mediante Mammoth, sin guardarlo como archivo en Blob ni llamar a OpenAI.
 
-OpenAI genera exclusivamente un borrador estructurado. El administrador revisa y decide publicar. Las respuestas se solicitan con `store: false` y el archivo remoto se elimina.
+La ruta anterior de importación de un solo artículo sí utiliza OpenAI y un Blob privado temporal; actualmente comparte el nombre de variable del token con el Blob público, por lo que necesita configuración separada antes de usar ambos almacenes. El administrador revisa los borradores y decide publicar. La llamada de importación anterior usa `store: false` y trata de eliminar el archivo remoto al terminar.
 
 ## Caché y picos
 
-Las páginas públicas envían `s-maxage=300, stale-while-revalidate=86400`; Vercel absorbe lecturas repetidas en CDN. Neon usa su conexión HTTP serverless y las consultas están indexadas por slug/estado/fecha. Si aparecen límites reales, se añadirá invalidación por tag y Upstash para rate limit distribuido; no se incorpora antes de medir.
+Las páginas públicas envían `s-maxage=300, stale-while-revalidate=86400`; Vercel puede servir lecturas repetidas desde CDN. Neon usa un pool serverless y las consultas están indexadas por slug/estado/fecha. El límite de intentos de login actual vive en memoria y no se comparte entre instancias.
 
 ## Despliegue
 
 1. Crear Neon en Vercel Marketplace en la misma región de cómputo.
-2. Crear un Blob público para imágenes y uno privado para importaciones. El token configurado debe corresponder al store usado por cada entorno.
+2. Conectar un Blob público para imágenes. Si se usa el importador anterior, configurar y adaptar por separado el acceso al Blob privado; el código actual no distingue ambos tokens.
 3. Configurar las variables de `.env.example` en Development, Preview y Production.
 4. Ejecutar migraciones con `pnpm db:migrate` y el seed con `pnpm seed:admin`.
 5. Conectar el repositorio a Vercel y validar `/`, `/admin/login`, `/sitemap.xml` y `/robots.txt`.
