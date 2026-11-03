@@ -147,49 +147,169 @@ function initLandingGsapInner(main: Element, reduce: boolean): void {
 
 	setActiveChapter('hero');
 
-	const scrollToOrigen = () => {
-		const st = ScrollTrigger.getById('hero-curtain');
-		if (!st) {
-			main.querySelector<HTMLElement>('#origen')?.scrollIntoView({ behavior: 'smooth' });
-			return;
+	const scrollYForHash = (hash: string): number | null => {
+		const id = hash.replace(/^#/, '');
+		if (!id) return null;
+		if (id === 'hero') return 0;
+		if (id === 'demo') {
+			const st = ScrollTrigger.getById('hero-curtain');
+			if (!st) {
+				const demo = main.querySelector<HTMLElement>('#demo');
+				return demo ? demo.getBoundingClientRect().top + window.scrollY : null;
+			}
+			return st.start + (st.end - st.start) * 0.42;
 		}
-		gsap.to(window, {
-			duration: 1.2,
-			ease: 'power2.inOut',
-			scrollTo: st.end,
-		});
+		if (id === 'origen') {
+			const st = ScrollTrigger.getById('hero-curtain');
+			if (!st) {
+				const origen = main.querySelector<HTMLElement>('#origen');
+				return origen ? origen.getBoundingClientRect().top + window.scrollY : null;
+			}
+			return st.end;
+		}
+		const target =
+			main.querySelector<HTMLElement>(`#${CSS.escape(id)}`) ??
+			main.querySelector<HTMLElement>(`[data-chapter="${id}"]`);
+		if (!target) return null;
+		return target.getBoundingClientRect().top + window.scrollY;
+	};
+
+	const ensureNavCurtains = (): [HTMLElement, HTMLElement] => {
+		const shell = 'pointer-events-none fixed inset-x-0 z-[100] bg-ink';
+		let top = document.querySelector<HTMLElement>('[data-landing-curtain="top"]');
+		let bottom = document.querySelector<HTMLElement>('[data-landing-curtain="bottom"]');
+		if (!top) {
+			top = document.createElement('div');
+			top.dataset.landingCurtain = 'top';
+			top.className = `${shell} top-0 h-[50vh]`;
+			top.setAttribute('aria-hidden', 'true');
+			document.body.appendChild(top);
+		}
+		if (!bottom) {
+			bottom = document.createElement('div');
+			bottom.dataset.landingCurtain = 'bottom';
+			bottom.className = `${shell} bottom-0 h-[50vh]`;
+			bottom.setAttribute('aria-hidden', 'true');
+			document.body.appendChild(bottom);
+		}
+		return [top, bottom];
+	};
+
+	let curtainNavBusy = false;
+
+	/** Cover with black bars, jump scroll, then open — same entrance as first load. */
+	const navigateWithEntrance = (hash: string) => {
+		if (curtainNavBusy) return;
+		curtainNavBusy = true;
+
+		// Menu locks body scroll; unlock before we jump or the first click is a no-op.
+		document.body.classList.remove('overflow-hidden');
+		const menuPanel = document.querySelector<HTMLElement>('[data-menu-panel]');
+		if (menuPanel?.dataset.open === 'true') {
+			menuPanel.dataset.open = 'false';
+			menuPanel.setAttribute('aria-hidden', 'true');
+			menuPanel.classList.add('pointer-events-none');
+			menuPanel.classList.remove('pointer-events-auto');
+			menuPanel.style.opacity = '0';
+			document.querySelectorAll<HTMLElement>('[data-menu-button]').forEach((button) => {
+				button.dataset.open = 'false';
+				button.setAttribute('aria-expanded', 'false');
+			});
+		}
+
+		const [top, bottom] = ensureNavCurtains();
+		gsap.killTweensOf([top, bottom, window]);
+		gsap.set([top, bottom], { height: '50vh' });
+
+		const jumpToHash = () => {
+			const y = scrollYForHash(hash);
+			if (y == null) return;
+			window.scrollTo(0, Math.max(0, y));
+			ScrollTrigger.update();
+			const st = ScrollTrigger.getById('hero-curtain');
+			const tween = st?.getTween();
+			if (!tween) return;
+			const id = hash.replace(/^#/, '');
+			if (id === 'hero') tween.progress(0);
+			else if (id === 'demo') tween.progress(0.42);
+			else tween.progress(1);
+		};
+
+		const reveal = () => {
+			jumpToHash();
+			// Pins can shift after the first jump; measure again while still covered.
+			jumpToHash();
+			const next = `${window.location.pathname}${window.location.search}${hash}`;
+			history.replaceState(null, '', next);
+			gsap.to([top, bottom], {
+				height: 0,
+				duration: 1.15,
+				ease: 'power2.inOut',
+				onComplete: () => {
+					top.remove();
+					bottom.remove();
+					curtainNavBusy = false;
+				},
+			});
+		};
+
+		requestAnimationFrame(() => requestAnimationFrame(reveal));
 	};
 
 	railItems.forEach((item) => {
 		item.addEventListener('click', (event) => {
 			event.preventDefault();
 			const id = item.dataset.chapterRailItem;
+			if (!id) return;
 			if (id === 'demo') {
 				heroApi.scrollToDemo();
 				return;
 			}
-			if (id === 'origen') {
-				scrollToOrigen();
-				return;
-			}
-			if (id === 'hero') {
-				gsap.to(window, { duration: 0.9, ease: 'power2.inOut', scrollTo: 0 });
-				return;
-			}
-			const target = id ? main.querySelector<HTMLElement>(`[data-chapter="${id}"]`) : null;
-			target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			if (scrollYForHash(id) == null) return;
+			navigateWithEntrance(`#${id}`);
 		});
 	});
 
-	document.querySelectorAll('a[href$="#origen"]').forEach((link) => {
+	const samePath = (pathname: string) =>
+		pathname.replace(/\/+$/, '') === window.location.pathname.replace(/\/+$/, '');
+
+	document.querySelectorAll('a[href*="#"]').forEach((link) => {
+		if (!(link instanceof HTMLAnchorElement)) return;
+		if (link.dataset.curtainNav === '1') return;
+		let url: URL;
+		try {
+			url = new URL(link.href, window.location.href);
+		} catch {
+			return;
+		}
+		if (!samePath(url.pathname)) return;
+		if (!url.hash || url.hash === '#') return;
+		if (scrollYForHash(url.hash) == null) return;
+		link.dataset.curtainNav = '1';
 		link.addEventListener('click', (event) => {
 			event.preventDefault();
-			scrollToOrigen();
+			event.stopPropagation();
+			navigateWithEntrance(url.hash);
 		});
 	});
 
+	const backTop = document.querySelector<HTMLAnchorElement>('[data-back-top]');
+	if (backTop && backTop.dataset.curtainNav !== '1') {
+		backTop.dataset.curtainNav = '1';
+		backTop.addEventListener('click', (event) => {
+			event.preventDefault();
+			event.stopPropagation();
+			navigateWithEntrance('#hero');
+		});
+	}
+
 	if (window.location.hash === '#origen') {
-		requestAnimationFrame(() => scrollToOrigen());
+		requestAnimationFrame(() => {
+			const y = scrollYForHash('origen');
+			if (y == null) return;
+			window.scrollTo(0, y);
+			ScrollTrigger.getById('hero-curtain')?.getTween()?.progress(1);
+		});
 	}
 
 	panels.forEach((panel, index) => {

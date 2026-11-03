@@ -355,7 +355,7 @@ export const landing = {
 	finder: {
 		title: 'How many pieces do you need each month',
 		intro:
-			'Enter images, videos, scripts, audio, presentations, and websites. The result is an approximate estimate of credits and of the plan that could cover that volume.',
+			'Enter images, video clips, scripts, audio minutes, slides, and websites. The result is an approximate estimate of credits and of the plan that could cover that volume.',
 		disclaimer:
 			'This estimate is approximate and can vary by tool, the real length of each piece, and current prices on the platform.',
 		image: 'Images',
@@ -365,11 +365,13 @@ export const landing = {
 		presentation: 'Presentations',
 		website: 'Websites',
 		minutes: 'minutes',
+		clips: 'clips (8 s)',
+		slides: 'slides',
 		decrease: 'Decrease',
 		increase: 'Increase',
 		videoLength: 'Reference video length',
-		short: '5 seconds',
-		medium: '15 seconds',
+		short: '4 seconds',
+		medium: '8 seconds',
 		empty: 'Enter at least one piece to see a plan.',
 		error: 'Use whole numbers between 0 and 500.',
 		creditsLabel: 'Estimated credits per month (approximate)',
@@ -378,7 +380,7 @@ export const landing = {
 		enterprise:
 			'This volume exceeds the 2,500 credits of the Business plan. Corporate is built to fit.',
 		assumption:
-			'Approximate calculation reference: 1 credit per image, 1 credit per script, 3 credits per second of edited video (the video slider is in minutes), 2 credits per minute of audio, 5 credits per presentation, and 15 credits per website. The platform script generator currently does not charge credits; the 1 credit per script is used only to size the plan. Actual usage can vary.',
+			'Approximate reference (platform rates, 2026-11-03): 4 credits per image (1K/2K), 25 credits per 8 s video clip, 1 credit per script, 6 credits per started minute of audio (text to speech), 9 credits per slide (without AI images), and 26 credits per landing-style website. Each slider step is one unit of that rate. Tool, resolution, length, and options can change the real total.',
 		perMonth: 'per month',
 		cta: 'Get this plan',
 	},
@@ -484,7 +486,7 @@ export const landing = {
 			},
 			{
 				q: 'How do credits work?',
-				a: 'Credits are the platform’s unit of use. An ad image uses 1 credit. One second of edited video uses 3. Voice uses 2 credits per minute. The script generator currently does not charge credits.',
+				a: 'Credits are the platform’s unit of use. A generated image at 1K or 2K uses about 4 credits. An 8 s video (text or image to video) uses about 25. Text to speech uses 6 credits per started minute. A video script uses 1 credit. Exact usage depends on the tool and the options you choose.',
 			},
 			{
 				q: 'Can I manage more than one brand or business from my account?',

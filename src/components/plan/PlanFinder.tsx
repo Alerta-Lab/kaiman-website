@@ -11,10 +11,10 @@ type PlanFinderProps = {
 
 const limits = {
 	image: 80,
-	videoMinutes: 60,
+	video: 60,
 	script: 80,
 	audioMinutes: 120,
-	presentation: 40,
+	presentation: 80,
 	website: 12,
 };
 
@@ -71,26 +71,24 @@ function Slider({
 
 export function PlanFinder({ copy, planNames }: PlanFinderProps) {
 	const [image, setImage] = useState(12);
-	const [videoMinutes, setVideoMinutes] = useState(3);
+	const [video, setVideo] = useState(6);
 	const [script, setScript] = useState(8);
 	const [audioMinutes, setAudioMinutes] = useState(10);
-	const [presentation, setPresentation] = useState(2);
+	const [presentation, setPresentation] = useState(10);
 	const [website, setWebsite] = useState(0);
 
 	const credits =
 		image * pieceCredits.image +
-		videoMinutes * 60 * pieceCredits.creditsPerVideoSecond +
+		video * pieceCredits.video +
 		script * pieceCredits.script +
 		audioMinutes * pieceCredits.creditsPerAudioMinute +
 		presentation * pieceCredits.presentation +
 		website * pieceCredits.website;
-	const pieces = image + videoMinutes + script + audioMinutes + presentation + website;
-	const planId = pieces > 0 ? recommendPlan(credits) : null;
+	const planId = recommendPlan(credits);
 	const plan = plans.find((item) => item.id === planId);
-	const href = planId ? signupUrlForPlan(planId) : signupUrlForPlan('start');
+	const href = signupUrlForPlan(planId);
 
 	const result = useMemo(() => {
-		if (!planId) return null;
 		if (planId === 'enterprise') {
 			return { name: planNames.enterprise, price: null as string | null, unit: null as string | null };
 		}
@@ -116,10 +114,10 @@ export function PlanFinder({ copy, planNames }: PlanFinderProps) {
 				<Slider
 					id="pieces-video"
 					label={copy.video}
-					value={videoMinutes}
-					max={limits.videoMinutes}
-					onChange={setVideoMinutes}
-					unit={copy.minutes}
+					value={video}
+					max={limits.video}
+					onChange={setVideo}
+					unit={copy.clips}
 					icon={<Clapperboard size={16} className="text-feature-video" aria-hidden="true" />}
 				/>
 				<Slider
@@ -145,6 +143,7 @@ export function PlanFinder({ copy, planNames }: PlanFinderProps) {
 					value={presentation}
 					max={limits.presentation}
 					onChange={setPresentation}
+					unit={copy.slides}
 					icon={<Presentation size={16} className="text-feature-presentation" aria-hidden="true" />}
 				/>
 				<Slider
@@ -158,9 +157,7 @@ export function PlanFinder({ copy, planNames }: PlanFinderProps) {
 			</div>
 
 			<div className="flex flex-col justify-between gap-6 rounded-2xl bg-gradient-to-b from-primary-800 to-ink-200 p-6" aria-live="polite">
-				{pieces === 0 || !result ? (
-					<p className="text-base text-pretty text-neutral-200">{copy.empty}</p>
-				) : (
+				{result ? (
 					<div className="flex flex-col gap-2">
 						<p className="text-sm text-primary-200">{copy.planLabel}</p>
 						<p className="font-display text-4xl font-semibold text-white">{result.name}</p>
@@ -179,13 +176,12 @@ export function PlanFinder({ copy, planNames }: PlanFinderProps) {
 							</p>
 						) : null}
 					</div>
-				)}
+				) : null}
 				<a
 					href={href}
-					data-plan={planId ?? 'start'}
-					onClick={() => writePlanCookie(planId ?? 'start')}
-					aria-disabled={pieces === 0}
-					className={`inline-flex items-center justify-center rounded-lg bg-white px-3 py-2 font-display text-base font-semibold text-ink transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-primary-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:scale-[0.98] ${pieces === 0 ? 'pointer-events-none opacity-40' : ''}`}
+					data-plan={planId}
+					onClick={() => writePlanCookie(planId)}
+					className="inline-flex items-center justify-center rounded-lg bg-white px-3 py-2 font-display text-base font-semibold text-ink transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-primary-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:scale-[0.98]"
 				>
 					{copy.cta}
 				</a>

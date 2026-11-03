@@ -354,7 +354,7 @@ export const landing = {
 	finder: {
 		title: 'Cuántas piezas necesitas al mes',
 		intro:
-			'Indica imágenes, videos, guiones, audio, presentaciones y websites. El resultado es una estimación aproximada de créditos y del plan que podría cubrir ese volumen.',
+			'Indica imágenes, clips de video, guiones, minutos de audio, slides y websites. El resultado es una estimación aproximada de créditos y del plan que podría cubrir ese volumen.',
 		disclaimer:
 			'Esta medida es aproximada y puede variar según la herramienta, la duración real de cada pieza y los precios vigentes en la plataforma.',
 		image: 'Imágenes',
@@ -364,11 +364,13 @@ export const landing = {
 		presentation: 'Presentaciones',
 		website: 'Websites',
 		minutes: 'minutos',
+		clips: 'clips (8 s)',
+		slides: 'slides',
 		decrease: 'Restar',
 		increase: 'Sumar',
 		videoLength: 'Duración de referencia del video',
-		short: '5 segundos',
-		medium: '15 segundos',
+		short: '4 segundos',
+		medium: '8 segundos',
 		empty: 'Indica al menos una pieza para ver un plan.',
 		error: 'Usa números enteros entre 0 y 500.',
 		creditsLabel: 'Créditos estimados al mes (aproximado)',
@@ -377,7 +379,7 @@ export const landing = {
 		enterprise:
 			'Este volumen supera los 2.500 créditos del plan Empresarial. Corporativo se arma a medida.',
 		assumption:
-			'Referencia aproximada de cálculo: 1 crédito por imagen, 1 crédito por guion, 3 créditos por segundo de video (el slider de video va en minutos), 2 créditos por minuto de audio, 5 créditos por presentación y 15 créditos por website. El generador de guiones de la plataforma hoy no cobra créditos; el 1 crédito por guion sirve solo para dimensionar el plan. El consumo real puede variar.',
+			'Referencia aproximada (tarifas de plataforma, 2026-11-03): 4 créditos por imagen (1K/2K), 25 créditos por clip de video de 8 s, 1 crédito por guion, 6 créditos por minuto iniciado de audio (texto a voz), 9 créditos por slide (sin imágenes de IA) y 26 créditos por website tipo landing. Cada paso del slider es una unidad de esa tarifa. Herramientas, resolución, duración y opciones pueden cambiar el total real.',
 		perMonth: 'al mes',
 		cta: 'Obtener plan',
 	},
@@ -475,7 +477,7 @@ export const landing = {
 			},
 			{
 				q: '¿Cómo funcionan los créditos?',
-				a: 'Los créditos son la unidad de uso de la plataforma. Una imagen de anuncio usa 1 crédito. Un segundo de video editado usa 3. Una voz usa 2 créditos por minuto. El generador de guiones hoy no cobra créditos.',
+				a: 'Los créditos son la unidad de uso de la plataforma. Una imagen generada en 1K o 2K usa alrededor de 4 créditos. Un video de 8 s (texto o imagen a video) usa alrededor de 25. Texto a voz usa 6 créditos por minuto iniciado. Un guion de video usa 1 crédito. El consumo exacto depende de la herramienta y de las opciones elegidas.',
 			},
 			{
 				q: '¿Puedo manejar más de una marca o negocio desde mi cuenta?',

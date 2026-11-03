@@ -12,6 +12,14 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-03 — Nav con entrada de cortinas
+
+- Enlaces in-page (Sobre Kaiman, Planes, footer, rail): no ancla suave; barras negras cubren, saltan al destino y abren (misma entrada que el load).
+
+### 2026-11-03 — Estimador de créditos (tarifas API)
+
+- Fuente: `docs/kaiman-credit-prices-2026-11-03.md`. Un paso de slider = 1 unidad tarifada: imagen 4, clip video 8 s = 25, guion 1, audio 6/min, slide 9, landing 26. Copy assumption + FAQ ES/EN alineados.
+
 ### 2026-11-03 — Salsana modal + cursor expand
 
 - Expand abre modal centrado en viewport (portal a `body`), no fullscreen nativo.
