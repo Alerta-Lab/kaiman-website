@@ -131,13 +131,15 @@ const menuLinks = [
 		}
 	</nav>
 
-	<div class="mx-auto flex w-full max-w-content flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+	<div class="mx-auto flex w-full max-w-content flex-col gap-4">
 		<div class="flex flex-wrap gap-3">
 			<Button href={signupUrl}>{copy.nav.signup}</Button>
 			<Button href={loginUrl} variant="secondary">{copy.nav.login}</Button>
 			<Button href={plansHref} variant="secondary">{copy.nav.plans}</Button>
 		</div>
-		<LanguageMenu locale={locale} label={copy.nav.language} placement="top" />
+		<div class="relative z-10 self-start">
+			<LanguageMenu locale={locale} label={copy.nav.language} placement="top" />
+		</div>
 	</div>
 </div>
 

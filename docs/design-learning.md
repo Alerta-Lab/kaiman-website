@@ -12,6 +12,31 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-04 — Problem facets + secreto
+
+- Facets con `Card`: imagen + footer label (Colores / Tipografías / Tono… / Estilo) + índice; sin «su/sus».
+- Secreto: texto blanco más grande; acento `text-feature-image` en «consistencia de marca» / «brand consistency».
+
+### 2026-11-04 — Wireframe NEW: copy + distribución
+
+- Fuente: `docs/references/wireframe-home-en-new/Main.dc.html` (ES del HTML; EN traducido).
+- Copy renovado en hero, origen, problem, Brand Understanding, audiencias, tools, value, playbooks, FAQ, close.
+- Layout: problem con título+intro / 4 facets etiquetadas / caja “secreto”; sección `#menos`; 4 audiencias con pasos (`#ana` `#carlos` `#sofia` `#coaches`).
+- Imágenes section-* y mock de prompt del hero se mantienen.
+
+### 2026-11-04 — Rama wireframe landing (sin GSAP)
+
+- Branch `feat/wireframe-landing`: `WireframeLanding.astro` replica la estructura de `docs/references/wireframe-home-en/Main.dc.html`.
+- Tokens/proyecto: `Button`, ink/primary, imágenes de `public`, SiteHeader/Footer.
+- Extra vs wireframe: demo video, PlanFinder (piezas al mes), blog real, FAQ/planes del diccionario landing.
+- Copy narrativo en `src/i18n/locales/{es,en}/wireframe.ts` vía `getWireframe`.
+- Tipografía: títulos con `leading-[1.02–1.1]` (antes default ~1.5), body más compacto, menos padding de sección.
+- Ajustes: hero con más `pt` bajo header; problem en grid 2×2 (crops de `inconsistence`); Brand Knowledge con `inconsistence.png`; planes `md:grid-cols-3`; sección Playbooks; sin login en CTA final.
+- Tools/Blitz: 8 cards del wireframe, grid `auto-fit minmax(16.25rem)`, media ~150px de alto + chips de categorías.
+- Hero prompt: shell estilo Wizard (`border-2` feature-image `#db2777`, pills `black-capsule`); texto fijo + brand + formato seleccionado + 3 outputs.
+- Hero modes: tamaño normal (`text-sm` + `px-3`), una línea (`flex-nowrap` + `overflow-hidden` + `shrink-0`); si no caben se cortan, sin wrap ni scroll.
+- Assets wireframe por sección (PNG en `public/`): `section-2.png` (origen), `section-3.1`…`3.4.png` (problem), `section-4.png` (Brand Knowledge), `section-11-1`…`11-8.png` (tools blitz). Si falta el archivo, el path queda asignado.
+
 ### 2026-11-04 — Tour: media de pasos
 
 - 01 `brand-profile.png`, 02 `single-item-order.png`, 03 `order-ready.png`.

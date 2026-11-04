@@ -1,5 +1,5 @@
 ---
-import LandingPage from '../../components/sections/LandingPage.astro';
+import WireframeLanding from '../../components/sections/WireframeLanding.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import SiteHeader from '../../components/layout/SiteHeader.astro';
 import { getLanding, isLocale, locales, type Locale } from '../../i18n';
@@ -23,6 +23,6 @@ const copy = getLanding(locale);
 
 <BaseLayout locale={locale} title={copy.meta.title} description={copy.meta.description}>
 	<SiteHeader locale={locale} />
-	<LandingPage locale={locale} />
+	<WireframeLanding locale={locale} />
 	<SiteFooter locale={locale} />
 </BaseLayout>
