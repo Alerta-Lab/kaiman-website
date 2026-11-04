@@ -12,7 +12,7 @@ const site =
 // https://astro.build/config
 export default defineConfig({
 	site,
-	base: githubPages ? '/kaiman-website' : undefined,
+	base: githubPages ? '/kaiman-website/' : undefined,
 	output: githubPages ? 'static' : 'server',
 	adapter: githubPages ? undefined : vercel(),
 	i18n: {

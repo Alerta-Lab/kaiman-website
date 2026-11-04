@@ -12,6 +12,11 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-04 — Assets en GitHub Pages (slash de base)
+
+- Fallo: `base: /kaiman-website` sin `/` final → `asset()` unía `kaiman-website` + `video/...` = 404.
+- Fix: `base: /kaiman-website/` y `asset()` fuerza un `/` entre base y path.
+
 ### 2026-11-03 — 404 al estilo landing
 
 - Fondo ink + radiales, header cápsula, logo Kaiman, display 404 atenuado, CTAs `k-btn` (ES / EN / Blog). Sin look lavanda del blog.
