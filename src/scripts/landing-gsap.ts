@@ -37,7 +37,7 @@ export function initLandingGsap(root: ParentNode = document): void {
 	});
 	main
 		.querySelectorAll<HTMLElement>(
-			'[data-story-pin], [data-hero-pin], [data-playbooks-pin], [data-playbooks-track], [data-playbooks-card], [data-playbooks-progress], [data-capacity-pin], [data-capacity-track], [data-capacity-card], [data-capacity-progress], [data-story-stage], [data-reveal-item], [data-parallax-bg], [data-parallax-content] > *, [data-hero-exit], [data-hero-giant], [data-curtain-left], [data-curtain-right], [data-curtain-top], [data-curtain-bottom], [data-origen-layer]',
+			'[data-story-pin], [data-hero-pin], [data-playbooks-pin], [data-playbooks-track], [data-playbooks-card], [data-playbooks-progress], [data-capacity-pin], [data-capacity-track], [data-capacity-card], [data-capacity-progress], [data-story-stage], [data-swap-copy], [data-swap-media], [data-reveal-item], [data-parallax-bg], [data-parallax-content] > *, [data-hero-exit], [data-hero-giant], [data-curtain-left], [data-curtain-right], [data-curtain-top], [data-curtain-bottom], [data-origen-layer]',
 		)
 		.forEach((node) => {
 			gsap.killTweensOf(node);
@@ -384,8 +384,12 @@ function initLandingGsapInner(main: Element, reduce: boolean): void {
 			stages.forEach((stage) => {
 				const lines = stage.querySelectorAll<HTMLElement>('[data-stage-line]');
 				const fill = stage.querySelector<HTMLElement>('[data-platform-fill]');
+				const swapCopy = stage.querySelectorAll<HTMLElement>('[data-swap-copy]');
+				const swapMedia = stage.querySelectorAll<HTMLElement>('[data-swap-media]');
 				if (lines.length) gsap.set(lines, { clearProps: 'all', opacity: 1, y: 0 });
 				if (fill) gsap.set(fill, { clearProps: 'clipPath', clipPath: 'none' });
+				if (swapCopy.length) gsap.set(swapCopy, { clearProps: 'all', opacity: 1, y: 0 });
+				if (swapMedia.length) gsap.set(swapMedia, { clearProps: 'all', opacity: 1, y: 0 });
 			});
 		});
 
@@ -397,15 +401,47 @@ function initLandingGsapInner(main: Element, reduce: boolean): void {
 		});
 	});
 
-	// Desktop: pinned story stages + horizontal timelines + shape wipes.
+	// Desktop: pinned story stages + optional column swaps + horizontal timelines.
 	desktop.add('(min-width: 1024px)', () => {
 		stories.forEach((story, storyIndex) => {
 			const pin = story.querySelector<HTMLElement>('[data-story-pin]');
 			const stages = gsap.utils.toArray<HTMLElement>(story.querySelectorAll('[data-story-stage]'));
 			if (!pin || stages.length < 2) return;
 
-			const segment = 1;
+			const hold = 0.85;
 			const fade = 0.55;
+
+			type StoryBeat =
+				| { kind: 'hold' }
+				| { kind: 'swap'; stage: HTMLElement }
+				| { kind: 'enter'; from: HTMLElement; to: HTMLElement }
+				| { kind: 'audience'; root: HTMLElement; id: string };
+
+			const appendAudienceBeats = (stage: HTMLElement, list: StoryBeat[]) => {
+				const switcher = stage.querySelector<HTMLElement>('[data-audience-switcher]');
+				if (!switcher) return;
+				const ids = audienceIdsOf(switcher);
+				for (let i = 1; i < ids.length; i += 1) {
+					list.push({ kind: 'audience', root: switcher, id: ids[i] });
+					list.push({ kind: 'hold' });
+				}
+			};
+
+			const beats: StoryBeat[] = [{ kind: 'hold' }];
+			if (stages[0].querySelector('[data-swap-col]')) {
+				beats.push({ kind: 'swap', stage: stages[0] });
+				beats.push({ kind: 'hold' });
+			}
+			appendAudienceBeats(stages[0], beats);
+			for (let index = 1; index < stages.length; index += 1) {
+				beats.push({ kind: 'enter', from: stages[index - 1], to: stages[index] });
+				beats.push({ kind: 'hold' });
+				if (stages[index].querySelector('[data-swap-col]')) {
+					beats.push({ kind: 'swap', stage: stages[index] });
+					beats.push({ kind: 'hold' });
+				}
+				appendAudienceBeats(stages[index], beats);
+			}
 
 			gsap.set(stages, { opacity: 0, x: 0, y: 36, pointerEvents: 'none' });
 			gsap.set(stages[0], { opacity: 1, x: 0, y: 0, pointerEvents: 'auto' });
@@ -413,6 +449,10 @@ function initLandingGsapInner(main: Element, reduce: boolean): void {
 			stages.forEach((stage, index) => {
 				const lines = stage.querySelectorAll<HTMLElement>('[data-stage-line]');
 				const fill = stage.querySelector<HTMLElement>('[data-platform-fill]');
+				const swapCopy = stage.querySelectorAll<HTMLElement>('[data-swap-copy]');
+				const swapMedia = stage.querySelectorAll<HTMLElement>('[data-swap-media]');
+				if (swapCopy.length) gsap.set(swapCopy, { opacity: 1, y: 0 });
+				if (swapMedia.length) gsap.set(swapMedia, { opacity: 0, y: 28 });
 				if (index === 0) {
 					if (lines.length) gsap.set(lines, { opacity: 1, y: 0 });
 					if (fill) gsap.set(fill, { clipPath: 'inset(0 0 0% 0)' });
@@ -422,29 +462,69 @@ function initLandingGsapInner(main: Element, reduce: boolean): void {
 				if (fill) gsap.set(fill, { clipPath: 'inset(0 0 100% 0)' });
 			});
 
+			const audienceMarks: { time: number; root: HTMLElement; id: string }[] = [];
+
 			const tl = gsap.timeline({
 				scrollTrigger: {
 					id: `story-${story.id || storyIndex}`,
 					trigger: story,
 					start: 'top top',
-					end: () => `+=${stages.length * 100}%`,
+					end: () => `+=${Math.max(beats.length, stages.length) * 90}%`,
 					scrub: 0.95,
 					pin: pin,
 					anticipatePin: 1,
 					invalidateOnRefresh: true,
+					onUpdate: () => {
+						if (!audienceMarks.length) return;
+						const time = tl.time();
+						let current = audienceMarks[0];
+						for (const mark of audienceMarks) {
+							if (time + 0.001 >= mark.time) current = mark;
+							else break;
+						}
+						setAudienceFocus(current.root, current.id);
+					},
 				},
 			});
 
-			tl.to({}, { duration: segment }, 0);
+			let at = 0;
+			for (const beat of beats) {
+				if (beat.kind === 'hold') {
+					tl.to({}, { duration: hold }, at);
+					at += hold;
+					continue;
+				}
 
-			for (let index = 1; index < stages.length; index += 1) {
-				const prev = stages[index - 1];
-				const stage = stages[index];
-				const at = index * segment;
+				if (beat.kind === 'audience') {
+					audienceMarks.push({ time: at, root: beat.root, id: beat.id });
+					tl.to({}, { duration: fade * 0.35 }, at);
+					at += fade * 0.35;
+					continue;
+				}
+
+				if (beat.kind === 'swap') {
+					const copyEl = beat.stage.querySelectorAll<HTMLElement>('[data-swap-copy]');
+					const mediaEl = beat.stage.querySelectorAll<HTMLElement>('[data-swap-media]');
+					if (copyEl.length) {
+						tl.to(copyEl, { opacity: 0, y: -24, duration: fade, ease: 'none' }, at);
+					}
+					if (mediaEl.length) {
+						tl.to(mediaEl, { opacity: 1, y: 0, duration: fade, ease: 'none' }, at);
+					}
+					at += fade;
+					continue;
+				}
+
+				const { from: prev, to: stage } = beat;
 				const prevLines = prev.querySelectorAll<HTMLElement>('[data-stage-line]');
 				const prevFill = prev.querySelector<HTMLElement>('[data-platform-fill]');
 				const lines = stage.querySelectorAll<HTMLElement>('[data-stage-line]');
 				const fill = stage.querySelector<HTMLElement>('[data-platform-fill]');
+				const switcher = stage.querySelector<HTMLElement>('[data-audience-switcher]');
+				if (switcher) {
+					const firstId = audienceIdsOf(switcher)[0];
+					if (firstId) audienceMarks.push({ time: at, root: switcher, id: firstId });
+				}
 
 				gsap.set(stage, { x: 0, y: 36, opacity: 0 });
 				tl.to(
@@ -483,7 +563,7 @@ function initLandingGsapInner(main: Element, reduce: boolean): void {
 				if (fill) {
 					tl.to(fill, { clipPath: 'inset(0 0 0% 0)', duration: fade, ease: 'none' }, at);
 				}
-				tl.to({}, { duration: Math.max(segment - fade, 0.2) }, at + fade);
+				at += fade;
 			}
 		});
 
@@ -804,31 +884,40 @@ function initHeroCurtain(
 	return api;
 }
 
+function setAudienceFocus(root: HTMLElement, id: string): void {
+	if (root.dataset.activeAudience === id) return;
+	root.dataset.activeAudience = id;
+	root.querySelectorAll<HTMLElement>('[data-audience-link]').forEach((link) => {
+		const active = link.dataset.audienceLink === id;
+		link.classList.toggle('text-white', active);
+		link.classList.toggle('text-white/45', !active);
+	});
+	root.querySelectorAll<HTMLElement>('[data-audience-photo]').forEach((photo) => {
+		const active = photo.dataset.audiencePhoto === id;
+		photo.classList.toggle('opacity-100', active);
+		photo.classList.toggle('opacity-0', !active);
+		photo.setAttribute('aria-hidden', active ? 'false' : 'true');
+	});
+}
+
+function audienceIdsOf(root: HTMLElement): string[] {
+	return gsap.utils
+		.toArray<HTMLElement>(root.querySelectorAll('[data-audience-link]'))
+		.map((link) => link.dataset.audienceLink)
+		.filter((id): id is string => Boolean(id));
+}
+
 function initAudienceSwitcher(main: Element): void {
 	const root = main.querySelector<HTMLElement>('[data-audience-switcher]');
 	if (!root) return;
-	const links = gsap.utils.toArray<HTMLElement>(root.querySelectorAll('[data-audience-link]'));
-	const photos = gsap.utils.toArray<HTMLElement>(root.querySelectorAll('[data-audience-photo]'));
+	const ids = audienceIdsOf(root);
+	if (ids[0]) setAudienceFocus(root, ids[0]);
 
-	const activate = (id: string) => {
-		links.forEach((link) => {
-			const active = link.dataset.audienceLink === id;
-			link.classList.toggle('text-white', active);
-			link.classList.toggle('text-white/45', !active);
-		});
-		photos.forEach((photo) => {
-			const active = photo.dataset.audiencePhoto === id;
-			photo.classList.toggle('opacity-100', active);
-			photo.classList.toggle('opacity-0', !active);
-			photo.setAttribute('aria-hidden', active ? 'false' : 'true');
-		});
-	};
-
-	links.forEach((link) => {
+	root.querySelectorAll<HTMLElement>('[data-audience-link]').forEach((link) => {
 		const id = link.dataset.audienceLink;
 		if (!id) return;
-		link.addEventListener('pointerenter', () => activate(id));
-		link.addEventListener('focus', () => activate(id));
+		link.addEventListener('pointerenter', () => setAudienceFocus(root, id));
+		link.addEventListener('focus', () => setAudienceFocus(root, id));
 	});
 }
 
@@ -1115,6 +1204,7 @@ function initVideoCursor(main: Element, heroApi: HeroApi): void {
 	const heroHotspot = main.querySelector<HTMLElement>('[data-video-hotspot]');
 	const goTargets = gsap.utils.toArray<HTMLElement>(document.querySelectorAll('[data-cursor-go]'));
 	const canvasTargets = gsap.utils.toArray<HTMLElement>(main.querySelectorAll('[data-canvas-pan]'));
+	const panTargets = gsap.utils.toArray<HTMLElement>(main.querySelectorAll('[data-h-scroll]'));
 	if (!cursor) return;
 
 	const playLabel = cursor.dataset.playLabel ?? 'Play';
@@ -1122,24 +1212,24 @@ function initVideoCursor(main: Element, heroApi: HeroApi): void {
 	const goLabel = cursor.dataset.goLabel ?? 'Ir';
 	const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-	type CursorMode = 'scroll' | 'toggle' | 'go' | 'expand' | 'grab' | 'grabbing';
+	type CursorMode = 'scroll' | 'toggle' | 'go' | 'pan' | 'expand' | 'grab' | 'grabbing';
 
 	const videoModeOf = (): 'scroll' | 'toggle' =>
 		heroHotspot?.dataset.hotspotMode === 'toggle' ? 'toggle' : 'scroll';
 
 	const syncIcons = (mode: CursorMode) => {
-		iconPan?.classList.add('hidden');
+		iconPan?.classList.toggle('hidden', mode !== 'pan');
 		iconExpand?.classList.toggle('hidden', mode !== 'expand');
 		iconHand?.classList.toggle('hidden', mode !== 'grab');
 		iconGrab?.classList.toggle('hidden', mode !== 'grabbing');
-		const iconMode = mode === 'expand' || mode === 'grab' || mode === 'grabbing';
+		const iconMode = mode === 'pan' || mode === 'expand' || mode === 'grab' || mode === 'grabbing';
 		if (label) label.classList.toggle('hidden', iconMode);
 	};
 
 	const syncLabel = (mode: CursorMode) => {
 		syncIcons(mode);
 		if (!label) return;
-		if (mode === 'expand' || mode === 'grab' || mode === 'grabbing') return;
+		if (mode === 'pan' || mode === 'expand' || mode === 'grab' || mode === 'grabbing') return;
 		if (mode === 'go') {
 			label.textContent = goLabel;
 			return;
@@ -1256,6 +1346,7 @@ function initVideoCursor(main: Element, heroApi: HeroApi): void {
 		if (el.closest('[data-cursor-expand]')) return 'expand';
 		const canvas = el.closest<HTMLElement>('[data-canvas-pan]');
 		if (canvas) return canvas.dataset.dragging === 'true' ? 'grabbing' : 'grab';
+		if (el.closest('[data-h-scroll]')) return 'pan';
 		return null;
 	};
 
@@ -1302,6 +1393,10 @@ function initVideoCursor(main: Element, heroApi: HeroApi): void {
 	});
 
 	canvasTargets.forEach((target) => {
+		target.classList.add('cursor-none');
+	});
+
+	panTargets.forEach((target) => {
 		target.classList.add('cursor-none');
 	});
 

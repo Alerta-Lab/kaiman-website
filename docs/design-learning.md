@@ -12,6 +12,23 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-04 — Tour: media de pasos
+
+- 01 `brand-profile.png`, 02 `single-item-order.png`, 03 `order-ready.png`.
+
+### 2026-11-04 — Audiencias: foto en el encabezado
+
+- Foto 1:1 a la izquierda del nombre + título del perfil; las cards de acción solo título + texto.
+- Overview desktop: al pin de la sección, el scroll pasa el foco Martinez → Ana → Carlos → Sofia (foto + lista).
+- Cursor pan (círculo + flechas ↔) restaurado sobre `[data-h-scroll]`; el wheel vertical sigue libre.
+
+### 2026-11-04 — Producto: swap texto → imagen
+
+- Stage 1 (Producto): el copy de la derecha cede a `inconsistence.png` (titular izquierda fijo).
+- Stage 3 (Consistencia): el copy de la derecha cede a `consistency.png`.
+- Ambas imágenes: `object-contain` + `max-h` acotada, centradas con padding (no full-bleed).
+- Desktop: pin + scrub (`data-swap-col`). Mobile: texto e imagen apilados, sin swap.
+
 ### 2026-11-04 — Assets en GitHub Pages (slash de base)
 
 - Fallo: `base: /kaiman-website` sin `/` final → `asset()` unía `kaiman-website` + `video/...` = 404.

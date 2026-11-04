@@ -92,6 +92,8 @@ export const landing = {
 			'Una marca se construye cuando las personas pueden reconocerla una y otra vez.',
 		closing:
 			'Kaiman mantiene la personalidad de tu marca en cada generación para que tu negocio construya una imagen consistente, reconocible y propia, sin que tengas que explicarla cada vez.',
+		inconsistencyAlt: 'Ejemplo de piezas publicitarias con marca inconsistente.',
+		consistencyAlt: 'Ejemplo de piezas publicitarias con marca consistente.',
 	},
 	brandUnderstanding: {
 		eyebrow: 'Brand Understanding · El pilar central de Kaiman',

@@ -93,6 +93,8 @@ export const landing = {
 		secretBody: 'A brand is built when people can recognize it again and again.',
 		closing:
 			'Kaiman keeps your brand personality in every generation so your business builds a consistent, recognizable, and ownable image without explaining it every time.',
+		inconsistencyAlt: 'Example of advertising pieces with an inconsistent brand.',
+		consistencyAlt: 'Example of advertising pieces with a consistent brand.',
 	},
 	brandUnderstanding: {
 		eyebrow: 'Brand Understanding · Kaiman’s central pillar',

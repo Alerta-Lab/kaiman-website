@@ -63,9 +63,9 @@ const audiencePhotos: Record<string, string> = {
 };
 
 const tourMedia = [
-	asset('/brand/showcase-salsana.webp'),
-	asset(locale === 'en' ? '/video/demo-en-poster.jpg' : '/video/demo-es-poster.jpg'),
-	asset('/demos/salsana/pieza-2.webp'),
+	asset('/brand-profile.png'),
+	asset('/single-item-order.png'),
+	asset('/order-ready.png'),
 ] as const;
 
 const origenLead = copy.origin.paragraphs[0] ?? '';
@@ -335,7 +335,7 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 				<div class="absolute inset-y-0 right-0 w-1/3 bg-linear-to-l from-primary-800/20 to-transparent"></div>
 			</div>
 
-			{/* Stage 1 — title + intro (Monument diagram) */}
+			{/* Stage 1 — title + intro → right swaps to inconsistency visual */}
 			<div data-story-stage class="max-lg:relative max-lg:border-b max-lg:border-white/10 lg:absolute lg:inset-0">
 				<div class="grid w-full grid-cols-1 lg:h-full lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
 					<div class="relative flex flex-col justify-between gap-8 border-white/15 px-5 pt-28 pb-10 sm:px-8 lg:border-r lg:px-10 lg:pt-32 lg:pb-12">
@@ -345,13 +345,37 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 						<h2 class="max-w-[16ch] font-display text-[clamp(1.85rem,4.6vw,3.75rem)] leading-[1.02] font-semibold tracking-tight text-balance text-white">
 							{copy.consistency.title}
 						</h2>
-						<p class="hidden text-xs font-semibold tracking-[0.16em] text-white/45 uppercase lg:block">{copy.footer.studio}</p>
-					</div>
-					<div class="relative flex flex-col justify-center gap-6 border-t border-white/15 px-5 py-10 sm:px-8 lg:gap-8 lg:border-t-0 lg:px-10 lg:py-12">
-						<p class="max-w-xl font-display text-xl leading-snug text-pretty text-primary-300 sm:text-2xl lg:text-[1.75rem]">
-							{copy.consistency.intro}
+						<p class="hidden text-xs font-semibold tracking-[0.16em] text-white/45 uppercase lg:block">
+							{copy.footer.studio}
 						</p>
-						<p class="max-w-xl text-base text-pretty text-neutral-300 sm:text-lg">{copy.consistency.body}</p>
+					</div>
+					<div
+						data-swap-col
+						class="relative flex flex-col border-t border-white/15 px-5 py-10 sm:px-8 lg:h-full lg:border-t-0 lg:px-0 lg:py-0"
+					>
+						<div
+							data-swap-copy
+							class="relative z-10 flex flex-col justify-center gap-6 lg:h-full lg:gap-8 lg:px-10 lg:py-12"
+						>
+							<p class="max-w-xl font-display text-xl leading-snug text-pretty text-primary-300 sm:text-2xl lg:text-[1.75rem]">
+								{copy.consistency.intro}
+							</p>
+							<p class="max-w-xl text-base text-pretty text-neutral-300 sm:text-lg">{copy.consistency.body}</p>
+						</div>
+						<div
+							data-swap-media
+							class="relative mt-8 flex items-center justify-center lg:absolute lg:inset-0 lg:mt-0 lg:px-8 lg:py-10"
+						>
+							<img
+								src={asset('/inconsistence.png')}
+								alt={copy.consistency.inconsistencyAlt}
+								width="1600"
+								height="2000"
+								class="h-auto w-full max-h-[min(58vh,28rem)] object-contain object-center lg:max-h-[min(70vh,34rem)]"
+								loading="lazy"
+								decoding="async"
+							/>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -409,7 +433,7 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 				</div>
 			</div>
 
-			{/* Stage 3 — secret / closing */}
+			{/* Stage 3 — secret / closing → right swaps to consistency visual */}
 			<div data-story-stage class="max-lg:relative lg:absolute lg:inset-0">
 				<div class="grid w-full grid-cols-1 lg:h-full lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
 					<div class="relative flex flex-col justify-between gap-8 border-white/15 px-5 pt-16 pb-10 sm:px-8 lg:border-r lg:px-10 lg:pt-32 lg:pb-12">
@@ -421,11 +445,35 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 						</h3>
 						<p class="hidden text-xs font-semibold tracking-[0.16em] text-white/45 uppercase lg:block">{copy.footer.studio}</p>
 					</div>
-					<div class="relative flex flex-col justify-center gap-6 border-t border-white/15 px-5 py-10 sm:px-8 lg:gap-8 lg:border-t-0 lg:px-10 lg:py-12">
-						<p class="max-w-xl font-display text-xl leading-snug text-pretty text-primary-300 sm:text-2xl lg:text-[1.75rem]">
-							{copy.consistency.secretBody}
-						</p>
-						<p class="max-w-xl text-base font-semibold text-pretty text-neutral-100 sm:text-lg">{copy.consistency.closing}</p>
+					<div
+						data-swap-col
+						class="relative flex flex-col border-t border-white/15 px-5 py-10 sm:px-8 lg:h-full lg:border-t-0 lg:px-0 lg:py-0"
+					>
+						<div
+							data-swap-copy
+							class="relative z-10 flex flex-col justify-center gap-6 lg:h-full lg:gap-8 lg:px-10 lg:py-12"
+						>
+							<p class="max-w-xl font-display text-xl leading-snug text-pretty text-primary-300 sm:text-2xl lg:text-[1.75rem]">
+								{copy.consistency.secretBody}
+							</p>
+							<p class="max-w-xl text-base font-semibold text-pretty text-neutral-100 sm:text-lg">
+								{copy.consistency.closing}
+							</p>
+						</div>
+						<div
+							data-swap-media
+							class="relative mt-8 flex items-center justify-center lg:absolute lg:inset-0 lg:mt-0 lg:px-8 lg:py-10"
+						>
+							<img
+								src={asset('/consistency.png')}
+								alt={copy.consistency.consistencyAlt}
+								width="1600"
+								height="1600"
+								class="h-auto w-full max-h-[min(58vh,28rem)] object-contain object-center lg:max-h-[min(70vh,34rem)]"
+								loading="lazy"
+								decoding="async"
+							/>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -640,11 +688,24 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 			class:list={['relative flex min-h-svh w-full flex-col justify-center border-t border-white/10 bg-ink-100 pt-28 pb-16', gutter]}
 		>
 			<div data-parallax-content class="flex w-full flex-col">
-				<div class="border-b border-white/15 pb-8 sm:pb-10">
-					<p class="mb-3 text-sm font-semibold tracking-[0.14em] text-primary-300 uppercase">{cardItem.name}</p>
-					<h2 class="max-w-4xl font-display text-4xl font-semibold tracking-tight text-balance text-white sm:text-5xl lg:text-6xl">
-						{cardItem.title}
-					</h2>
+				<div class="flex items-end gap-4 border-b border-white/15 pb-8 sm:gap-5 sm:pb-10 lg:gap-6">
+					<div class="aspect-square w-20 shrink-0 overflow-hidden bg-ink-200 sm:w-24 lg:w-28">
+						<img
+							src={audiencePhotos[cardItem.id]}
+							alt=""
+							width="224"
+							height="224"
+							class="h-full w-full object-cover object-top"
+							loading="lazy"
+							decoding="async"
+						/>
+					</div>
+					<div class="min-w-0 flex-1 pb-0.5">
+						<p class="mb-2 text-sm font-semibold tracking-[0.14em] text-primary-300 uppercase sm:mb-3">{cardItem.name}</p>
+						<h2 class="font-display text-3xl font-semibold tracking-tight text-balance text-white sm:text-5xl lg:text-6xl">
+							{cardItem.title}
+						</h2>
+					</div>
 				</div>
 				<div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-0">
 					<div class="flex flex-col gap-4 pt-8 lg:border-r lg:border-white/15 lg:pt-10 lg:pr-10">
@@ -658,24 +719,13 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 						<div data-h-scroll class="relative min-w-0 touch-none select-none">
 							<div
 								data-h-scroll-track
-								class="flex cursor-grab gap-4 overflow-x-auto pb-2 active:cursor-grabbing [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+								class="flex gap-4 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
 							>
 								{
 									cardItem.actions.map((action) => (
-										<article class="w-[min(16rem,72vw)] shrink-0 overflow-hidden bg-ink-200 sm:w-[18rem]">
-											<div class="aspect-[4/3] overflow-hidden">
-												<img
-													src={audiencePhotos[cardItem.id]}
-													alt=""
-													class="pointer-events-none h-full w-full object-cover object-top"
-													loading="lazy"
-													draggable="false"
-												/>
-											</div>
-											<div class="flex flex-col gap-2 p-4">
-												<h3 class="text-base font-semibold tracking-tight text-white uppercase sm:text-lg">{action.title}</h3>
-												<p class="text-sm text-pretty text-neutral-300">{action.body}</p>
-											</div>
+										<article class="flex w-[min(16rem,72vw)] shrink-0 flex-col gap-3 border border-white/15 bg-ink-200 p-5 sm:w-[18rem] sm:p-6">
+											<h3 class="text-base font-semibold tracking-tight text-white uppercase sm:text-lg">{action.title}</h3>
+											<p class="text-sm text-pretty text-neutral-300 sm:text-[0.95rem] sm:leading-relaxed">{action.body}</p>
 										</article>
 									))
 								}
