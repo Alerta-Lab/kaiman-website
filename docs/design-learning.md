@@ -12,6 +12,11 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-05 — Anclas alineadas con nav
+
+- Wireframe usaba `top` / `brand-knowledge` / `pricing` / `faq`; header/footer apuntaban a `hero` / `brand-understanding` / `planes` / `preguntas` (IDs del LandingPage viejo) → 404 de ancla en Pages.
+- IDs unificados a los del nav; `scroll-mt-28` en secciones ancladas por el header fijo.
+
 ### 2026-11-05 — Footer blanks, leads, close width
 
 - Instagram, blog (footer + CTA sección) y Alerta: `target="_blank"` + `rel="noopener noreferrer"`.

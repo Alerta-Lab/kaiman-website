@@ -90,7 +90,7 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 
 <main id="contenido" class="bg-ink text-white">
 	{/* S1 · Hero */}
-	<section id="top" class="relative overflow-hidden border-b border-white/10">
+	<section id="hero" class="relative overflow-hidden border-b border-white/10 scroll-mt-28">
 		<div class="pointer-events-none absolute inset-0 bg-[radial-gradient(1200px_520px_at_80%_0%,rgba(107,72,233,0.28),transparent_70%)]" aria-hidden="true"></div>
 		<div class:list={[shell, 'relative grid items-center gap-10 pt-28 pb-14 lg:grid-cols-2 lg:gap-12 lg:pt-32 lg:pb-16']}>
 			<div>
@@ -105,7 +105,7 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 				<p class="mt-3 max-w-xl text-base leading-relaxed text-pretty text-neutral-300 sm:text-lg">{wf.hero.body2}</p>
 				<div class="mt-7 flex flex-wrap gap-3">
 					<Button href={signupUrl}>{wf.hero.cta}</Button>
-					<Button href="#brand-knowledge" variant="secondary">{wf.hero.secondaryCta}</Button>
+					<Button href="#brand-understanding" variant="secondary">{wf.hero.secondaryCta}</Button>
 				</div>
 				<p class="mt-3 text-sm text-neutral-400">{wf.hero.note}</p>
 			</div>
@@ -172,7 +172,7 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 	</section>
 
 	{/* S2 · Origin */}
-	<section id="origen" class:list={[sectionY, 'border-b border-white/10']}>
+	<section id="origen" class:list={[sectionY, 'scroll-mt-28 border-b border-white/10']}>
 		<div class:list={[shell, 'grid items-center gap-8 lg:grid-cols-2 lg:gap-12']}>
 			<div>
 				<h2 class={h2}>{wf.origin.title}</h2>
@@ -261,7 +261,7 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 	</section>
 
 	{/* S4 · Brand Understanding */}
-	<section id="brand-knowledge" class:list={[sectionY, 'border-b border-white/10']}>
+	<section id="brand-understanding" class:list={[sectionY, 'scroll-mt-28 border-b border-white/10']}>
 		<div class={shell}>
 			<p class="font-display font-medium text-primary-300">{wf.brandKnowledge.eyebrow}</p>
 			<h2 class:list={[h2, 'mt-2 max-w-4xl']}>{wf.brandKnowledge.title}</h2>
@@ -619,7 +619,7 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 	</section>
 
 	{/* S11 · Pricing */}
-	<section id="pricing" class:list={[sectionY, 'border-b border-white/10 bg-ink-100']}>
+	<section id="planes" class:list={[sectionY, 'scroll-mt-28 border-b border-white/10 bg-ink-100']}>
 		<div class={shell}>
 			<h2 class={h2}>{copy.plans.title}</h2>
 			<p class={lead}>{copy.plans.intro}</p>
@@ -659,7 +659,7 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 	</section>
 
 	{/* Piezas al mes */}
-	<section id="piezas" class:list={[sectionY, 'border-b border-white/10']}>
+	<section id="piezas" class:list={[sectionY, 'scroll-mt-28 border-b border-white/10']}>
 		<div class={shell}>
 			<h2 class={h2}>{copy.finder.title}</h2>
 			<p class={lead}>{copy.finder.intro}</p>
@@ -673,7 +673,7 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 	</section>
 
 	{/* Playbooks */}
-	<section id="playbooks" class:list={[sectionY, 'border-b border-white/10 bg-ink-100']}>
+	<section id="playbooks" class:list={[sectionY, 'scroll-mt-28 border-b border-white/10 bg-ink-100']}>
 		<div class={shell}>
 			<h2 class={h2}>{wf.playbooks.title}</h2>
 			<p class={lead}>{wf.playbooks.body}</p>
@@ -696,7 +696,7 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 	</section>
 
 	{/* Blog */}
-	<section id="blog" class:list={[sectionY, 'border-b border-white/10']}>
+	<section id="blog" class:list={[sectionY, 'scroll-mt-28 border-b border-white/10']}>
 		<div class={shell}>
 			<p class="font-display text-sm font-semibold tracking-[0.14em] text-primary-300 uppercase">{copy.blog.eyebrow}</p>
 			<h2 class:list={[h2, 'mt-3']}>{copy.blog.title}</h2>
@@ -741,7 +741,7 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 	</section>
 
 	{/* FAQ */}
-	<section id="faq" class:list={[sectionY, 'border-b border-white/10']}>
+	<section id="preguntas" class:list={[sectionY, 'scroll-mt-28 border-b border-white/10']}>
 		<div class="mx-auto w-full max-w-3xl px-5 sm:px-6 lg:px-8">
 			<h2 class={h2}>{wf.faq.title}</h2>
 			<div class="mt-8">
