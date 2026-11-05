@@ -12,6 +12,12 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-05 — Footer blanks, leads, close width
+
+- Instagram, blog (footer + CTA sección) y Alerta: `target="_blank"` + `rel="noopener noreferrer"`.
+- Leads de sección: sin `max-w-2xl` (usan el ancho del shell).
+- Close CTA: contenedor `max-w-5xl` para que «más eficiente» no parta de línea.
+
 ### 2026-11-05 — Finder rates copy + locale URLs
 
 - Quitado el párrafo de tarifas del PlanFinder (`assumption` ES/EN).

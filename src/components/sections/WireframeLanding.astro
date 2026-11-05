@@ -83,7 +83,8 @@ const h2 =
 	'font-display text-[clamp(1.65rem,3.4vw,2.75rem)] leading-[1.08] font-semibold tracking-tight text-balance text-white';
 const h3 =
 	'mt-2 font-display text-[clamp(1.5rem,2.8vw,2.15rem)] leading-[1.1] font-semibold tracking-tight text-balance text-white';
-const lead = 'mt-4 max-w-2xl text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base';
+const lead = 'mt-4 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base';
+const body = 'mt-3 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base';
 const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-tight text-white sm:text-xl';
 ---
 
@@ -265,7 +266,7 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 			<p class="font-display font-medium text-primary-300">{wf.brandKnowledge.eyebrow}</p>
 			<h2 class:list={[h2, 'mt-2 max-w-4xl']}>{wf.brandKnowledge.title}</h2>
 			<p class={lead}>{wf.brandKnowledge.body1}</p>
-			<p class="mt-3 max-w-2xl text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.brandKnowledge.body2}</p>
+			<p class={body}>{wf.brandKnowledge.body2}</p>
 			<div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 				{
 					wf.brandKnowledge.steps.map((step) => (
@@ -498,8 +499,8 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 		<div class={shell}>
 			<h2 class:list={[h2, 'max-w-4xl']}>{wf.tools.title}</h2>
 			<p class={lead}>{wf.tools.body1}</p>
-			<p class="mt-3 max-w-2xl text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.tools.body2}</p>
-			<p class="mt-3 max-w-2xl text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.tools.body3}</p>
+			<p class={body}>{wf.tools.body2}</p>
+			<p class={body}>{wf.tools.body3}</p>
 			<div class="mt-11 grid grid-cols-[repeat(auto-fit,minmax(16.25rem,1fr))] gap-4">
 				{
 					toolItems.map((item) => (
@@ -734,7 +735,7 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 				)
 			}
 			<div class="mt-8">
-				<Button href={blogHref} variant="secondary">{copy.blog.cta}</Button>
+				<Button href={blogHref} variant="secondary" target="_blank" rel="noopener noreferrer">{copy.blog.cta}</Button>
 			</div>
 		</div>
 	</section>
@@ -768,7 +769,7 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 	{/* Close CTA */}
 	<section class="relative overflow-hidden py-16 sm:py-20">
 		<div class="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_420px_at_50%_100%,rgba(107,72,233,0.28),transparent_72%)]" aria-hidden="true"></div>
-		<div class="relative mx-auto max-w-3xl px-5 text-center sm:px-6">
+		<div class="relative mx-auto max-w-5xl px-5 text-center sm:px-6">
 			<h2 class={h2}>{wf.close.title}</h2>
 			<p class="mt-4 text-base text-pretty text-neutral-300 sm:text-lg">{wf.close.body}</p>
 			<div class="mt-7 flex flex-wrap justify-center gap-3">

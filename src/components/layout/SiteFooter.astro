@@ -24,8 +24,8 @@ const productLinks = [
 ];
 
 const resourceLinks = [
-	{ href: `${home}#playbooks`, label: copy.footer.playbooks },
-	{ href: blogIndexPath(locale), label: copy.footer.help },
+	{ href: `${home}#playbooks`, label: copy.footer.playbooks, blank: false },
+	{ href: blogIndexPath(locale), label: copy.footer.help, blank: true },
 ];
 
 const legalLinks = [
@@ -73,7 +73,12 @@ const legalLinks = [
 					<Phone size={16} aria-hidden="true" />
 					{copy.footer.phone}
 				</a>
-				<a class="mt-2 inline-flex items-center gap-3 text-sm font-semibold text-neutral-300 hover:underline hover:underline-offset-4" href={instagramUrl}>
+				<a
+					class="mt-2 inline-flex items-center gap-3 text-sm font-semibold text-neutral-300 hover:underline hover:underline-offset-4"
+					href={instagramUrl}
+					target="_blank"
+					rel="noopener noreferrer"
+				>
 					<SocialIcon
 						url={instagramUrl}
 						as="span"
@@ -98,11 +103,23 @@ const legalLinks = [
 			<nav class="flex flex-col gap-2" aria-label={copy.footer.resources}>
 				<p class="text-sm font-semibold text-white">{copy.footer.resources}</p>
 				{resourceLinks.map((link) => (
-					<a class="w-fit text-sm text-neutral-300 hover:underline hover:underline-offset-4" href={link.href}>
+					<a
+						class="w-fit text-sm text-neutral-300 hover:underline hover:underline-offset-4"
+						href={link.href}
+						target={link.blank ? '_blank' : undefined}
+						rel={link.blank ? 'noopener noreferrer' : undefined}
+					>
 						{link.label}
 					</a>
 				))}
-				<a class="w-fit text-sm text-neutral-300 hover:underline hover:underline-offset-4" href={alertaUrl}>{copy.footer.alerta}</a>
+				<a
+					class="w-fit whitespace-nowrap text-sm text-neutral-300 hover:underline hover:underline-offset-4"
+					href={alertaUrl}
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					{copy.footer.alerta}
+				</a>
 			</nav>
 
 			<nav class="flex flex-col gap-2" aria-label={copy.footer.legal}>
