@@ -1,9 +1,9 @@
 ---
-import { getRelativeLocaleUrl } from 'astro:i18n';
 import { ArrowUp, Mail, MapPin, Phone } from 'lucide-react';
 import { SocialIcon } from 'react-social-icons';
 import { getLanding, type Locale } from '../../i18n';
 import { blogIndexPath } from '../../lib/blog-paths';
+import { localeUrl } from '../../lib/locale-url';
 import { alertaUrl, instagramUrl, signupUrl } from '../../lib/plans';
 import Button from '../ui/Button.astro';
 
@@ -13,7 +13,7 @@ interface Props {
 
 const { locale } = Astro.props;
 const copy = getLanding(locale);
-const home = getRelativeLocaleUrl(locale, '/');
+const home = localeUrl(locale);
 const year = new Date().getFullYear();
 
 const productLinks = [
@@ -29,8 +29,8 @@ const resourceLinks = [
 ];
 
 const legalLinks = [
-	{ href: getRelativeLocaleUrl(locale, '/terminos'), label: copy.footer.terms },
-	{ href: getRelativeLocaleUrl(locale, '/privacidad'), label: copy.footer.privacy },
+	{ href: localeUrl(locale, 'terminos'), label: copy.footer.terms },
+	{ href: localeUrl(locale, 'privacidad'), label: copy.footer.privacy },
 ];
 ---
 

@@ -1,9 +1,9 @@
 ---
-import { getRelativeLocaleUrl } from 'astro:i18n';
 import { LogIn, Menu, X } from 'lucide-react';
 import { getLanding, type Locale } from '../../i18n';
 import { blogIndexPath } from '../../lib/blog-paths';
 import { asset } from '../../lib/asset';
+import { localeUrl } from '../../lib/locale-url';
 import { loginUrl, signupUrl } from '../../lib/plans';
 import Button from '../ui/Button.astro';
 import LanguageMenu from './LanguageMenu.astro';
@@ -14,7 +14,7 @@ interface Props {
 
 const { locale } = Astro.props;
 const copy = getLanding(locale);
-const home = getRelativeLocaleUrl(locale, '/');
+const home = localeUrl(locale);
 const plansHref = `${home}#planes`;
 
 const menuLinks = [

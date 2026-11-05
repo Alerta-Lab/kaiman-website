@@ -1,8 +1,8 @@
 ---
-import { getRelativeLocaleUrl } from 'astro:i18n';
 import { ChevronDown, ChevronUp, Languages } from 'lucide-react';
 import { localeLabels, locales, type Locale } from '../../i18n';
 import { pathWithoutLocale } from '../../lib/blog-paths';
+import { localeUrl } from '../../lib/locale-url';
 
 interface Props {
 	locale: Locale;
@@ -50,7 +50,7 @@ const dropUp = placement === 'top';
 	>
 		{
 			locales.map((code) => {
-				const href = getRelativeLocaleUrl(code, pathForLocale);
+				const href = localeUrl(code, pathForLocale);
 				return (
 					<a
 						href={href}

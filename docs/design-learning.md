@@ -12,6 +12,18 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-05 — Finder rates copy + locale URLs
+
+- Quitado el párrafo de tarifas del PlanFinder (`assumption` ES/EN).
+- Links de locale: `localeUrl` / `blog*Path` siempre incluyen `/es|en/` + `base`. `getRelativeLocaleUrl` omitía `es` (`prefixDefaultLocale: false`) y en Pages salían `/kaiman-website/blogs/...` → 404.
+
+### 2026-11-05 — Origin link, secreto, galleries S7/S8
+
+- Visitar Alerta: `target="_blank"` + `whitespace-nowrap`.
+- Secreto: acento en `text-primary-300` (no feature-image).
+- Productos: grid 2×2 `section-7.1`…`7.4.png`.
+- Vendedores: foto arriba + 3 clips 9:16 `section-8.1`…`8.3.png`.
+
 ### 2026-11-05 — GitHub Pages: redirect sin `base`
 
 - Síntoma: `/kaiman-website/` redirigía a `/es/` (raíz del org) → 404; `/kaiman-website/es/` sí respondía 200.

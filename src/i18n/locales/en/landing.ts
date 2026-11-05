@@ -381,8 +381,6 @@ export const landing = {
 		unitLabel: 'Reference cost per credit on that plan',
 		enterprise:
 			'This volume exceeds the 2,500 credits of the Business plan. Corporate is built to fit.',
-		assumption:
-			'Approximate reference (platform rates, 2026-11-03): 4 credits per image (1K/2K), 25 credits per 8 s video clip, 1 credit per script, 6 credits per started minute of audio (text to speech), 9 credits per slide (without AI images), and 26 credits per landing-style website. Each slider step is one unit of that rate. Tool, resolution, length, and options can change the real total.',
 		perMonth: 'per month',
 		cta: 'Get this plan',
 	},
@@ -449,14 +447,6 @@ export const landing = {
 				body: 'Define your positioning, organize your communication themes, and turn your experience into content that builds authority and recognition.',
 			},
 		],
-	},
-	blog: {
-		eyebrow: 'Blog',
-		title: 'Latest published articles',
-		body: 'Short reads on product, brand, and artificial intelligence applied to your business marketing.',
-		cta: 'Browse all articles',
-		read: 'Read',
-		empty: 'No published articles yet.',
 	},
 	blog: {
 		eyebrow: 'Blog',

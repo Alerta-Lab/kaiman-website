@@ -380,8 +380,6 @@ export const landing = {
 		unitLabel: 'Costo de referencia por crédito en ese plan',
 		enterprise:
 			'Este volumen supera los 2.500 créditos del plan Empresarial. Corporativo se arma a medida.',
-		assumption:
-			'Referencia aproximada (tarifas de plataforma, 2026-11-03): 4 créditos por imagen (1K/2K), 25 créditos por clip de video de 8 s, 1 crédito por guion, 6 créditos por minuto iniciado de audio (texto a voz), 9 créditos por slide (sin imágenes de IA) y 26 créditos por website tipo landing. Cada paso del slider es una unidad de esa tarifa. Herramientas, resolución, duración y opciones pueden cambiar el total real.',
 		perMonth: 'al mes',
 		cta: 'Obtener plan',
 	},

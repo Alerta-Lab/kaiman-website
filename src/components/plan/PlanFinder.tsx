@@ -186,7 +186,6 @@ export function PlanFinder({ copy, planNames }: PlanFinderProps) {
 					{copy.cta}
 				</a>
 			</div>
-			<p className="text-sm text-pretty text-neutral-400 lg:col-span-2">{copy.assumption}</p>
 		</div>
 	);
 }

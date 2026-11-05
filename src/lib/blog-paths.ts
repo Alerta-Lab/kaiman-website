@@ -1,5 +1,5 @@
-import { getRelativeLocaleUrl } from 'astro:i18n';
 import type { Locale } from '../i18n';
+import { localeUrl } from './locale-url';
 
 /** Strip Astro `base` (e.g. `/kaiman-website`) so locale parsing sees `/es/...`. */
 export function stripBase(pathname: string): string {
@@ -16,19 +16,19 @@ export function stripBase(pathname: string): string {
 
 /** Locale-prefixed public blog paths (no trailing slash). Includes `base` when set. */
 export function blogIndexPath(locale: Locale) {
-	return getRelativeLocaleUrl(locale, 'blogs').replace(/\/$/, '');
+	return localeUrl(locale, 'blogs').replace(/\/$/, '');
 }
 
 export function blogPostPath(locale: Locale, slug: string) {
-	return getRelativeLocaleUrl(locale, `blogs/${slug}`).replace(/\/$/, '');
+	return localeUrl(locale, `blogs/${slug}`).replace(/\/$/, '');
 }
 
 export function blogCategoryPath(locale: Locale, slug: string) {
-	return getRelativeLocaleUrl(locale, `blogs/categoria/${slug}`).replace(/\/$/, '');
+	return localeUrl(locale, `blogs/categoria/${slug}`).replace(/\/$/, '');
 }
 
 export function blogSearchPath(locale: Locale) {
-	return getRelativeLocaleUrl(locale, 'blogs/buscar').replace(/\/$/, '');
+	return localeUrl(locale, 'blogs/buscar').replace(/\/$/, '');
 }
 
 /**
@@ -40,8 +40,8 @@ export function swapBlogLocalePath(pathname: string, nextLocale: Locale): string
 	const match = path.match(/^\/(es|en)(\/.*)?$/);
 	if (!match) return blogIndexPath(nextLocale);
 	const rest = match[2] ?? '/';
-	if (rest === '/' || rest === '') return getRelativeLocaleUrl(nextLocale, '/');
-	return getRelativeLocaleUrl(nextLocale, rest.replace(/^\//, ''));
+	if (rest === '/' || rest === '') return localeUrl(nextLocale);
+	return localeUrl(nextLocale, rest.replace(/^\//, '')).replace(/\/$/, '');
 }
 
 /** Path after locale prefix, without Astro `base` (e.g. `/` or `/blogs/foo`). */
