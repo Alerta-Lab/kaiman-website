@@ -1,8 +1,9 @@
 ---
 import { getRelativeLocaleUrl } from 'astro:i18n';
-import { LogIn, X } from 'lucide-react';
+import { LogIn, Menu, X } from 'lucide-react';
 import { getLanding, type Locale } from '../../i18n';
 import { blogIndexPath } from '../../lib/blog-paths';
+import { asset } from '../../lib/asset';
 import { loginUrl, signupUrl } from '../../lib/plans';
 import Button from '../ui/Button.astro';
 import LanguageMenu from './LanguageMenu.astro';
@@ -30,12 +31,12 @@ const menuLinks = [
 	class="fixed inset-x-0 top-4 z-[60] px-4 transition-opacity duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] data-[demo-hidden=true]:pointer-events-none data-[demo-hidden=true]:opacity-0"
 >
 	<div
-		class="mx-auto flex max-w-content items-center justify-between gap-3 rounded-2xl bg-ink-100/80 px-4 py-2 backdrop-blur-md"
+		class="mx-auto flex max-w-content items-center justify-between gap-3 rounded-2xl border border-black-stroke bg-ink-100/80 px-4 py-2 backdrop-blur-md"
 	>
 		<div class="flex min-w-0 items-center gap-2 sm:gap-3">
 			<a href={home} class="flex shrink-0 items-center" aria-current="page">
 				<img
-					src="/kaiman-logo.png"
+					src={asset('/kaiman-logo.png')}
 					alt={copy.meta.title}
 					width="140"
 					height="32"
@@ -44,7 +45,7 @@ const menuLinks = [
 			</a>
 			<button
 				type="button"
-				class="inline-flex h-10 items-center gap-2 rounded-lg px-3 text-sm font-display font-semibold text-neutral-200 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+				class="hidden h-10 items-center gap-2 rounded-lg px-3 text-sm font-display font-semibold text-neutral-200 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary lg:inline-flex"
 				data-menu-button
 				data-open="false"
 				data-open-label={copy.nav.openMenu}
@@ -57,7 +58,7 @@ const menuLinks = [
 			</button>
 			<a
 				href={plansHref}
-				class="inline-flex h-10 items-center rounded-lg px-3 text-sm font-display font-semibold text-neutral-200 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+				class="hidden h-10 items-center rounded-lg px-3 text-sm font-display font-semibold text-neutral-200 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary lg:inline-flex"
 			>
 				{copy.nav.plans}
 			</a>
@@ -72,6 +73,19 @@ const menuLinks = [
 				</Button>
 				<Button href={signupUrl} size="sm">{copy.nav.signup}</Button>
 			</div>
+			<button
+				type="button"
+				class="inline-flex size-10 items-center justify-center rounded-lg text-white transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary lg:hidden"
+				data-menu-button
+				data-open="false"
+				data-open-label={copy.nav.openMenu}
+				data-close-label={copy.nav.closeMenu}
+				aria-expanded="false"
+				aria-controls="site-menu"
+				aria-label={copy.nav.openMenu}
+			>
+				<Menu size={22} aria-hidden="true" />
+			</button>
 		</div>
 	</div>
 </header>
@@ -80,8 +94,8 @@ const menuLinks = [
 	id="site-menu"
 	data-menu-panel
 	data-open="false"
-	class="pointer-events-none fixed inset-0 z-[80] flex flex-col bg-ink px-6 pt-24 pb-10 opacity-0 sm:px-10"
-	style="clip-path: circle(0% at 8rem 2.5rem); transition: clip-path 620ms cubic-bezier(0.22,1,0.36,1), opacity 320ms ease;"
+	class="pointer-events-none fixed inset-0 z-[80] flex flex-col bg-ink p-5 opacity-0 sm:p-8 lg:p-10"
+	style="clip-path: circle(0% at calc(100% - 2.5rem) 2.5rem); transition: clip-path 620ms cubic-bezier(0.22,1,0.36,1), opacity 320ms ease;"
 	aria-hidden="true"
 >
 	<div class="mx-auto flex w-full max-w-content items-start justify-between gap-6">
@@ -89,7 +103,7 @@ const menuLinks = [
 		<button
 			type="button"
 			data-menu-close
-			class="inline-flex items-center gap-2 rounded-lg px-3 py-2 font-display text-sm font-semibold text-white transition-colors hover:bg-white/10"
+			class="inline-flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 font-display text-sm font-semibold text-white transition-colors hover:bg-white/10"
 			aria-label={copy.nav.closeMenu}
 		>
 			{copy.nav.closeMenu}
@@ -97,19 +111,19 @@ const menuLinks = [
 		</button>
 	</div>
 
-	<nav class="mx-auto flex w-full max-w-content flex-1 flex-col justify-center gap-2 py-10" aria-label={copy.nav.home}>
+	<nav class="mx-auto flex w-full max-w-content flex-1 flex-col justify-center gap-1 py-6 sm:gap-2 sm:py-8" aria-label={copy.nav.home}>
 		{
 			menuLinks.map((link, index) => (
 				<a
 					href={link.href}
 					data-menu-link
-					class="group flex items-baseline gap-5 border-b border-white/10 py-4 transition-colors first:pt-0 last:border-b-0"
+					class="group flex items-baseline gap-4 border-b border-white/10 py-3.5 transition-colors first:pt-0 last:border-b-0 sm:gap-5 sm:py-4"
 					style="opacity:0; transform: translateY(16px);"
 				>
 					<span class="font-display text-sm font-semibold tabular-nums text-primary-400">
 						{String(index + 1).padStart(2, '0')}
 					</span>
-					<span class="font-display text-3xl font-semibold tracking-tight text-white/45 transition-colors group-hover:text-white sm:text-5xl lg:text-6xl">
+					<span class="font-display text-2xl font-semibold tracking-tight text-white/45 transition-colors group-hover:text-white sm:text-5xl lg:text-6xl">
 						{link.label}
 					</span>
 				</a>
@@ -117,34 +131,47 @@ const menuLinks = [
 		}
 	</nav>
 
-	<div class="mx-auto flex w-full max-w-content flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+	<div class="mx-auto flex w-full max-w-content flex-col gap-4">
 		<div class="flex flex-wrap gap-3">
 			<Button href={signupUrl}>{copy.nav.signup}</Button>
 			<Button href={loginUrl} variant="secondary">{copy.nav.login}</Button>
 			<Button href={plansHref} variant="secondary">{copy.nav.plans}</Button>
 		</div>
-		<LanguageMenu locale={locale} label={copy.nav.language} />
+		<div class="relative z-10 self-start">
+			<LanguageMenu locale={locale} label={copy.nav.language} placement="top" />
+		</div>
 	</div>
 </div>
 
 <script>
-	const button = document.querySelector('[data-menu-button]');
+	const buttons = Array.from(document.querySelectorAll('[data-menu-button]')).filter(
+		(node): node is HTMLButtonElement => node instanceof HTMLButtonElement,
+	);
 	const panel = document.querySelector('[data-menu-panel]');
 	const closeBtn = document.querySelector('[data-menu-close]');
-	const openLabel = button?.getAttribute('data-open-label') ?? '';
-	const closeLabel = button?.getAttribute('data-close-label') ?? openLabel;
+	const openLabel = buttons[0]?.getAttribute('data-open-label') ?? '';
+	const closeLabel = buttons[0]?.getAttribute('data-close-label') ?? openLabel;
 
 	function setOpen(open: boolean) {
-		if (!(button instanceof HTMLButtonElement) || !(panel instanceof HTMLElement)) return;
-		button.dataset.open = open ? 'true' : 'false';
-		button.setAttribute('aria-expanded', String(open));
-		button.setAttribute('aria-label', open ? closeLabel : openLabel);
+		if (!(panel instanceof HTMLElement) || !buttons.length) return;
+		const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
+		buttons.forEach((button) => {
+			button.dataset.open = open ? 'true' : 'false';
+			button.setAttribute('aria-expanded', String(open));
+			button.setAttribute('aria-label', open ? closeLabel : openLabel);
+		});
 		panel.dataset.open = open ? 'true' : 'false';
 		panel.setAttribute('aria-hidden', open ? 'false' : 'true');
 		panel.classList.toggle('pointer-events-none', !open);
 		panel.classList.toggle('pointer-events-auto', open);
 		panel.style.opacity = open ? '1' : '0';
-		panel.style.clipPath = open ? 'circle(160% at 8rem 2.5rem)' : 'circle(0% at 8rem 2.5rem)';
+		panel.style.clipPath = open
+			? isDesktop
+				? 'circle(160% at 8rem 2.5rem)'
+				: 'circle(160% at calc(100% - 2.5rem) 2.5rem)'
+			: isDesktop
+				? 'circle(0% at 8rem 2.5rem)'
+				: 'circle(0% at calc(100% - 2.5rem) 2.5rem)';
 		document.body.classList.toggle('overflow-hidden', open);
 
 		panel.querySelectorAll('[data-menu-link]').forEach((link, index) => {
@@ -157,9 +184,11 @@ const menuLinks = [
 		});
 	}
 
-	button?.addEventListener('click', () => {
-		const open = button.getAttribute('aria-expanded') === 'true';
-		setOpen(!open);
+	buttons.forEach((button) => {
+		button.addEventListener('click', () => {
+			const open = button.getAttribute('aria-expanded') === 'true';
+			setOpen(!open);
+		});
 	});
 
 	closeBtn?.addEventListener('click', () => setOpen(false));

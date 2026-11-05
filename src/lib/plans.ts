@@ -1,4 +1,4 @@
-/** Customer-facing plans from kaimanstudio.ai pricing (ES). */
+/** Customer-facing plans from the public Kaiman Studio pricing. */
 export const plans = [
 	{
 		id: 'start',
@@ -11,10 +11,10 @@ export const plans = [
 	{
 		id: 'pro',
 		monthlyUsd: 99,
-		credits: 1200,
+		credits: 1500,
 		seats: 3,
 		storageGb: 3,
-		brands: null,
+		brands: 3,
 	},
 	{
 		id: 'scale',
@@ -40,19 +40,22 @@ export const creditPacks = [
 ] as const;
 
 /**
- * Reference weights for the monthly piece estimator.
- * Video: 3 credits per second. Audio/voice: 2 credits per minute.
- * Presentation and website use sizing weights for plan recommendation.
+ * Approximate weights for the monthly piece estimator (1 slider step = 1 billed unit).
+ * Source: docs/kaiman-credit-prices-2026-11-03.md (API pricing, 2026-11-03).
+ * Image: image_generator 1K/2K = 4.
+ * Video: text/image_to_video 8 s = 25 (1 + 3/s).
+ * Script: ai_script_video_generator = 1.
+ * Audio: text_to_speech = 6 per started minute.
+ * Presentation: gamma_generate without AI images = 9 per slide.
+ * Website: landing_page = 26.
  */
 export const pieceCredits = {
-	image: 1,
+	image: 4,
+	video: 25,
 	script: 1,
-	presentation: 5,
-	website: 15,
-	creditsPerAudioMinute: 2,
-	videoShortSeconds: 5,
-	videoMediumSeconds: 15,
-	creditsPerVideoSecond: 3,
+	presentation: 9,
+	website: 26,
+	creditsPerAudioMinute: 6,
 } as const;
 
 export const signupUrl = 'https://app.kaimanstudio.ai/auth/register';

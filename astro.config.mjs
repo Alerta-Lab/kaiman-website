@@ -4,11 +4,17 @@ import vercel from '@astrojs/vercel';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
 
+const githubPages = process.env.GITHUB_PAGES === 'true';
+const site =
+	process.env.PUBLIC_SITE_URL ??
+	(githubPages ? 'https://alerta-lab.github.io' : 'http://localhost:4321');
+
 // https://astro.build/config
 export default defineConfig({
-	site: process.env.PUBLIC_SITE_URL ?? 'http://localhost:4321',
-	output: 'server',
-	adapter: vercel(),
+	site,
+	base: githubPages ? '/kaiman-website/' : undefined,
+	output: githubPages ? 'static' : 'server',
+	adapter: githubPages ? undefined : vercel(),
 	i18n: {
 		defaultLocale: 'es',
 		locales: ['es', 'en'],
@@ -23,6 +29,6 @@ export default defineConfig({
 		},
 	},
 	security: {
-		checkOrigin: true,
+		checkOrigin: !githubPages,
 	},
 });

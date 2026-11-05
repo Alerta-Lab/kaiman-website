@@ -2,13 +2,15 @@
   "name": "landing-kaiman",
   "type": "module",
   "version": "0.0.1",
+  "packageManager": "pnpm@10.15.0",
   "engines": {
     "node": ">=22.23.4"
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
+		"build": "astro build",
+		"build:pages": "node scripts/build-github-pages.mjs",
+		"preview": "astro preview",
     "astro": "astro",
     "check": "astro check",
     "test": "vitest run",

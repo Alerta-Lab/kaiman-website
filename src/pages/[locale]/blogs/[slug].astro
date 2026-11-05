@@ -2,10 +2,21 @@
 import ArticleView from '../../../components/blog/organisms/ArticleView.astro';
 import PublicFooter from '../../../components/blog/organisms/PublicFooter.astro';
 import PublicHeader from '../../../components/blog/organisms/PublicHeader.astro';
-import { isLocale, type Locale } from '../../../i18n';
+import { isLocale, locales, type Locale } from '../../../i18n';
 import BlogLayout from '../../../layouts/BlogLayout.astro';
 import { blogPostPath } from '../../../lib/blog-paths';
-import { getPublishedPost, getSiblingPost } from '../../../server/repositories/posts';
+import { getPublishedPost, getSiblingPost, listPublishedPosts } from '../../../server/repositories/posts';
+
+export async function getStaticPaths() {
+	const paths: { params: { locale: Locale; slug: string } }[] = [];
+	for (const locale of locales) {
+		const posts = await listPublishedPosts({ locale });
+		for (const post of posts) {
+			paths.push({ params: { locale, slug: post.slug } });
+		}
+	}
+	return paths;
+}
 
 const param = Astro.params.locale;
 if (!param || !isLocale(param)) return Astro.redirect('/es/blogs');

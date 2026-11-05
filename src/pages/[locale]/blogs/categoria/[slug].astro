@@ -4,10 +4,22 @@ import Text from '../../../../components/blog/atoms/Text.astro';
 import PostCard from '../../../../components/blog/molecules/PostCard.astro';
 import PublicFooter from '../../../../components/blog/organisms/PublicFooter.astro';
 import PublicHeader from '../../../../components/blog/organisms/PublicHeader.astro';
-import { isLocale, type Locale } from '../../../../i18n';
+import { isLocale, locales, type Locale } from '../../../../i18n';
 import BlogLayout from '../../../../layouts/BlogLayout.astro';
 import { blogCategoryPath, blogTagPath } from '../../../../lib/blog-paths';
 import { categoryDisplayName, getCategoryBySlug, listPublishedPosts } from '../../../../server/repositories/posts';
+
+export async function getStaticPaths() {
+	const paths: { params: { locale: Locale; slug: string } }[] = [];
+	for (const locale of locales) {
+		const posts = await listPublishedPosts({ locale });
+		const tagSlugs = new Set(posts.flatMap((post) => post.tags.map((tag) => tag.slug)));
+		for (const slug of tagSlugs) {
+			paths.push({ params: { locale, slug } });
+		}
+	}
+	return paths;
+}
 
 const param = Astro.params.locale;
 if (!param || !isLocale(param)) return Astro.redirect('/es/blogs');

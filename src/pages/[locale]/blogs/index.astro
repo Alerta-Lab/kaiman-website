@@ -5,10 +5,14 @@ import Text from '../../../components/blog/atoms/Text.astro';
 import PostCard from '../../../components/blog/molecules/PostCard.astro';
 import PublicFooter from '../../../components/blog/organisms/PublicFooter.astro';
 import PublicHeader from '../../../components/blog/organisms/PublicHeader.astro';
-import { isLocale, type Locale } from '../../../i18n';
+import { isLocale, locales, type Locale } from '../../../i18n';
 import BlogLayout from '../../../layouts/BlogLayout.astro';
 import { blogCategoryPath, blogIndexPath } from '../../../lib/blog-paths';
 import { categoryDisplayName, listPublishedCategories, listPublishedPosts } from '../../../server/repositories/posts';
+
+export function getStaticPaths() {
+	return locales.map((locale) => ({ params: { locale } }));
+}
 
 const param = Astro.params.locale;
 if (!param || !isLocale(param)) return Astro.redirect('/es/blogs');

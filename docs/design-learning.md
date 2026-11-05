@@ -12,9 +12,194 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-04 — Problem facets + secreto
+
+- Facets con `Card`: imagen + footer label (Colores / Tipografías / Tono… / Estilo) + índice; sin «su/sus».
+- Secreto: texto blanco más grande; acento `text-feature-image` en «consistencia de marca» / «brand consistency».
+
+### 2026-11-04 — Wireframe NEW: copy + distribución
+
+- Fuente: `docs/references/wireframe-home-en-new/Main.dc.html` (ES del HTML; EN traducido).
+- Copy renovado en hero, origen, problem, Brand Understanding, audiencias, tools, value, playbooks, FAQ, close.
+- Layout: problem con título+intro / 4 facets etiquetadas / caja “secreto”; sección `#menos`; 4 audiencias con pasos (`#ana` `#carlos` `#sofia` `#coaches`).
+- Imágenes section-* y mock de prompt del hero se mantienen.
+
+### 2026-11-04 — Rama wireframe landing (sin GSAP)
+
+- Branch `feat/wireframe-landing`: `WireframeLanding.astro` replica la estructura de `docs/references/wireframe-home-en/Main.dc.html`.
+- Tokens/proyecto: `Button`, ink/primary, imágenes de `public`, SiteHeader/Footer.
+- Extra vs wireframe: demo video, PlanFinder (piezas al mes), blog real, FAQ/planes del diccionario landing.
+- Copy narrativo en `src/i18n/locales/{es,en}/wireframe.ts` vía `getWireframe`.
+- Tipografía: títulos con `leading-[1.02–1.1]` (antes default ~1.5), body más compacto, menos padding de sección.
+- Ajustes: hero con más `pt` bajo header; problem en grid 2×2 (crops de `inconsistence`); Brand Knowledge con `inconsistence.png`; planes `md:grid-cols-3`; sección Playbooks; sin login en CTA final.
+- Tools/Blitz: 8 cards del wireframe, grid `auto-fit minmax(16.25rem)`, media ~150px de alto + chips de categorías.
+- Hero prompt: shell estilo Wizard (`border-2` feature-image `#db2777`, pills `black-capsule`); texto fijo + brand + formato seleccionado + 3 outputs.
+- Hero modes: tamaño normal (`text-sm` + `px-3`), una línea (`flex-nowrap` + `overflow-hidden` + `shrink-0`); si no caben se cortan, sin wrap ni scroll.
+- Assets wireframe por sección (PNG en `public/`): `section-2.png` (origen), `section-3.1`…`3.4.png` (problem), `section-4.png` (Brand Knowledge), `section-11-1`…`11-8.png` (tools blitz). Si falta el archivo, el path queda asignado.
+
+### 2026-11-04 — Tour: media de pasos
+
+- 01 `brand-profile.png`, 02 `single-item-order.png`, 03 `order-ready.png`.
+
+### 2026-11-04 — Audiencias: foto en el encabezado
+
+- Foto 1:1 a la izquierda del nombre + título del perfil; las cards de acción solo título + texto.
+- Overview desktop: al pin de la sección, el scroll pasa el foco Martinez → Ana → Carlos → Sofia (foto + lista).
+- Cursor pan (círculo + flechas ↔) restaurado sobre `[data-h-scroll]`; el wheel vertical sigue libre.
+
+### 2026-11-04 — Producto: swap texto → imagen
+
+- Stage 1 (Producto): el copy de la derecha cede a `inconsistence.png` (titular izquierda fijo).
+- Stage 3 (Consistencia): el copy de la derecha cede a `consistency.png`.
+- Ambas imágenes: `object-contain` + `max-h` acotada, centradas con padding (no full-bleed).
+- Desktop: pin + scrub (`data-swap-col`). Mobile: texto e imagen apilados, sin swap.
+
+### 2026-11-04 — Assets en GitHub Pages (slash de base)
+
+- Fallo: `base: /kaiman-website` sin `/` final → `asset()` unía `kaiman-website` + `video/...` = 404.
+- Fix: `base: /kaiman-website/` y `asset()` fuerza un `/` entre base y path.
+
+### 2026-11-03 — 404 al estilo landing
+
+- Fondo ink + radiales, header cápsula, logo Kaiman, display 404 atenuado, CTAs `k-btn` (ES / EN / Blog). Sin look lavanda del blog.
+
+### 2026-11-03 — GitHub Pages
+
+- Workflow `.github/workflows/deploy-github-pages.yml` (Astro static, no Jekyll).
+- `pnpm build:pages` + `GITHUB_PAGES=true` → `base: /kaiman-website`, sin adapter Vercel; aparca `/api` y `/admin` durante el build.
+- En Settings → Pages: Source = **GitHub Actions**.
+
+### 2026-11-03 — Nav con entrada de cortinas
+
+- Enlaces in-page (Sobre Kaiman, Planes, footer, rail): no ancla suave; barras negras cubren, saltan al destino y abren (misma entrada que el load).
+
+### 2026-11-03 — Estimador de créditos (tarifas API)
+
+- Fuente: `docs/kaiman-credit-prices-2026-11-03.md`. Un paso de slider = 1 unidad tarifada: imagen 4, clip video 8 s = 25, guion 1, audio 6/min, slide 9, landing 26. Copy assumption + FAQ ES/EN alineados.
+
+### 2026-11-03 — Salsana modal + cursor expand
+
+- Expand abre modal centrado en viewport (portal a `body`), no fullscreen nativo.
+- Hover en expand: cursor custom pasa de hand a icono expand; círculo más pequeño en canvas (grab/expand).
+
+### 2026-11-03 — Cursor sin pan en carruseles
+
+- El círculo custom ya no aparece sobre `[data-h-scroll]` (modo pan). Wheel vertical tampoco se redirige al track: el scroll de página queda libre; el carrusel sigue por drag / gesto nativo.
+
+### 2026-11-03 — Recorrido del producto (v2)
+
+- Copy descriptiva ES/EN (sin placeholders). Pasos con media real (showcase, demo poster, pieza Salsana).
+- &lt; lg: snap carousel; lg: 3 cols + rail 01—02—03. `#recorrido`.
+
+### 2026-11-03 — Footer columnas mobile/tablet
+
+- Contacto a ancho completo; Producto / Recursos / Legal en 2 cols (móvil) y 3 cols (tablet); 4 cols en lg. Copyright fuera de Legal, fila propia.
+
+### 2026-11-03 — Carruseles mobile
+
+- &lt; lg: snap carousel (`data-h-scroll`) en detalles de marca, Brand Understanding, audiencias (foto+título por slide), plataforma, planes, capacidad y playbooks.
+
+### 2026-11-03 — Mobile simple (Monument)
+
+- &lt; lg: stories sin pin/scrub (producto/plataforma/audiencias en flujo); timelines horizontales sin pin (scroll nativo).
+- Desktop (≥1024) conserva pins GSAP.
+
+### 2026-11-03 — Hero + header responsive
+
+- Hero &lt; lg: telón izq. a ancho completo (sin franja de video); demo al scroll.
+- Header &lt; lg: hamburguesa (mismo panel Sobre Kaiman); Sobre Kaiman + Planes solo desde lg.
+
+### 2026-11-03 — Estimaciones de créditos
+
+- Finder y rates: disclaimer visible de que el cálculo es aproximado y puede variar (ES/EN). Corporativo vuelve a card dark.
+
+### 2026-11-03 — Planes Starter / Pro / Business / Enterprise
+
+- Arriba 3 cards (Esencial/Profesional/Empresarial); abajo Corporativo a ancho completo con copy de ajuste a medida (ES/EN).
+- Profesional: 1500 créditos + 3 marcas; badge «Más popular».
+
+### 2026-11-03 — Footer link hover
+
+- Links del footer: hover con underline (sin cambio de color).
+
+### 2026-11-03 — Sección últimos blogs
+
+- Tras Playbooks: `#blog` con 3 posts publicados (`listPublishedPosts`), cards dark + CTA al índice del blog; empty state i18n.
+
+### 2026-11-03 — Capacidad timeline horizontal
+
+- `#capacidad` usa el mismo patrón que Playbooks: pin + carrusel scrub + línea de progreso (`initHorizontalTimeline` compartido).
+
+### 2026-11-03 — Playbooks timeline pin order
+
+- Playbooks ST se crea después de los story pins; `anticipatePin: 0`; progreso = `maxShift` real; pin/plataforma con `bg-ink-100` para no traslapar.
+
+### 2026-11-03 — Playbooks timeline + header border
+
+- FAQ accordion ~0.32s.
+- Header bar: `border border-black-stroke` (#404040).
+- `#playbooks`: pin + carrusel horizontal scrub; línea de progreso; cards numeradas tipo timeline.
+
+### 2026-11-03 — FAQ cierra en toda la card
+
+- Con `details` abierto, un click en el cuerpo de la respuesta también cierra (no solo el `summary`).
+
+### 2026-11-03 — CTA final 2 columnas
+
+- Cierre: copy + CTAs izq. (primario signup, secundario wearealerta.com); der. placeholder de imagen (`final.imageAlt` ES/EN) listo para asset.
+
+### 2026-11-03 — Chapter rail sync
+
+- Rail incluye `plataforma` y etiquetas reales (Producto, Brand Understanding, etc.).
+- Hero/demo/origen siguen el scrub del curtain; el resto usa un probe de scroll (`top ≤ 42vh`) para no perder `producto` ni apagar el indicador en secciones con pin/sticky.
+
+### 2026-11-03 — Recorrido del producto
+
+- Título + texto arriba; hairline `border-white/15`; debajo las 3 cards de slots (sin cambiar copy ni placeholders).
+
+### 2026-11-03 — Plataforma vuelve a 2 columnas
+
+- Se revirtió el carrusel centrado. `#plataforma` otra vez como `data-story`: título fijo izq. + stages der. (intro → 01…05) con fill de título y `data-stage-line`.
+
+### 2026-11-03 — Gutter unificado desde plataforma
+
+- Desde `#plataforma` hasta el CTA final: sin `Container`/`max-w-content`; solo gutter Monument (`px-5 sm:px-8 lg:px-10`) como las secciones superiores. Copy puede seguir en `max-w-copy`.
+
+### 2026-11-03 — Salsana canvas masonry
+
+- «Misma marca, varias piezas»: 2 cols (título izq. / canvas der.); sección `h-svh max-h-svh`; canvas `h-full` sin forzar alto extra.
+- Cursor canvas: mano (`grab`) / mano cerrada al drag (`grabbing`).
+
+### 2026-11-03 — Brand timeline gallery panel
+
+- Paso 03: collage sin crop — izq. 2×16:9, der. 9:16; columnas `flex-[128]/[81]`; Martinez WebP vertical.
+- Cerrar menú: `cursor-pointer`.
+
+### 2026-11-03 — FAQ dos columnas (miligram)
+
+- `#preguntas`: título + lead sticky izq.; acordeón der. con hairlines y `+` a la izquierda (sin cards).
+- Hairline vertical en la columna de preguntas (`lg:border-l`), no en el aside.
+- Una sola `details` abierta; activa `bg-white` + texto ink; altura animada GSAP (~0.55s); textos `select-none`.
+- Mismo gutter/grid Monument (`1fr / 1.05fr`); lead ES/EN en `faq.lead`.
+
+### 2026-11-03 — Gutter full-bleed Monument
+
+- Columna compartida: `px-5 sm:px-8 lg:px-10` (sin `max-w-content`) en Brand Understanding, audiencias y perfiles, alineada al grid de producto/consistencia.
+- Grid 2 cols `1fr / 1.05fr` + hairline vertical en Brand Understanding.
+
+### 2026-11-03 — Brand Understanding sticky stack (miligram)
+
+- Sección sin pin GSAP: columna izq. sticky (eyebrow + título + copy) y paneles der. `lg:sticky top-0` con `bg-ink-100` y z-index creciente para que el siguiente se pegue y empuje/cubra al anterior.
+- Tags «Kaiman entiende» como pills outline en el primer panel; títulos de paso en `font-display` italic.
+
 ### 2026-11-03 — Leads de audiencia en primary
 
 - Perfiles (Martinez/Ana/Carlos/Sofia): `lead` como headline (`font-display`) en `text-primary`.
+
+### 2026-11-03 — Imágenes consistencia optimizadas
+
+- `colors/typography/comunication/visual.png` (~1.4MB c/u) → `public/brand/point-*.webp` (~10–26KB), ancho máx. 1200.
+- PNG pesados eliminados; cards usan `<img>` con esas rutas.
 
 ### 2026-11-03 — Producto/consistencia diagram Monument
 

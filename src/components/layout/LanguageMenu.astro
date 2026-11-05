@@ -1,6 +1,6 @@
 ---
 import { getRelativeLocaleUrl } from 'astro:i18n';
-import { ChevronDown, Languages } from 'lucide-react';
+import { ChevronDown, ChevronUp, Languages } from 'lucide-react';
 import { localeLabels, locales, type Locale } from '../../i18n';
 import { pathWithoutLocale, swapBlogLocalePath } from '../../lib/blog-paths';
 
@@ -9,22 +9,44 @@ interface Props {
 	label: string;
 	/** When set, switch keeps this path (locale-relative, e.g. `/blogs` or `/blogs/slug`). */
 	path?: string;
+	/** `top` opens the list upward (e.g. footer of the Sobre Kaiman menu). */
+	placement?: 'bottom' | 'top';
 }
 
-const { locale, label, path } = Astro.props;
+const { locale, label, path, placement = 'bottom' } = Astro.props;
 const currentPath = path ?? pathWithoutLocale(Astro.url.pathname);
+const dropUp = placement === 'top';
 ---
 
-<details class="group relative">
+<details class="group relative inline-block w-fit max-w-full">
 	<summary
 		class="flex cursor-pointer list-none items-center gap-2 rounded-lg px-3 py-2 text-sm font-display font-semibold text-white marker:content-none hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [&::-webkit-details-marker]:hidden"
 		aria-label={label}
 	>
 		<Languages size={16} aria-hidden="true" />
 		{localeLabels[locale]}
-		<ChevronDown size={16} aria-hidden="true" className="transition-transform duration-300 group-open:rotate-180" />
+		{
+			dropUp ? (
+				<ChevronUp
+					size={16}
+					aria-hidden="true"
+					className="transition-transform duration-300 group-open:rotate-180"
+				/>
+			) : (
+				<ChevronDown
+					size={16}
+					aria-hidden="true"
+					className="transition-transform duration-300 group-open:rotate-180"
+				/>
+			)
+		}
 	</summary>
-	<div class="absolute right-0 z-50 mt-2 min-w-40 rounded-xl bg-ink-200 p-2 shadow-[0_16px_40px_rgba(0,0,0,0.45)]">
+	<div
+		class:list={[
+			'absolute z-50 min-w-40 rounded-xl border border-white/10 bg-ink-200 p-2 shadow-[0_16px_40px_rgba(0,0,0,0.45)]',
+			dropUp ? 'bottom-full left-0 mb-2' : 'top-full right-0 mt-2',
+		]}
+	>
 		{
 			locales.map((code) => {
 				const href =

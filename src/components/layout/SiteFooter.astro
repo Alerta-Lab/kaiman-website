@@ -59,21 +59,21 @@ const legalLinks = [
 			</div>
 		</div>
 
-		<div class="grid gap-12 border-t border-white/10 pt-12 lg:grid-cols-4">
-			<div class="flex flex-col gap-3">
+		<div class="grid grid-cols-2 gap-x-6 gap-y-10 border-t border-white/10 pt-12 sm:grid-cols-3 lg:grid-cols-4 lg:gap-12">
+			<div class="col-span-2 flex flex-col gap-3 sm:col-span-3 lg:col-span-1">
 				<p class="inline-flex items-start gap-2 text-sm text-pretty text-neutral-300">
 					<MapPin size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
 					{copy.footer.address}
 				</p>
-				<a class="inline-flex items-center gap-2 text-sm text-neutral-300 hover:text-white" href={`mailto:${copy.footer.email}`}>
+				<a class="inline-flex items-center gap-2 text-sm text-neutral-300 hover:underline hover:underline-offset-4" href={`mailto:${copy.footer.email}`}>
 					<Mail size={16} aria-hidden="true" />
 					{copy.footer.email}
 				</a>
-				<a class="inline-flex items-center gap-2 text-sm text-neutral-300 hover:text-white" href="tel:+15862024830">
+				<a class="inline-flex items-center gap-2 text-sm text-neutral-300 hover:underline hover:underline-offset-4" href="tel:+15862024830">
 					<Phone size={16} aria-hidden="true" />
 					{copy.footer.phone}
 				</a>
-				<a class="mt-2 inline-flex items-center gap-3 text-sm font-semibold hover:text-primary-300" href={instagramUrl}>
+				<a class="mt-2 inline-flex items-center gap-3 text-sm font-semibold text-neutral-300 hover:underline hover:underline-offset-4" href={instagramUrl}>
 					<SocialIcon
 						url={instagramUrl}
 						as="span"
@@ -89,7 +89,7 @@ const legalLinks = [
 			<nav class="flex flex-col gap-2" aria-label={copy.footer.product}>
 				<p class="text-sm font-semibold text-white">{copy.footer.product}</p>
 				{productLinks.map((link) => (
-					<a class="text-sm text-neutral-300 hover:text-primary-300" href={link.href}>
+					<a class="w-fit text-sm text-neutral-300 hover:underline hover:underline-offset-4" href={link.href}>
 						{link.label}
 					</a>
 				))}
@@ -98,25 +98,26 @@ const legalLinks = [
 			<nav class="flex flex-col gap-2" aria-label={copy.footer.resources}>
 				<p class="text-sm font-semibold text-white">{copy.footer.resources}</p>
 				{resourceLinks.map((link) => (
-					<a class="text-sm text-neutral-300 hover:text-primary-300" href={link.href}>
+					<a class="w-fit text-sm text-neutral-300 hover:underline hover:underline-offset-4" href={link.href}>
 						{link.label}
 					</a>
 				))}
-				<a class="text-sm text-neutral-300 hover:text-primary-300" href={alertaUrl}>{copy.footer.alerta}</a>
+				<a class="w-fit text-sm text-neutral-300 hover:underline hover:underline-offset-4" href={alertaUrl}>{copy.footer.alerta}</a>
 			</nav>
 
 			<nav class="flex flex-col gap-2" aria-label={copy.footer.legal}>
 				<p class="text-sm font-semibold text-white">{copy.footer.legal}</p>
 				{legalLinks.map((link) => (
-					<a class="text-sm text-neutral-300 hover:text-primary-300" href={link.href}>
+					<a class="w-fit text-sm text-neutral-300 hover:underline hover:underline-offset-4" href={link.href}>
 						{link.label}
 					</a>
 				))}
-				<p class="mt-4 text-sm text-neutral-400">
-					© {year} {copy.footer.studio}. {copy.footer.rights}
-				</p>
 			</nav>
 		</div>
+
+		<p class="text-sm text-neutral-400">
+			© {year} {copy.footer.studio}. {copy.footer.rights}
+		</p>
 	</div>
 </footer>
 

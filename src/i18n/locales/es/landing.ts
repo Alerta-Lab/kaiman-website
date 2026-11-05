@@ -80,10 +80,10 @@ export const landing = {
 			'Todo negocio necesita generar marketing constantemente. Y hoy, más que nunca, las empresas pequeñas y medianas, especialmente, deben hacerlo para conseguir clientes.',
 		body: 'La mayoría utiliza inteligencia artificial para crear sus publicaciones. Pero con cada nueva generación, su marca puede perder consistencia porque la IA no tiene presentes detalles esenciales como:',
 		points: [
-			{ label: 'Colores', image: '/brand/point-colors.jpg' },
-			{ label: 'Tipografías', image: '/brand/point-type.jpg' },
-			{ label: 'Tono de comunicación', image: '/brand/point-tone.jpg' },
-			{ label: 'Estilo visual', image: '/brand/point-style.jpg' },
+			{ label: 'Colores', image: '/brand/point-colors.webp' },
+			{ label: 'Tipografías', image: '/brand/point-type.webp' },
+			{ label: 'Tono de comunicación', image: '/brand/point-tone.webp' },
+			{ label: 'Estilo visual', image: '/brand/point-style.webp' },
 		],
 		consequence:
 			'Sin esos detalles, su contenido empieza a parecerse al de todos los demás y pierde algo fundamental: lo que hace única a su marca.',
@@ -92,6 +92,8 @@ export const landing = {
 			'Una marca se construye cuando las personas pueden reconocerla una y otra vez.',
 		closing:
 			'Kaiman mantiene la personalidad de tu marca en cada generación para que tu negocio construya una imagen consistente, reconocible y propia, sin que tengas que explicarla cada vez.',
+		inconsistencyAlt: 'Ejemplo de piezas publicitarias con marca inconsistente.',
+		consistencyAlt: 'Ejemplo de piezas publicitarias con marca consistente.',
 	},
 	brandUnderstanding: {
 		eyebrow: 'Brand Understanding · El pilar central de Kaiman',
@@ -112,6 +114,24 @@ export const landing = {
 			{
 				title: 'Aprende contigo',
 				body: 'A medida que trabajas, tus decisiones y preferencias enriquecen lo que Kaiman entiende de tu negocio, convirtiéndolo en un socio cada vez más preparado para trabajar contigo.',
+				images: {
+					left: [
+						{
+							src: '/brand/showcase-salsana.webp',
+							alt: 'Pieza de marca Salsana generada con el contexto de Kaiman',
+						},
+						{
+							src: '/brand/showcase-carlos.webp',
+							alt: 'Pieza de marca Carlos generada con el contexto de Kaiman',
+						},
+					],
+					right: [
+						{
+							src: '/brand/showcase-martinez.webp',
+							alt: 'Perfil Martinez con identidad visual coherente',
+						},
+					],
+				},
 			},
 		],
 		understandsLabel: 'Kaiman entiende:',
@@ -308,7 +328,7 @@ export const landing = {
 		sweetAlt: 'Pieza gráfica de Salsana, línea dulce',
 		videoAlt: 'Video de Salsana',
 		generate: 'Generar',
-		fullscreen: 'Ver en pantalla completa',
+		fullscreen: 'Ver ampliado',
 		close: 'Cerrar',
 		tools: {
 			image: 'Generador de imágenes',
@@ -317,17 +337,28 @@ export const landing = {
 	},
 	tour: {
 		title: 'Recorrido del producto',
-		body: 'Estos espacios quedan listos para el video y las capturas del flujo real. Puedes sustituir cada bloque cuando tengas el material.',
+		body: 'Tres momentos del flujo en Kaiman: la marca que ya entiende, el pedido de una pieza y el resultado listo para usar.',
 		slots: [
-			{ title: 'Ficha de marca', note: 'Espacio para un recorrido de la marca guardada.' },
-			{ title: 'Pedido de una pieza', note: 'Espacio para el momento en que se pide imagen o video.' },
-			{ title: 'Pieza lista', note: 'Espacio para el resultado dentro de la plataforma.' },
+			{
+				title: 'Ficha de marca',
+				note: 'Colores, tipografía, tono y referencias quedan guardados para que cada pieza parta del mismo contexto.',
+			},
+			{
+				title: 'Pedido de una pieza',
+				note: 'Pides imagen o video con la marca ya cargada; el pedido hereda lo que Kaiman ya conoce de tu negocio.',
+			},
+			{
+				title: 'Pieza lista',
+				note: 'Recibes el resultado alineado con tu identidad, listo para revisar, ajustar y publicar.',
+			},
 		],
 	},
 	finder: {
 		title: 'Cuántas piezas necesitas al mes',
 		intro:
-			'Indica imágenes, videos, guiones, audio, presentaciones y websites. El resultado usa créditos de referencia y señala el plan que cubre ese volumen.',
+			'Indica imágenes, clips de video, guiones, minutos de audio, slides y websites. El resultado es una estimación aproximada de créditos y del plan que podría cubrir ese volumen.',
+		disclaimer:
+			'Esta medida es aproximada y puede variar según la herramienta, la duración real de cada pieza y los precios vigentes en la plataforma.',
 		image: 'Imágenes',
 		video: 'Video',
 		script: 'Guiones',
@@ -335,20 +366,22 @@ export const landing = {
 		presentation: 'Presentaciones',
 		website: 'Websites',
 		minutes: 'minutos',
+		clips: 'clips (8 s)',
+		slides: 'slides',
 		decrease: 'Restar',
 		increase: 'Sumar',
 		videoLength: 'Duración de referencia del video',
-		short: '5 segundos',
-		medium: '15 segundos',
+		short: '4 segundos',
+		medium: '8 segundos',
 		empty: 'Indica al menos una pieza para ver un plan.',
 		error: 'Usa números enteros entre 0 y 500.',
-		creditsLabel: 'Créditos estimados al mes',
-		planLabel: 'Plan que cubre este volumen',
+		creditsLabel: 'Créditos estimados al mes (aproximado)',
+		planLabel: 'Plan de referencia para este volumen',
 		unitLabel: 'Costo de referencia por crédito en ese plan',
 		enterprise:
-			'Este volumen supera los 2.500 créditos del plan Premium. Enterprise se arma a medida.',
+			'Este volumen supera los 2.500 créditos del plan Empresarial. Corporativo se arma a medida.',
 		assumption:
-			'Referencia de cálculo: 1 crédito por imagen, 1 crédito por guion, 3 créditos por segundo de video (el slider de video va en minutos), 2 créditos por minuto de audio, 5 créditos por presentación y 15 créditos por website. El generador de guiones de la plataforma hoy no cobra créditos; el 1 crédito por guion sirve para dimensionar el plan.',
+			'Referencia aproximada (tarifas de plataforma, 2026-11-03): 4 créditos por imagen (1K/2K), 25 créditos por clip de video de 8 s, 1 crédito por guion, 6 créditos por minuto iniciado de audio (texto a voz), 9 créditos por slide (sin imágenes de IA) y 26 créditos por website tipo landing. Cada paso del slider es una unidad de esa tarifa. Herramientas, resolución, duración y opciones pueden cambiar el total real.',
 		perMonth: 'al mes',
 		cta: 'Obtener plan',
 	},
@@ -356,7 +389,7 @@ export const landing = {
 		title: 'Mejor marketing debe estar al alcance de tu negocio.',
 		intro:
 			'Elige el plan que mejor se adapte a las necesidades de tu empresa. Todos los planes de Kaiman parten del mismo Brand Understanding y te dan acceso a capacidades de marketing diseñadas para ayudarte a trabajar mejor y más eficientemente.',
-		perMonth: 'al mes',
+		perMonth: 'USD',
 		credits: 'créditos',
 		seat: 'puesto',
 		seats: 'puestos',
@@ -364,39 +397,29 @@ export const landing = {
 		brand: 'marca',
 		brands: 'marcas',
 		perCredit: 'por crédito',
-		cta: 'Comienza tu prueba gratis',
-		enterpriseTitle: 'Enterprise',
-		enterpriseBody: 'Precio personalizado. Para organizaciones que necesitan cupo, puestos o marcas fuera de estos tres planes.',
-		enterpriseCta: 'Escribir a Alerta',
+		cta: 'Regístrate ahora',
+		popular: 'Más popular',
+		custom: 'A medida',
+		enterpriseCta: 'Agenda una llamada',
 		names: {
-			start: 'Basic',
-			pro: 'Medium',
-			scale: 'Premium',
+			start: 'Esencial',
+			pro: 'Profesional',
+			scale: 'Empresarial',
+			enterprise: 'Corporativo',
+		},
+		taglines: {
+			start: 'Para personas que empiezan con marketing impulsado por IA.',
+			pro: 'Para equipos en crecimiento listos para avanzar más.',
+			scale: 'Para equipos que necesitan escala, colaboración y visibilidad.',
+			enterprise: 'Para organizaciones con necesidades complejas.',
 		},
 		blurbs: {
-			start: 'Una persona, una marca y 500 créditos al mes.',
-			pro: 'Hasta 3 puestos y 1.200 créditos al mes.',
-			scale: 'Hasta 5 puestos, 5 marcas y 2.500 créditos al mes.',
+			start: 'Pensado para solopreneurs que quieren trabajar de forma más inteligente con IA.',
+			pro: 'Pensado para freelancers o equipos de marketing ágiles que gestionan una o más marcas.',
+			scale: 'Pensado para equipos consolidados y organizaciones que coordinan el marketing.',
+			enterprise:
+				'Precio y cupo a medida. Para organizaciones que necesitan créditos, puestos o marcas fuera de estos tres planes, o un copiloto de marketing con IA ajustado a su operación.',
 		},
-	},
-	packs: {
-		title: 'Créditos extra',
-		intro:
-			'Si el cupo del plan no alcanza, la plataforma vende paquetes de un solo pago. El precio por crédito de estos paquetes es más alto que el del plan mensual.',
-		credits: 'créditos',
-		perCredit: 'por crédito',
-	},
-	rates: {
-		title: 'Qué consume un crédito',
-		intro: 'Costos de referencia publicados en el catálogo de la plataforma. Pueden cambiar según la herramienta.',
-		rows: [
-			{ name: 'Imagen de anuncio', detail: '1 crédito por imagen' },
-			{ name: 'Video editado', detail: '3 créditos por segundo' },
-			{ name: 'Audio / voz', detail: '2 créditos por minuto' },
-			{ name: 'Presentación', detail: '5 créditos por pieza' },
-			{ name: 'Website', detail: '15 créditos por pieza' },
-			{ name: 'Guion del generador', detail: 'Sin cobro de créditos' },
-		],
 	},
 	playbooks: {
 		title: 'No necesitas saber por dónde empezar. Kaiman sí.',
@@ -426,8 +449,17 @@ export const landing = {
 			},
 		],
 	},
+	blog: {
+		eyebrow: 'Blog',
+		title: 'Últimos artículos publicados',
+		body: 'Lecturas cortas sobre producto, marca e inteligencia artificial aplicadas al marketing de tu negocio.',
+		cta: 'Ver todos los artículos',
+		read: 'Leer',
+		empty: 'Todavía no hay artículos publicados.',
+	},
 	faq: {
 		title: 'Preguntas frecuentes',
+		lead: 'Respuestas sobre el producto, los planes y cómo trabaja Kaiman con tu negocio.',
 		items: [
 			{
 				q: '¿Necesito saber de marketing para usar Kaiman?',
@@ -447,11 +479,11 @@ export const landing = {
 			},
 			{
 				q: '¿Cómo funcionan los créditos?',
-				a: 'Los créditos son la unidad de uso de la plataforma. Una imagen de anuncio usa 1 crédito. Un segundo de video editado usa 3. Una voz usa 2 créditos por minuto. El generador de guiones hoy no cobra créditos.',
+				a: 'Los créditos son la unidad de uso de la plataforma. Una imagen generada en 1K o 2K usa alrededor de 4 créditos. Un video de 8 s (texto o imagen a video) usa alrededor de 25. Texto a voz usa 6 créditos por minuto iniciado. Un guion de video usa 1 crédito. El consumo exacto depende de la herramienta y de las opciones elegidas.',
 			},
 			{
 				q: '¿Puedo manejar más de una marca o negocio desde mi cuenta?',
-				a: 'Sí, según el plan. Basic incluye 1 marca. Premium incluye hasta 5 marcas. Medium se centra en puestos y créditos para un equipo pequeño.',
+				a: 'Sí, según el plan. Esencial incluye 1 marca. Profesional incluye hasta 3 marcas. Empresarial incluye hasta 5 marcas. Corporativo se define a medida.',
 			},
 			{
 				q: '¿Qué incluye la prueba gratis?',
@@ -467,6 +499,8 @@ export const landing = {
 		title: 'Tu negocio ya tiene mucho que enseñarle a Kaiman.',
 		body: 'Empieza por contarle quién eres, qué haces y qué quieres lograr. Kaiman utilizará ese conocimiento para ayudarte a hacer mejor marketing, de manera más eficiente.',
 		cta: 'Comienza tu prueba gratis',
+		alertaCta: 'Conoce Alerta',
+		imageAlt: 'Espacio para imagen de cierre',
 		lines: [
 			'No necesitas saber de marketing.',
 			'No necesitas aprender inteligencia artificial.',

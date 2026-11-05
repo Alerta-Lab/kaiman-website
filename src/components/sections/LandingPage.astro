@@ -1,23 +1,26 @@
 ---
 import {
+	ArrowUpRight,
 	Coins,
+	Folder,
 	HardDrive,
 	Users,
 } from 'lucide-react';
 import { getLanding, type Locale } from '../../i18n';
+import { blogIndexPath, blogPostPath } from '../../lib/blog-paths';
 import { signupUrlForPlan } from '../../lib/plan-handoff';
 import {
 	alertaUrl,
-	creditPacks,
 	creditUnitUsd,
 	formatUsd,
 	plans,
 	signupUrl,
 } from '../../lib/plans';
+import { asset } from '../../lib/asset';
+import { listPublishedPosts } from '../../server/repositories/posts';
 import { PieceGallery } from '../gallery/PieceGallery';
 import { PlanFinder } from '../plan/PlanFinder';
 import Button from '../ui/Button.astro';
-import Container from '../ui/Container.astro';
 
 interface Props {
 	locale: Locale;
@@ -25,36 +28,49 @@ interface Props {
 
 const { locale } = Astro.props;
 const copy = getLanding(locale);
-const demoPoster = locale === 'en' ? '/video/demo-en-poster.jpg' : '/video/demo-es-poster.jpg';
-const demoVideo = locale === 'en' ? '/video/demo-en.mp4' : '/video/demo-es.mp4';
+const latestPosts = await listPublishedPosts({ limit: 3, locale });
+const blogHref = blogIndexPath(locale);
+const demoPoster = asset(locale === 'en' ? '/video/demo-en-poster.jpg' : '/video/demo-es-poster.jpg');
+const demoVideo = asset(locale === 'en' ? '/video/demo-en.mp4' : '/video/demo-es.mp4');
 
+const gutter = 'px-5 sm:px-8 lg:px-10';
 const panel =
-	'relative flex min-h-svh w-full flex-col justify-center overflow-hidden border-t border-white/10 bg-ink-100 px-4 pt-24 pb-10 sm:px-6';
+	`relative flex min-h-svh w-full flex-col justify-center overflow-hidden border-t border-white/10 bg-ink-100 ${gutter} pt-24 pb-10`;
 const body = 'text-sm text-pretty text-neutral-200 sm:text-base';
 const card = 'rounded-xl bg-ink-200 p-4 sm:p-5';
+/** Horizontal snap carousel below lg; grid/stack from lg up. */
+const mobileCarousel =
+	'flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:grid lg:snap-none lg:gap-0 lg:overflow-visible';
+const mobileSlide = 'w-[min(18.5rem,82vw)] shrink-0 snap-start lg:w-auto lg:shrink';
 
 const chapters = [
 	{ id: 'hero', label: locale === 'en' ? 'Start' : 'Inicio' },
 	{ id: 'demo', label: 'Demo' },
 	{ id: 'origen', label: locale === 'en' ? 'Origin' : 'Origen' },
-	{ id: 'producto', label: locale === 'en' ? 'Brand' : 'Marca' },
-	{ id: 'brand-understanding', label: 'Brand' },
+	{ id: 'producto', label: copy.nav.product },
+	{ id: 'brand-understanding', label: copy.nav.brand },
 	{ id: 'audiencias', label: locale === 'en' ? 'Audience' : 'Audiencias' },
-	{ id: 'planes', label: locale === 'en' ? 'Plans' : 'Planes' },
-	{ id: 'preguntas', label: 'FAQ' },
+	{ id: 'plataforma', label: locale === 'en' ? 'Platform' : 'Plataforma' },
+	{ id: 'planes', label: copy.nav.plans },
+	{ id: 'preguntas', label: locale === 'en' ? 'FAQ' : 'FAQ' },
 ];
 
 const audiencePhotos: Record<string, string> = {
-	professionals: '/martinez.png',
-	products: '/ana.png',
-	sellers: '/carlos.png',
-	creators: '/sofia.png',
+	professionals: asset('/martinez.png'),
+	products: asset('/ana.png'),
+	sellers: asset('/carlos.png'),
+	creators: asset('/sofia.png'),
 };
+
+const tourMedia = [
+	asset('/brand-profile.png'),
+	asset('/single-item-order.png'),
+	asset('/order-ready.png'),
+] as const;
 
 const origenLead = copy.origin.paragraphs[0] ?? '';
 const origenRest = copy.origin.paragraphs.slice(1);
 const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
-
 ---
 
 <div data-landing-curtain="top" class="pointer-events-none fixed inset-x-0 top-0 z-[100] h-[50vh] bg-ink" aria-hidden="true"></div>
@@ -90,12 +106,12 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 	data-pause-label={copy.demo.pause}
 	data-go-label={copy.demo.go}
 	data-scroll-label={copy.demo.scroll}
-	class="pointer-events-none fixed top-0 left-0 z-[70] flex size-20 flex-col items-center justify-center rounded-full bg-primary text-white opacity-0 shadow-[0_12px_40px_rgba(107,72,233,0.45)] transition-[opacity,width,height,background-color,color,box-shadow] duration-300 will-change-transform data-[visible=true]:opacity-100 data-[mode=go]:size-11 data-[mode=go]:bg-white data-[mode=go]:text-ink data-[mode=go]:shadow-[0_8px_24px_rgba(0,0,0,0.35)] sm:size-24 sm:data-[mode=go]:size-12"
+	class="pointer-events-none fixed top-0 left-0 z-[90] flex size-20 flex-col items-center justify-center rounded-full bg-primary text-white opacity-0 shadow-[0_12px_40px_rgba(107,72,233,0.45)] transition-[opacity,width,height,background-color,color,box-shadow] duration-300 will-change-transform data-[visible=true]:opacity-100 data-[mode=go]:size-11 data-[mode=go]:bg-white data-[mode=go]:text-ink data-[mode=go]:shadow-[0_8px_24px_rgba(0,0,0,0.35)] data-[mode=grab]:size-11 data-[mode=grabbing]:size-11 data-[mode=expand]:size-11 data-[mode=grab]:shadow-[0_8px_24px_rgba(107,72,233,0.4)] data-[mode=grabbing]:shadow-[0_8px_24px_rgba(107,72,233,0.4)] data-[mode=expand]:bg-white data-[mode=expand]:text-ink data-[mode=expand]:shadow-[0_8px_24px_rgba(0,0,0,0.35)] sm:size-24 sm:data-[mode=go]:size-12 sm:data-[mode=grab]:size-12 sm:data-[mode=grabbing]:size-12 sm:data-[mode=expand]:size-12"
 	aria-hidden="true"
 >
 	<span data-video-cursor-label class="font-display text-xs font-semibold tracking-[0.18em] uppercase">{copy.demo.play}</span>
 	<svg
-		data-video-cursor-icon
+		data-video-cursor-icon="pan"
 		class="hidden size-7"
 		viewBox="0 0 24 24"
 		fill="none"
@@ -109,6 +125,59 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 		<path d="m6 9-3 3 3 3"></path>
 		<path d="M16 12h4"></path>
 		<path d="m18 9 3 3-3 3"></path>
+	</svg>
+	<svg
+		data-video-cursor-icon="expand"
+		class="hidden size-5"
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		stroke-width="2"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+		aria-hidden="true"
+	>
+		<path d="m15 15 6 6"></path>
+		<path d="m15 9 6-6"></path>
+		<path d="M21 16.2V21h-4.8"></path>
+		<path d="M21 7.8V3h-4.8"></path>
+		<path d="M3 16.2V21h4.8"></path>
+		<path d="m3 21 6-6"></path>
+		<path d="M3 7.8V3h4.8"></path>
+		<path d="M3 3l6 6"></path>
+	</svg>
+	<svg
+		data-video-cursor-icon="hand"
+		class="hidden size-5"
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		stroke-width="2"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+		aria-hidden="true"
+	>
+		<path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2"></path>
+		<path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2"></path>
+		<path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8"></path>
+		<path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"></path>
+	</svg>
+	<svg
+		data-video-cursor-icon="grab"
+		class="hidden size-5"
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		stroke-width="2"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+		aria-hidden="true"
+	>
+		<path d="M18 11.5V9a2 2 0 0 0-2-2a2 2 0 0 0-2 2v1.4"></path>
+		<path d="M14 10V8a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2"></path>
+		<path d="M10 9.9V9a2 2 0 0 0-2-2a2 2 0 0 0-2 2v5"></path>
+		<path d="M6 14a2 2 0 0 0-2-2a2 2 0 0 0-2 2"></path>
+		<path d="M18 11a2 2 0 1 1 4 0v3a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"></path>
 	</svg>
 </div>
 
@@ -138,14 +207,14 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 
 			<div
 				data-curtain-top
-				class="pointer-events-none absolute inset-x-0 top-0 z-[12] h-[18%] bg-ink [clip-path:polygon(0_0,100%_0,100%_70%,0_100%)]"
+				class="pointer-events-none absolute inset-x-0 top-0 z-[12] h-[18%] bg-ink [clip-path:polygon(0_0,100%_0,100%_70%,0_100%)] max-lg:hidden"
 				aria-hidden="true"
 			>
 				<div class="absolute inset-y-0 left-0 w-1/3 bg-linear-to-r from-primary-900/40 to-transparent"></div>
 			</div>
 			<div
 				data-curtain-bottom
-				class="pointer-events-none absolute inset-x-0 bottom-0 z-[12] h-[18%] bg-ink [clip-path:polygon(0_30%,100%_0,100%_100%,0_100%)]"
+				class="pointer-events-none absolute inset-x-0 bottom-0 z-[12] h-[18%] bg-ink [clip-path:polygon(0_30%,100%_0,100%_100%,0_100%)] max-lg:hidden"
 				aria-hidden="true"
 			>
 				<div class="absolute inset-y-0 right-0 w-1/3 bg-linear-to-l from-feature-video/25 to-transparent"></div>
@@ -153,10 +222,10 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 
 			<div
 				data-curtain-left
-				class="absolute inset-y-0 left-0 z-[14] w-[78%] bg-ink [clip-path:polygon(0_0,100%_0,100%_100%,0_100%)] sm:w-[70%] sm:[clip-path:polygon(0_0,100%_0,88%_100%,0_100%)] md:w-[60%] md:[clip-path:polygon(0_0,100%_0,84%_100%,0_100%)] lg:w-[56%] lg:[clip-path:polygon(0_0,100%_0,82%_100%,0_100%)]"
+				class="absolute inset-y-0 left-0 z-[14] w-full bg-ink [clip-path:polygon(0_0,100%_0,100%_100%,0_100%)] lg:w-[56%] lg:[clip-path:polygon(0_0,100%_0,82%_100%,0_100%)]"
 			>
 				<div class="absolute inset-y-0 left-0 w-1/2 bg-linear-to-r from-primary-900/30 to-transparent" aria-hidden="true"></div>
-				<div class="relative flex h-full items-center px-4 pt-24 pb-10 sm:px-6 sm:pr-[12%] md:pr-[14%] lg:pr-10">
+				<div class="relative flex h-full items-center px-5 pt-28 pb-10 sm:px-8 lg:pr-10 lg:pl-10">
 					<div class="flex w-full max-w-[34rem] flex-col">
 						<div class="flex w-full flex-col gap-5 sm:gap-6">
 							<p data-hero-exit="up" class="text-sm font-semibold tracking-[0.16em] text-primary-300 uppercase">{copy.hero.eyebrow}</p>
@@ -174,7 +243,7 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 
 			<div
 				data-curtain-right
-				class="pointer-events-none absolute inset-y-0 right-0 z-[14] w-[10%] bg-ink/70 [clip-path:polygon(40%_0,100%_0,100%_100%,0_100%)] sm:w-[16%] lg:w-[20%]"
+				class="pointer-events-none absolute inset-y-0 right-0 z-[14] hidden w-[20%] bg-ink/70 [clip-path:polygon(40%_0,100%_0,100%_100%,0_100%)] lg:block"
 				aria-hidden="true"
 			></div>
 
@@ -182,7 +251,7 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 				type="button"
 				data-video-hotspot
 				data-hotspot-mode="scroll"
-				class="absolute inset-0 z-[20] cursor-none border-0 bg-transparent [clip-path:polygon(78%_0,100%_0,100%_100%,78%_100%)] sm:[clip-path:polygon(64%_8%,100%_0,100%_100%,56%_100%)] md:[clip-path:polygon(56%_8%,100%_0,100%_100%,48%_100%)]"
+				class="absolute inset-0 z-[20] cursor-none border-0 bg-transparent max-lg:[clip-path:inset(0_0_0_100%)] lg:[clip-path:polygon(56%_8%,100%_0,100%_100%,48%_100%)]"
 				aria-label={copy.demo.play}
 			></button>
 
@@ -260,37 +329,61 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 	<div id="origen" data-chapter="origen" class="pointer-events-none h-px w-full overflow-hidden" aria-hidden="true"></div>
 
 	<section id="producto" data-chapter="producto" data-story class="relative border-t border-white/10 bg-ink">
-		<div data-story-pin class="relative h-svh w-full overflow-hidden">
-			<div data-parallax-bg class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+		<div data-story-pin class="relative w-full max-lg:h-auto max-lg:overflow-visible lg:h-svh lg:overflow-hidden">
+			<div data-parallax-bg class="pointer-events-none absolute inset-0 -z-10 max-lg:hidden" aria-hidden="true">
 				<div class="absolute inset-y-0 left-0 w-1/4 bg-linear-to-r from-feature-image/15 to-transparent"></div>
 				<div class="absolute inset-y-0 right-0 w-1/3 bg-linear-to-l from-primary-800/20 to-transparent"></div>
 			</div>
 
-			{/* Stage 1 — title + intro (Monument diagram) */}
-			<div data-story-stage class="absolute inset-0">
-				<div class="grid h-full w-full grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
-					<div class="relative flex flex-col justify-between border-white/15 px-5 pt-28 pb-10 sm:px-8 lg:border-r lg:px-10 lg:pt-32 lg:pb-12">
+			{/* Stage 1 — title + intro → right swaps to inconsistency visual */}
+			<div data-story-stage class="max-lg:relative max-lg:border-b max-lg:border-white/10 lg:absolute lg:inset-0">
+				<div class="grid w-full grid-cols-1 lg:h-full lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
+					<div class="relative flex flex-col justify-between gap-8 border-white/15 px-5 pt-28 pb-10 sm:px-8 lg:border-r lg:px-10 lg:pt-32 lg:pb-12">
 						<p class="font-display text-xs font-semibold tracking-[0.2em] text-primary-300 uppercase">
 							{copy.consistency.eyebrow}
 						</p>
 						<h2 class="max-w-[16ch] font-display text-[clamp(1.85rem,4.6vw,3.75rem)] leading-[1.02] font-semibold tracking-tight text-balance text-white">
 							{copy.consistency.title}
 						</h2>
-						<p class="hidden text-xs font-semibold tracking-[0.16em] text-white/45 uppercase lg:block">{copy.footer.studio}</p>
-					</div>
-					<div class="relative flex flex-col justify-center gap-8 border-t border-white/15 px-5 py-10 sm:px-8 lg:border-t-0 lg:px-10 lg:py-12">
-						<p class="max-w-xl font-display text-xl leading-snug text-pretty text-primary-300 sm:text-2xl lg:text-[1.75rem]">
-							{copy.consistency.intro}
+						<p class="hidden text-xs font-semibold tracking-[0.16em] text-white/45 uppercase lg:block">
+							{copy.footer.studio}
 						</p>
-						<p class="max-w-xl text-base text-pretty text-neutral-300 sm:text-lg">{copy.consistency.body}</p>
+					</div>
+					<div
+						data-swap-col
+						class="relative flex flex-col border-t border-white/15 px-5 py-10 sm:px-8 lg:h-full lg:border-t-0 lg:px-0 lg:py-0"
+					>
+						<div
+							data-swap-copy
+							class="relative z-10 flex flex-col justify-center gap-6 lg:h-full lg:gap-8 lg:px-10 lg:py-12"
+						>
+							<p class="max-w-xl font-display text-xl leading-snug text-pretty text-primary-300 sm:text-2xl lg:text-[1.75rem]">
+								{copy.consistency.intro}
+							</p>
+							<p class="max-w-xl text-base text-pretty text-neutral-300 sm:text-lg">{copy.consistency.body}</p>
+						</div>
+						<div
+							data-swap-media
+							class="relative mt-8 flex items-center justify-center lg:absolute lg:inset-0 lg:mt-0 lg:px-8 lg:py-10"
+						>
+							<img
+								src={asset('/inconsistence.png')}
+								alt={copy.consistency.inconsistencyAlt}
+								width="1600"
+								height="2000"
+								class="h-auto w-full max-h-[min(58vh,28rem)] object-contain object-center lg:max-h-[min(70vh,34rem)]"
+								loading="lazy"
+								decoding="async"
+							/>
+						</div>
 					</div>
 				</div>
 			</div>
 
 			{/* Stage 2 — brand attributes bar */}
-			<div data-story-stage class="absolute inset-0">
-				<div class="flex h-full w-full flex-col">
-					<div class="flex flex-1 flex-col justify-end gap-6 border-b border-white/15 px-5 pt-28 pb-8 sm:px-8 lg:px-10 lg:pt-32">
+			<div data-story-stage class="max-lg:relative max-lg:border-b max-lg:border-white/10 lg:absolute lg:inset-0">
+				<div class="flex w-full flex-col lg:h-full">
+					<div class="flex flex-col justify-end gap-6 border-b border-white/15 px-5 pt-16 pb-8 sm:px-8 lg:flex-1 lg:px-10 lg:pt-32">
 						<p class="font-display text-xs font-semibold tracking-[0.2em] text-primary-300 uppercase">
 							{copy.consistency.pointsEyebrow}
 						</p>
@@ -298,39 +391,52 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 							{copy.consistency.consequence}
 						</p>
 					</div>
-					<ul class="grid grid-cols-2 border-white/15 lg:grid-cols-4">
-						{
-							copy.consistency.points.map((point, index) => (
-								<li
-									class:list={[
-										'flex flex-col border-white/15',
-										index % 2 === 1 && 'border-l',
-										index > 1 && 'border-t lg:border-t-0',
-										index > 0 && 'lg:border-l',
-									]}
-								>
-									<div
-										class="aspect-video bg-linear-to-br from-ink-200 to-ink"
-										data-point-image={point.image}
-										aria-hidden="true"
-									></div>
-									<div class="flex items-center justify-between gap-3 border-t border-white/15 px-4 py-4 sm:px-5">
-										<p class="font-display text-sm font-semibold tracking-tight text-white sm:text-base">{point.label}</p>
-										<span class="font-display text-xs font-semibold tabular-nums text-primary-300">
-											{String(index + 1).padStart(2, '0')}
-										</span>
-									</div>
-								</li>
-							))
-						}
-					</ul>
+					<div data-h-scroll class="touch-none select-none lg:touch-auto">
+						<ul
+							data-h-scroll-track
+							class:list={[
+								mobileCarousel,
+								'border-white/15 px-5 sm:px-8 lg:grid-cols-4 lg:border-t lg:px-0',
+							]}
+						>
+							{
+								copy.consistency.points.map((point, index) => (
+									<li
+										class:list={[
+											mobileSlide,
+											'flex flex-col overflow-hidden border border-white/15 bg-ink-200 lg:rounded-none lg:border-0 lg:border-white/15 lg:bg-transparent',
+											index > 0 && 'lg:border-l',
+										]}
+									>
+										<div class="aspect-video overflow-hidden bg-ink-200">
+											<img
+												src={asset(point.image)}
+												alt=""
+												width="1200"
+												height="675"
+												class="h-full w-full object-cover"
+												loading="lazy"
+												decoding="async"
+											/>
+										</div>
+										<div class="flex items-center justify-between gap-3 border-t border-white/15 px-4 py-4 sm:px-5">
+											<p class="font-display text-sm font-semibold tracking-tight text-white sm:text-base">{point.label}</p>
+											<span class="font-display text-xs font-semibold tabular-nums text-primary-300">
+												{String(index + 1).padStart(2, '0')}
+											</span>
+										</div>
+									</li>
+								))
+							}
+						</ul>
+					</div>
 				</div>
 			</div>
 
-			{/* Stage 3 — secret / closing */}
-			<div data-story-stage class="absolute inset-0">
-				<div class="grid h-full w-full grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
-					<div class="relative flex flex-col justify-between border-white/15 px-5 pt-28 pb-10 sm:px-8 lg:border-r lg:px-10 lg:pt-32 lg:pb-12">
+			{/* Stage 3 — secret / closing → right swaps to consistency visual */}
+			<div data-story-stage class="max-lg:relative lg:absolute lg:inset-0">
+				<div class="grid w-full grid-cols-1 lg:h-full lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
+					<div class="relative flex flex-col justify-between gap-8 border-white/15 px-5 pt-16 pb-10 sm:px-8 lg:border-r lg:px-10 lg:pt-32 lg:pb-12">
 						<p class="font-display text-xs font-semibold tracking-[0.2em] text-primary-300 uppercase">
 							{copy.consistency.secretEyebrow}
 						</p>
@@ -339,11 +445,35 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 						</h3>
 						<p class="hidden text-xs font-semibold tracking-[0.16em] text-white/45 uppercase lg:block">{copy.footer.studio}</p>
 					</div>
-					<div class="relative flex flex-col justify-center gap-8 border-t border-white/15 px-5 py-10 sm:px-8 lg:border-t-0 lg:px-10 lg:py-12">
-						<p class="max-w-xl font-display text-xl leading-snug text-pretty text-primary-300 sm:text-2xl lg:text-[1.75rem]">
-							{copy.consistency.secretBody}
-						</p>
-						<p class="max-w-xl text-base font-semibold text-pretty text-neutral-100 sm:text-lg">{copy.consistency.closing}</p>
+					<div
+						data-swap-col
+						class="relative flex flex-col border-t border-white/15 px-5 py-10 sm:px-8 lg:h-full lg:border-t-0 lg:px-0 lg:py-0"
+					>
+						<div
+							data-swap-copy
+							class="relative z-10 flex flex-col justify-center gap-6 lg:h-full lg:gap-8 lg:px-10 lg:py-12"
+						>
+							<p class="max-w-xl font-display text-xl leading-snug text-pretty text-primary-300 sm:text-2xl lg:text-[1.75rem]">
+								{copy.consistency.secretBody}
+							</p>
+							<p class="max-w-xl text-base font-semibold text-pretty text-neutral-100 sm:text-lg">
+								{copy.consistency.closing}
+							</p>
+						</div>
+						<div
+							data-swap-media
+							class="relative mt-8 flex items-center justify-center lg:absolute lg:inset-0 lg:mt-0 lg:px-8 lg:py-10"
+						>
+							<img
+								src={asset('/consistency.png')}
+								alt={copy.consistency.consistencyAlt}
+								width="1600"
+								height="1600"
+								class="h-auto w-full max-h-[min(58vh,28rem)] object-contain object-center lg:max-h-[min(70vh,34rem)]"
+								loading="lazy"
+								decoding="async"
+							/>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -351,56 +481,99 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 	</section>
 
 	<section
-		data-story
 		data-brand-timeline
 		data-chapter="brand-understanding"
 		id="brand-understanding"
 		class="relative border-t border-white/10 bg-ink-100"
 	>
-		<div data-story-pin class="relative flex h-svh w-full flex-col justify-center overflow-hidden px-4 pt-24 pb-10 sm:px-6">
-			<div data-parallax-bg class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
-				<div class="absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-primary-800/30 to-transparent"></div>
-				<div class="absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-feature-presentation/15 to-transparent"></div>
-			</div>
-			<div class="relative mx-auto h-full w-full max-w-content">
-				<div
-					data-story-stage
-					class="absolute inset-x-0 top-1/2 mx-auto flex max-w-3xl -translate-y-1/2 flex-col gap-5 px-1"
-				>
-					<p class="text-sm font-semibold tracking-[0.14em] text-primary-300 uppercase">{copy.brandUnderstanding.eyebrow}</p>
-					<h2 class="text-3xl font-semibold tracking-tight text-balance text-white sm:text-4xl lg:text-5xl">
+		<div class={`grid w-full grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]`}>
+			<aside
+				class:list={[
+					'flex flex-col justify-center gap-5 border-white/15 pt-28 pb-10 lg:sticky lg:top-0 lg:h-svh lg:self-start lg:justify-between lg:border-r lg:pt-32 lg:pb-12',
+					gutter,
+				]}
+			>
+				<p class="font-display text-xs font-semibold tracking-[0.2em] text-primary-300 uppercase">
+					{copy.brandUnderstanding.eyebrow}
+				</p>
+				<div class="flex flex-col gap-5">
+					<h2 class="max-w-[16ch] font-display text-[clamp(1.85rem,4.6vw,3.75rem)] leading-[1.02] font-semibold tracking-tight text-balance text-white">
 						{copy.brandUnderstanding.title}
 					</h2>
-					<p class="text-base text-pretty text-neutral-200 sm:text-lg">{copy.brandUnderstanding.intro}</p>
-					<p class="text-base text-pretty text-neutral-200 sm:text-lg">{copy.brandUnderstanding.support}</p>
-					<ul class="mt-2 flex flex-wrap gap-2">
-						{copy.brandUnderstanding.understands.map((item) => (
-							<li class="rounded-lg border border-primary-700/40 bg-primary-900/30 px-3 py-2 text-sm font-semibold text-primary-100">{item}</li>
-						))}
-					</ul>
+					<p class="max-w-xl text-base text-pretty text-neutral-300 sm:text-lg">{copy.brandUnderstanding.intro}</p>
+					<p class="max-w-xl text-base text-pretty text-neutral-400 sm:text-lg">{copy.brandUnderstanding.support}</p>
 				</div>
-				{
-					copy.brandUnderstanding.steps.map((step, index) => (
-						<div
-							data-story-stage
-							class="absolute inset-x-0 top-1/2 mx-auto flex w-full max-w-3xl -translate-y-1/2 flex-col gap-6 px-1"
-						>
-							<div class="flex items-center gap-4">
-								<p class="font-display text-5xl leading-none font-semibold tracking-tight text-primary-400 sm:text-6xl">
-									{String(index + 1).padStart(2, '0')}
+				<p class="hidden text-xs font-semibold tracking-[0.16em] text-white/45 uppercase lg:block">{copy.footer.studio}</p>
+			</aside>
+
+			<div data-h-scroll class="relative touch-none select-none lg:touch-auto">
+				<div
+					data-h-scroll-track
+					class="flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:px-8 lg:block lg:snap-none lg:overflow-visible lg:px-0 lg:pb-0"
+				>
+					{
+						copy.brandUnderstanding.steps.map((step, index) => (
+							<article
+								class="flex w-[min(20rem,85vw)] shrink-0 snap-start flex-col justify-center gap-5 rounded-xl border border-white/15 bg-ink-200 p-5 sm:w-[min(24rem,80vw)] sm:p-6 lg:sticky lg:top-0 lg:w-auto lg:min-h-svh lg:shrink lg:rounded-none lg:border-0 lg:border-t lg:border-white/15 lg:bg-ink-100 lg:px-10 lg:py-28 lg:first:border-t-0"
+								style={`z-index: ${index + 1}`}
+							>
+								<p class="font-display text-xs font-semibold tracking-[0.18em] text-primary-300 uppercase">
+									{String(index + 1).padStart(2, '0')} / {String(copy.brandUnderstanding.steps.length).padStart(2, '0')}
 								</p>
-								<span class="h-px flex-1 bg-white/15" aria-hidden="true"></span>
-								<p class="font-display text-xs font-semibold tracking-[0.16em] text-neutral-400 uppercase">
-									{String(copy.brandUnderstanding.steps.length).padStart(2, '0')}
-								</p>
-							</div>
-							<div class="flex flex-col gap-4 border-l-2 border-primary pl-6 sm:pl-8">
-								<h3 class="text-3xl font-semibold tracking-tight text-balance text-white sm:text-4xl">{step.title}</h3>
-								<p class="max-w-prose text-base text-pretty text-neutral-200 sm:text-lg">{step.body}</p>
-							</div>
-						</div>
-					))
-				}
+								<h3 class="font-display text-3xl leading-none font-semibold tracking-tight text-balance text-white italic sm:text-4xl lg:text-6xl">
+									{step.title}
+								</h3>
+								<p class="max-w-prose text-base text-pretty text-neutral-300 sm:text-lg">{step.body}</p>
+								{index === 0 && (
+									<div class="mt-2 flex flex-col gap-3">
+										<p class="text-xs font-semibold tracking-[0.14em] text-neutral-500 uppercase">
+											{copy.brandUnderstanding.understandsLabel}
+										</p>
+										<ul class="flex flex-wrap gap-2">
+											{copy.brandUnderstanding.understands.map((item) => (
+												<li class="rounded-full border border-white/20 bg-transparent px-3.5 py-1.5 text-sm text-neutral-200">
+													{item}
+												</li>
+											))}
+										</ul>
+									</div>
+								)}
+								{'images' in step && step.images ? (
+									<div class="mt-2 grid w-full min-w-0 max-w-3xl grid-cols-[minmax(0,1.52fr)_minmax(0,1fr)] gap-2 sm:gap-3">
+										<div class="flex min-w-0 flex-col gap-2 sm:gap-3">
+											{step.images.left.map((image) => (
+												<div class="overflow-hidden bg-ink">
+													<img
+														src={asset(image.src)}
+														alt={image.alt}
+														width="1600"
+														height="900"
+														class="aspect-video h-auto w-full object-contain"
+														loading="lazy"
+														decoding="async"
+													/>
+												</div>
+											))}
+										</div>
+										<div class="min-w-0 overflow-hidden bg-ink">
+											{step.images.right.map((image) => (
+												<img
+													src={asset(image.src)}
+													alt={image.alt}
+													width="900"
+													height="1600"
+													class="aspect-[9/16] h-auto w-full object-contain"
+													loading="lazy"
+													decoding="async"
+												/>
+											))}
+										</div>
+									</div>
+								) : null}
+							</article>
+						))
+					}
+				</div>
 			</div>
 		</div>
 	</section>
@@ -411,61 +584,94 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 		data-story
 		class:list={['relative border-t border-white/10']}
 	>
-		<div data-story-pin class="relative flex h-svh w-full flex-col justify-center overflow-hidden px-4 pt-24 pb-10 sm:px-6">
-			<div class="relative mx-auto h-full w-full max-w-content">
+		<div data-story-pin class:list={['relative flex w-full flex-col justify-center pt-24 pb-10 max-lg:h-auto max-lg:overflow-visible lg:h-svh lg:overflow-hidden', gutter]}>
+			<div class="relative w-full lg:h-full">
 				<div
 					data-story-stage
-					class="absolute inset-x-0 top-1/2 mx-auto flex max-w-copy -translate-y-1/2 flex-col gap-5 px-1"
+					class="flex max-w-3xl flex-col gap-5 max-lg:relative max-lg:mb-10 lg:absolute lg:inset-x-0 lg:top-1/2 lg:-translate-y-1/2"
 				>
-					<h2 class="text-3xl font-semibold tracking-tight text-balance text-white sm:text-4xl lg:text-5xl">{copy.audiences.title}</h2>
+					<h2 class="font-display text-3xl font-semibold tracking-tight text-balance text-white sm:text-4xl lg:text-5xl">{copy.audiences.title}</h2>
 					<p class="text-base text-pretty text-neutral-200 sm:text-lg">{copy.audiences.intro}</p>
 				</div>
 				<div
 					data-story-stage
-					class="absolute inset-x-0 top-1/2 mx-auto w-full -translate-y-1/2 px-1"
+					class="w-full max-lg:relative lg:absolute lg:inset-x-0 lg:top-1/2 lg:-translate-y-1/2"
 				>
-					<div data-audience-switcher class="grid items-stretch gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-						<div class="relative min-h-[22rem] overflow-hidden bg-ink-200 sm:min-h-[28rem] lg:min-h-[32rem]">
-							{
-								copy.audiences.cards.map((cardItem, index) => (
-									<div
-										data-audience-photo={cardItem.id}
-										class:list={[
-											'absolute inset-0 transition-opacity duration-300',
-											index === 0 ? 'opacity-100' : 'opacity-0',
-										]}
-										aria-hidden={index === 0 ? 'false' : 'true'}
-									>
-										<img
-											src={audiencePhotos[cardItem.id]}
-											alt=""
-											class="h-full w-full object-cover object-top"
-											loading="lazy"
-										/>
-										<div class="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" aria-hidden="true"></div>
-										<p class="absolute bottom-5 left-5 font-display text-2xl font-semibold text-white">{cardItem.name}</p>
-									</div>
-								))
-							}
+					<div data-audience-switcher>
+						<div data-h-scroll class="-mx-5 touch-none select-none sm:-mx-8 lg:hidden">
+							<div
+								data-h-scroll-track
+								class="flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:px-8"
+							>
+								{
+									copy.audiences.cards.map((cardItem) => (
+										<a
+											href={`#audiencia-${cardItem.id}`}
+											data-cursor-go
+											class="group flex w-[min(18.5rem,82vw)] shrink-0 snap-start flex-col overflow-hidden rounded-xl border border-white/10 bg-ink-200"
+										>
+											<div class="relative aspect-[4/5] overflow-hidden">
+												<img
+													src={audiencePhotos[cardItem.id]}
+													alt=""
+													class="pointer-events-none h-full w-full object-cover object-top"
+													loading="lazy"
+													draggable="false"
+												/>
+												<div class="absolute inset-0 bg-gradient-to-t from-ink/75 via-transparent to-transparent" aria-hidden="true"></div>
+												<p class="absolute bottom-4 left-4 font-display text-2xl font-semibold text-white">{cardItem.name}</p>
+											</div>
+											<p class="border-t border-white/10 px-4 py-4 text-sm font-semibold text-pretty text-neutral-200">{cardItem.title}</p>
+										</a>
+									))
+								}
+								<div class="w-2 shrink-0 sm:w-5" aria-hidden="true"></div>
+							</div>
 						</div>
-						<nav aria-label={copy.audiences.title} class="flex flex-col justify-center">
-							{
-								copy.audiences.cards.map((cardItem, index) => (
-									<a
-										href={`#audiencia-${cardItem.id}`}
-										data-audience-link={cardItem.id}
-										data-cursor-go
-										class:list={[
-											'group flex items-baseline justify-between gap-6 border-b border-white/10 py-5 transition-colors duration-200 first:pt-0 last:border-b-0',
-											index === 0 ? 'text-white' : 'text-white/45 hover:text-white',
-										]}
-									>
-										<span class="font-display text-xl font-semibold tracking-tight sm:text-2xl">{cardItem.name}</span>
-										<span class="max-w-[14rem] text-right text-sm font-semibold text-pretty sm:max-w-[18rem] sm:text-base">{cardItem.title}</span>
-									</a>
-								))
-							}
-						</nav>
+
+						<div class="hidden items-stretch gap-8 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
+							<div class="relative min-h-[32rem] overflow-hidden bg-ink-200">
+								{
+									copy.audiences.cards.map((cardItem, index) => (
+										<div
+											data-audience-photo={cardItem.id}
+											class:list={[
+												'absolute inset-0 transition-opacity duration-300',
+												index === 0 ? 'opacity-100' : 'opacity-0',
+											]}
+											aria-hidden={index === 0 ? 'false' : 'true'}
+										>
+											<img
+												src={audiencePhotos[cardItem.id]}
+												alt=""
+												class="h-full w-full object-cover object-top"
+												loading="lazy"
+											/>
+											<div class="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" aria-hidden="true"></div>
+											<p class="absolute bottom-5 left-5 font-display text-2xl font-semibold text-white">{cardItem.name}</p>
+										</div>
+									))
+								}
+							</div>
+							<nav aria-label={copy.audiences.title} class="flex flex-col justify-center">
+								{
+									copy.audiences.cards.map((cardItem, index) => (
+										<a
+											href={`#audiencia-${cardItem.id}`}
+											data-audience-link={cardItem.id}
+											data-cursor-go
+											class:list={[
+												'group flex items-baseline justify-between gap-6 border-b border-white/10 py-5 transition-colors duration-200 first:pt-0 last:border-b-0',
+												index === 0 ? 'text-white' : 'text-white/45 hover:text-white',
+											]}
+										>
+											<span class="font-display text-xl font-semibold tracking-tight sm:text-2xl">{cardItem.name}</span>
+											<span class="max-w-[14rem] text-right text-sm font-semibold text-pretty sm:max-w-[18rem] sm:text-base">{cardItem.title}</span>
+										</a>
+									))
+								}
+							</nav>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -479,45 +685,47 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 			data-reveal="up"
 			data-audience-profile
 			id={`audiencia-${cardItem.id}`}
-			class="relative flex min-h-svh w-full flex-col justify-center border-t border-white/10 bg-ink-100 px-4 pt-28 pb-16 sm:px-6"
+			class:list={['relative flex min-h-svh w-full flex-col justify-center border-t border-white/10 bg-ink-100 pt-28 pb-16', gutter]}
 		>
-			<div data-parallax-content class="mx-auto flex w-full max-w-content flex-col">
-				<div class="border-b border-white/15 pb-8 sm:pb-10">
-					<p class="mb-3 text-sm font-semibold tracking-[0.14em] text-primary-300 uppercase">{cardItem.name}</p>
-					<h2 class="max-w-4xl font-display text-4xl font-semibold tracking-tight text-balance text-white sm:text-5xl lg:text-6xl">
-						{cardItem.title}
-					</h2>
+			<div data-parallax-content class="flex w-full flex-col">
+				<div class="flex items-end gap-4 border-b border-white/15 pb-8 sm:gap-5 sm:pb-10 lg:gap-6">
+					<div class="aspect-square w-20 shrink-0 overflow-hidden bg-ink-200 sm:w-24 lg:w-28">
+						<img
+							src={audiencePhotos[cardItem.id]}
+							alt=""
+							width="224"
+							height="224"
+							class="h-full w-full object-cover object-top"
+							loading="lazy"
+							decoding="async"
+						/>
+					</div>
+					<div class="min-w-0 flex-1 pb-0.5">
+						<p class="mb-2 text-sm font-semibold tracking-[0.14em] text-primary-300 uppercase sm:mb-3">{cardItem.name}</p>
+						<h2 class="font-display text-3xl font-semibold tracking-tight text-balance text-white sm:text-5xl lg:text-6xl">
+							{cardItem.title}
+						</h2>
+					</div>
 				</div>
-				<div class="grid gap-8 pt-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.4fr)] lg:gap-0 lg:pt-10">
-					<div class="flex flex-col gap-4 lg:border-r lg:border-white/15 lg:pr-10">
+				<div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-0">
+					<div class="flex flex-col gap-4 pt-8 lg:border-r lg:border-white/15 lg:pt-10 lg:pr-10">
 						<p class="text-sm font-semibold text-neutral-300">{cardItem.subtitle}</p>
 						<p class="font-display text-2xl font-semibold tracking-tight text-balance text-primary-400 sm:text-3xl lg:text-4xl">
 							{cardItem.lead}
 						</p>
 						<p class="text-base text-pretty text-neutral-200 sm:text-lg">{cardItem.body}</p>
 					</div>
-					<div class="min-w-0 lg:pl-10">
+					<div class="min-w-0 pt-8 lg:pt-10 lg:pl-10">
 						<div data-h-scroll class="relative min-w-0 touch-none select-none">
 							<div
 								data-h-scroll-track
-								class="flex cursor-grab gap-4 overflow-x-auto pb-2 active:cursor-grabbing [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+								class="flex gap-4 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
 							>
 								{
 									cardItem.actions.map((action) => (
-										<article class="w-[min(16rem,72vw)] shrink-0 overflow-hidden bg-ink-200 sm:w-[18rem]">
-											<div class="aspect-[4/3] overflow-hidden">
-												<img
-													src={audiencePhotos[cardItem.id]}
-													alt=""
-													class="pointer-events-none h-full w-full object-cover object-top"
-													loading="lazy"
-													draggable="false"
-												/>
-											</div>
-											<div class="flex flex-col gap-2 p-4">
-												<h3 class="text-base font-semibold tracking-tight text-white uppercase sm:text-lg">{action.title}</h3>
-												<p class="text-sm text-pretty text-neutral-300">{action.body}</p>
-											</div>
+										<article class="flex w-[min(16rem,72vw)] shrink-0 flex-col gap-3 border border-white/15 bg-ink-200 p-5 sm:w-[18rem] sm:p-6">
+											<h3 class="text-base font-semibold tracking-tight text-white uppercase sm:text-lg">{action.title}</h3>
+											<p class="text-sm text-pretty text-neutral-300 sm:text-[0.95rem] sm:leading-relaxed">{action.body}</p>
 										</article>
 									))
 								}
@@ -529,116 +737,285 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 		</section>
 	))}
 
-	<section data-panel data-motion="styled" data-reveal="left" id="plataforma" class={panel}>
-		<div data-parallax-bg class="pointer-events-none absolute inset-0 -z-10 scale-110 will-change-transform" aria-hidden="true">
-			<div class="absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-primary-700/25 to-transparent"></div>
-			<div class="absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-feature-creators/15 to-transparent"></div>
+	<section
+		data-story
+		data-chapter="plataforma"
+		id="plataforma"
+		class="relative border-t border-white/10 bg-ink-100"
+	>
+		<div data-parallax-bg class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+			<div class="absolute inset-y-0 left-0 w-1/4 bg-linear-to-r from-primary-700/20 to-transparent"></div>
+			<div class="absolute inset-y-0 right-0 w-1/3 bg-linear-to-l from-feature-creators/12 to-transparent"></div>
 		</div>
-		<Container class="w-full">
-			<div data-parallax-content class="flex flex-col gap-10">
-				<div class="max-w-copy flex flex-col gap-5">
-					<h2 class="text-3xl font-semibold tracking-tight text-balance text-white sm:text-4xl">{copy.platform.title}</h2>
-					<p class={body}>{copy.platform.intro}</p>
-					<p class={body}>{copy.platform.body}</p>
-					<p class="text-lg font-semibold text-pretty text-neutral-100">{copy.platform.closing}</p>
+		<div data-story-pin class="relative w-full bg-ink-100 max-lg:h-auto max-lg:overflow-visible lg:h-svh lg:overflow-hidden">
+			<div class="grid w-full grid-cols-1 lg:h-full lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
+				<aside
+					class:list={[
+						'flex flex-col justify-between gap-6 border-white/15 pt-28 pb-8 lg:border-r lg:pt-32 lg:pb-12',
+						gutter,
+					]}
+				>
+					<p class="font-display text-xs font-semibold tracking-[0.2em] text-primary-300 uppercase">
+						{copy.nav.product}
+					</p>
+					<div class="flex flex-col gap-5">
+						<h2 class="max-w-[14ch] font-display text-[clamp(1.85rem,4.6vw,3.5rem)] leading-[1.02] font-semibold tracking-tight text-balance text-white">
+							{copy.platform.title}
+						</h2>
+						<p class="max-w-md font-display text-lg leading-snug text-pretty text-primary-300 sm:text-xl">
+							{copy.platform.intro}
+						</p>
+					</div>
+					<p class="hidden text-xs font-semibold tracking-[0.16em] text-white/45 uppercase lg:block">
+						{copy.footer.studio}
+					</p>
+				</aside>
+
+				<div class="relative min-h-0 border-t border-white/15 max-lg:py-8 lg:border-t-0">
+					<div
+						data-story-stage
+						class:list={[
+							'flex flex-col justify-center gap-6 max-lg:relative max-lg:mb-6 lg:absolute lg:inset-0',
+							gutter,
+						]}
+					>
+						<p data-stage-line class="max-w-xl text-base text-pretty text-neutral-300 sm:text-lg">
+							{copy.platform.body}
+						</p>
+						<p data-stage-line class="max-w-xl text-base font-semibold text-pretty text-neutral-100 sm:text-lg">
+							{copy.platform.closing}
+						</p>
+						<p data-stage-line class="font-display text-xs font-semibold tracking-[0.18em] text-primary-300 uppercase max-lg:hidden">
+							01 / {String(copy.platform.items.length).padStart(2, '0')}
+						</p>
+					</div>
+					<div data-h-scroll class="touch-none select-none lg:contents lg:touch-auto">
+						<div
+							data-h-scroll-track
+							class:list={[
+								'flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:px-8 lg:absolute lg:inset-0 lg:block lg:snap-none lg:overflow-visible lg:px-0',
+							]}
+						>
+							{
+								copy.platform.items.map((item, index) => (
+									<div
+										data-story-stage
+										class:list={[
+											mobileSlide,
+											'flex flex-col justify-center gap-5 rounded-xl border border-white/15 bg-ink-200 p-5 lg:absolute lg:inset-0 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:px-10',
+										]}
+									>
+										<p class="font-display text-xs font-semibold tracking-[0.18em] text-primary-300 uppercase">
+											{String(index + 1).padStart(2, '0')} / {String(copy.platform.items.length).padStart(2, '0')}
+										</p>
+										<div class="relative max-w-xl">
+											<h3 class="font-display text-3xl leading-none font-semibold tracking-tight text-balance text-white italic sm:text-4xl lg:text-6xl lg:text-white/20">
+												{item.title}
+											</h3>
+											<h3
+												data-platform-fill
+												aria-hidden="true"
+												class="pointer-events-none absolute inset-0 hidden font-display text-4xl leading-none font-semibold tracking-tight text-balance text-white italic sm:text-5xl lg:block lg:text-6xl"
+												style="clip-path: inset(0 0 100% 0)"
+											>
+												{item.title}
+											</h3>
+										</div>
+										<p data-stage-line class="max-w-prose text-base text-pretty text-neutral-300 sm:text-lg">
+											{item.body}
+										</p>
+									</div>
+								))
+							}
+						</div>
+					</div>
 				</div>
-				<ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-					{copy.platform.items.map((item) => (
-						<li class:list={[card, 'flex flex-col gap-3']}>
-							<h3 class="text-xl font-semibold tracking-tight text-balance text-white">{item.title}</h3>
-							<p class="text-base text-pretty text-neutral-200">{item.body}</p>
-						</li>
-					))}
-				</ul>
 			</div>
-		</Container>
+		</div>
 	</section>
 
-	<section data-panel data-motion="styled" data-reveal="right" id="capacidad" class:list={[panel]}>
-		<Container class="w-full">
-			<div data-parallax-content class="flex flex-col gap-10">
-				<div class="max-w-copy flex flex-col gap-5">
+	<section
+		data-capacity-timeline
+		id="capacidad"
+		class="relative z-10 border-t border-white/10 bg-ink-100"
+	>
+		<div data-parallax-bg class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+			<div class="absolute inset-y-0 left-0 w-1/4 bg-linear-to-r from-primary-700/20 to-transparent"></div>
+			<div class="absolute inset-y-0 right-0 w-1/3 bg-linear-to-l from-feature-analysis/15 to-transparent"></div>
+		</div>
+		<div data-capacity-pin class="relative flex w-full flex-col justify-center bg-ink-100 max-lg:h-auto max-lg:overflow-visible lg:h-svh lg:overflow-hidden">
+			<div class:list={['flex flex-col gap-8 pt-28 pb-8 lg:pt-32', gutter]}>
+				<div class="max-w-copy flex flex-col gap-4">
 					<h2 class="text-3xl font-semibold tracking-tight text-balance text-white sm:text-4xl">{copy.efficiency.title}</h2>
 					<p class={body}>{copy.efficiency.intro}</p>
 					<p class={body}>{copy.efficiency.body}</p>
 				</div>
-				<ul class="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-					{copy.efficiency.items.map((item) => (
-						<li class="rounded-xl border border-white/10 bg-ink p-5 sm:p-6">
-							<h3 class="text-xl font-semibold tracking-tight text-balance text-white">{item.title}</h3>
-							<p class="mt-3 text-base text-pretty text-neutral-200">{item.body}</p>
-						</li>
-					))}
-				</ul>
+				<div class="relative h-px w-full bg-white/15 max-lg:hidden" aria-hidden="true">
+					<div data-capacity-progress class="absolute inset-y-0 left-0 w-0 bg-primary"></div>
+				</div>
 			</div>
-		</Container>
+			<div data-h-scroll class="min-h-0 flex-1 touch-none select-none overflow-hidden pb-10 lg:touch-auto">
+				<div
+					data-capacity-track
+					data-h-scroll-track
+					class="flex h-full snap-x snap-mandatory items-stretch gap-4 overflow-x-auto pl-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-5 sm:pl-8 lg:gap-6 lg:snap-none lg:overflow-visible lg:pl-10 lg:will-change-transform"
+				>
+					{
+						copy.efficiency.items.map((item, index) => (
+							<article
+								data-capacity-card
+								class="flex w-[min(20rem,78vw)] shrink-0 snap-start flex-col justify-between gap-6 rounded-xl border border-white/10 bg-ink-200 p-5 sm:w-[22rem] sm:p-6"
+							>
+								<div class="flex flex-col gap-4">
+									<p class="font-display text-xs font-semibold tracking-[0.18em] text-primary-300 uppercase">
+										{String(index + 1).padStart(2, '0')} / {String(copy.efficiency.items.length).padStart(2, '0')}
+									</p>
+									<h3 class="font-display text-2xl font-semibold tracking-tight text-balance text-white sm:text-3xl">
+										{item.title}
+									</h3>
+									<p class="text-base text-pretty text-neutral-200">{item.body}</p>
+								</div>
+								<span class="block h-px w-10 bg-primary" aria-hidden="true"></span>
+							</article>
+						))
+					}
+					<div class="w-5 shrink-0 sm:w-8 lg:w-10" aria-hidden="true"></div>
+				</div>
+			</div>
+		</div>
 	</section>
 
-	<section data-panel data-motion="styled" data-reveal="up" class:list={[panel]}>
-		<Container class="w-full">
-			<div data-parallax-content class="flex flex-col gap-8">
-				<div class="max-w-copy flex flex-col gap-5">
-					<h2 class="text-3xl font-semibold tracking-tight text-balance text-white sm:text-4xl">{copy.salsana.title}</h2>
-					<p class={body}>{copy.salsana.body}</p>
+	<section
+		data-panel
+		data-motion="styled"
+		data-reveal="up"
+		class="relative flex h-svh max-h-svh w-full overflow-hidden border-t border-white/10 bg-ink-100"
+	>
+		<div
+			data-parallax-content
+			class="grid h-full w-full min-h-0 grid-cols-1 grid-rows-[auto_minmax(0,1fr)] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.2fr)] lg:grid-rows-1"
+		>
+			<aside
+				class:list={[
+					'flex flex-col justify-center gap-5 border-white/15 pt-28 pb-6 lg:border-r lg:pt-32 lg:pb-12',
+					gutter,
+				]}
+			>
+				<h2 class="max-w-[14ch] font-display text-[clamp(1.85rem,4.2vw,3.25rem)] leading-[1.02] font-semibold tracking-tight text-balance text-white">
+					{copy.salsana.title}
+				</h2>
+				<p class="max-w-md text-base text-pretty text-neutral-300 sm:text-lg">{copy.salsana.body}</p>
+			</aside>
+			<div class:list={['flex min-h-0 flex-col py-6 lg:justify-center lg:py-12', gutter]}>
+				<div class="h-full min-h-0 w-full">
+					<PieceGallery client:visible copy={copy.salsana} />
 				</div>
-				<div class="max-h-[52vh] overflow-hidden"><PieceGallery client:visible copy={copy.salsana} /></div>
 			</div>
-		</Container>
+		</div>
 	</section>
 
-	<section data-panel data-motion="styled" data-reveal="left" class:list={[panel]}>
-		<Container class="w-full">
-			<div data-parallax-content class="flex flex-col gap-8">
-				<div class="max-w-copy flex flex-col gap-5">
-					<h2 class="text-3xl font-semibold tracking-tight text-balance text-white sm:text-4xl">{copy.tour.title}</h2>
-					<p class={body}>{copy.tour.body}</p>
-				</div>
-				<div class="grid gap-3 md:grid-cols-3">
-					{copy.tour.slots.map((slot) => (
-						<div class="flex aspect-video flex-col justify-end rounded-xl border border-dashed border-white/15 bg-ink p-6">
-							<p class="text-lg font-semibold text-white">{slot.title}</p>
-							<p class="mt-2 text-sm text-pretty text-neutral-300">{slot.note}</p>
-						</div>
-					))}
+	<section
+		data-panel
+		data-motion="styled"
+		data-reveal="left"
+		id="recorrido"
+		class:list={[panel]}
+	>
+		<div data-parallax-content class="flex w-full flex-col gap-10 lg:gap-12">
+			<div class="max-w-copy flex flex-col gap-5">
+				<h2 class="font-display text-3xl font-semibold tracking-tight text-balance text-white sm:text-4xl lg:text-5xl">
+					{copy.tour.title}
+				</h2>
+				<p class="text-base text-pretty text-neutral-200 sm:text-lg">{copy.tour.body}</p>
+			</div>
+
+			<div class="hidden items-center gap-4 border-t border-white/15 pt-8 lg:flex" aria-hidden="true">
+				<span class="font-display text-xs font-semibold tracking-[0.18em] text-primary-300 uppercase">01</span>
+				<span class="h-px min-w-8 flex-1 bg-white/15"></span>
+				<span class="font-display text-xs font-semibold tracking-[0.18em] text-primary-300 uppercase">02</span>
+				<span class="h-px min-w-8 flex-1 bg-white/15"></span>
+				<span class="font-display text-xs font-semibold tracking-[0.18em] text-primary-300 uppercase">03</span>
+			</div>
+
+			<div data-h-scroll class="touch-none select-none lg:touch-auto">
+				<div
+					data-h-scroll-track
+					class:list={[mobileCarousel, 'lg:grid-cols-3 lg:gap-4']}
+				>
+					{
+						copy.tour.slots.map((slot, index) => (
+							<article
+								class:list={[
+									mobileSlide,
+									'flex flex-col overflow-hidden rounded-xl border border-white/10 bg-ink-200',
+								]}
+							>
+								<div class="aspect-[16/10] overflow-hidden bg-ink">
+									<img
+										src={tourMedia[index] ?? tourMedia[0]}
+										alt=""
+										class="pointer-events-none h-full w-full object-cover"
+										loading="lazy"
+										draggable="false"
+									/>
+								</div>
+								<div class="flex flex-1 flex-col gap-3 p-5 sm:p-6">
+									<p class="font-display text-xs font-semibold tracking-[0.18em] text-primary-300 uppercase">
+										{String(index + 1).padStart(2, '0')} / {String(copy.tour.slots.length).padStart(2, '0')}
+									</p>
+									<h3 class="font-display text-xl font-semibold tracking-tight text-balance text-white sm:text-2xl">
+										{slot.title}
+									</h3>
+									<p class="text-sm text-pretty text-neutral-300 sm:text-base">{slot.note}</p>
+								</div>
+							</article>
+						))
+					}
 				</div>
 			</div>
-		</Container>
+		</div>
 	</section>
 
 	<section data-panel data-motion="styled" data-reveal="right" data-chapter="planes" id="planes" class:list={[panel]}>
 		<div data-parallax-bg class="pointer-events-none absolute inset-0 -z-10 scale-110 will-change-transform" aria-hidden="true">
-			<div class="absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-primary-900/30 to-transparent"></div>
-			<div class="absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-feature-analysis/15 to-transparent"></div>
+			<div class="absolute inset-y-0 left-0 w-1/3 bg-linear-to-r from-primary-900/30 to-transparent"></div>
+			<div class="absolute inset-y-0 right-0 w-1/4 bg-linear-to-l from-feature-analysis/15 to-transparent"></div>
 		</div>
-		<Container class="w-full">
-			<div data-parallax-content class="flex flex-col gap-6">
-				<div class="max-w-copy flex flex-col gap-3">
-					<h2 class="text-3xl font-semibold tracking-tight text-balance text-white sm:text-4xl">{copy.plans.title}</h2>
-					<p class={body}>{copy.plans.intro}</p>
-				</div>
-				<div class="rounded-xl border border-white/10 bg-ink-200 p-6 sm:p-8">
-					<h3 class="text-2xl font-semibold text-white sm:text-3xl">{copy.plans.enterpriseTitle}</h3>
-					<p class="mt-3 max-w-copy text-base text-pretty text-neutral-200">{copy.plans.enterpriseBody}</p>
-					<div class="mt-6">
-						<Button href={`mailto:${copy.footer.email}`} variant="secondary">{copy.plans.enterpriseCta}</Button>
-					</div>
-				</div>
-				<ul class="grid gap-3 lg:grid-cols-3">
-					{plans.map((plan) => (
+		<div data-parallax-content class="flex w-full flex-col gap-8">
+			<div class="max-w-copy flex flex-col gap-3">
+				<h2 class="text-3xl font-semibold tracking-tight text-balance text-white sm:text-4xl">{copy.plans.title}</h2>
+				<p class={body}>{copy.plans.intro}</p>
+			</div>
+			<div data-h-scroll class="touch-none select-none lg:touch-auto">
+			<ul
+				data-h-scroll-track
+				class:list={[mobileCarousel, 'lg:grid-cols-3 lg:gap-3']}
+			>
+				{
+					plans.map((plan) => (
 						<li
 							class:list={[
-								'flex h-full flex-col gap-3 rounded-xl border p-5',
+								mobileSlide,
+								'relative flex h-full flex-col gap-5 rounded-xl border p-5 sm:p-6',
 								plan.id === 'pro'
-									? 'border-primary bg-ink-200 ring-1 ring-primary/40'
+									? 'border-primary bg-primary-900/40 ring-1 ring-primary/50'
 									: 'border-white/10 bg-ink-200',
 							]}
 						>
-							<h3 class="text-xl font-semibold text-white">{copy.plans.names[plan.id]}</h3>
-							<p class="text-sm text-pretty text-neutral-200">{copy.plans.blurbs[plan.id]}</p>
+							{plan.id === 'pro' ? (
+								<p class="absolute -top-3 left-5 bg-white px-3 py-1 font-display text-xs font-semibold tracking-[0.04em] text-ink uppercase">
+									{copy.plans.popular}
+								</p>
+							) : null}
+							<div class="flex flex-col gap-2">
+								<h3 class="text-xl font-semibold text-white sm:text-2xl">{copy.plans.names[plan.id]}</h3>
+								<p class="text-sm text-pretty text-neutral-300">{copy.plans.taglines[plan.id]}</p>
+							</div>
 							<p class="font-display text-3xl font-semibold text-white sm:text-4xl">
 								{formatUsd(plan.monthlyUsd)}
 								<span class="text-base font-semibold text-neutral-300"> {copy.plans.perMonth}</span>
 							</p>
+							<p class="text-sm text-pretty text-neutral-200">{copy.plans.blurbs[plan.id]}</p>
 							<ul class="flex flex-col gap-1.5 text-sm text-neutral-200">
 								<li class="inline-flex items-center gap-2">
 									<Coins size={16} aria-hidden="true" className="text-primary-300" />
@@ -652,127 +1029,245 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 									<HardDrive size={16} aria-hidden="true" className="text-primary-300" />
 									{plan.storageGb} {copy.plans.storage}
 								</li>
-								{plan.brands ? (
-									<li>
-										{plan.brands} {plan.brands === 1 ? copy.plans.brand : copy.plans.brands}
-									</li>
-								) : null}
+								<li class="inline-flex items-center gap-2">
+									<Folder size={16} aria-hidden="true" className="text-primary-300" />
+									{plan.brands} {plan.brands === 1 ? copy.plans.brand : copy.plans.brands}
+								</li>
 								<li>
 									{formatUsd(creditUnitUsd(plan.monthlyUsd, plan.credits))} {copy.plans.perCredit}
 								</li>
 							</ul>
-							<div class="mt-auto pt-1">
+							<div class="mt-auto pt-2">
 								<Button href={signupUrlForPlan(plan.id)} plan={plan.id}>{copy.plans.cta}</Button>
 							</div>
 						</li>
-					))}
-				</ul>
+					))
+				}
+			</ul>
 			</div>
-		</Container>
+			<div class="flex w-full flex-col gap-5 rounded-xl border border-white/10 bg-ink-200 p-6 sm:p-8">
+				<h3 class="text-2xl font-semibold tracking-tight text-white sm:text-3xl">{copy.plans.names.enterprise}</h3>
+				<p class="w-full max-w-none text-base text-pretty text-neutral-200">{copy.plans.blurbs.enterprise}</p>
+				<div>
+					<Button href={`mailto:${copy.footer.email}`} variant="secondary" plan="enterprise">
+						{copy.plans.enterpriseCta}
+					</Button>
+				</div>
+			</div>
+		</div>
 	</section>
 
 	<section data-panel data-motion="styled" data-reveal="up" class:list={[panel]}>
-		<Container class="w-full">
-			<div data-parallax-content class="flex flex-col gap-6">
-				<div class="max-w-copy flex flex-col gap-3">
-					<h2 class="text-2xl font-semibold tracking-tight text-balance text-white sm:text-3xl">{copy.finder.title}</h2>
-					<p class="text-base text-pretty text-neutral-200">{copy.finder.intro}</p>
-				</div>
-				<PlanFinder client:visible copy={copy.finder} planNames={copy.plans.names} />
+		<div data-parallax-content class="flex w-full flex-col gap-6">
+			<div class="max-w-copy flex flex-col gap-3">
+				<h2 class="text-2xl font-semibold tracking-tight text-balance text-white sm:text-3xl">{copy.finder.title}</h2>
+				<p class="text-base text-pretty text-neutral-200">{copy.finder.intro}</p>
+				<p class="rounded-lg border border-primary/30 bg-primary-900/25 px-4 py-3 text-sm font-semibold text-pretty text-primary-200">
+					{copy.finder.disclaimer}
+				</p>
 			</div>
-		</Container>
-	</section>
-
-	<section data-panel data-motion="styled" data-reveal="left" class:list={[panel]}>
-		<Container class="w-full">
-			<div data-parallax-content class="grid gap-12 lg:grid-cols-2">
-				<div>
-					<h2 class="text-3xl font-semibold tracking-tight text-balance text-white">{copy.packs.title}</h2>
-					<p class="mt-4 text-base text-pretty text-neutral-200">{copy.packs.intro}</p>
-					<ul class="mt-6 flex flex-col gap-2">
-						{creditPacks.map((pack) => (
-							<li class="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-ink px-4 py-4">
-								<span class="text-sm font-semibold text-white">
-									{pack.credits.toLocaleString('en-US')} {copy.packs.credits}
-								</span>
-								<span class="text-sm text-neutral-300">
-									{formatUsd(pack.usd)} · {formatUsd(pack.usd / pack.credits)} {copy.packs.perCredit}
-								</span>
-							</li>
-						))}
-					</ul>
-				</div>
-				<div>
-					<h2 class="text-3xl font-semibold tracking-tight text-balance text-white">{copy.rates.title}</h2>
-					<p class="mt-4 text-base text-pretty text-neutral-200">{copy.rates.intro}</p>
-					<ul class="mt-6 flex flex-col gap-2">
-						{copy.rates.rows.map((row) => (
-							<li class="rounded-xl border border-white/10 bg-ink px-4 py-4">
-								<p class="text-sm font-semibold text-white">{row.name}</p>
-								<p class="mt-1 text-sm text-neutral-300">{row.detail}</p>
-							</li>
-						))}
-					</ul>
-				</div>
-			</div>
-		</Container>
-	</section>
-
-	<section data-panel data-motion="styled" data-reveal="right" id="playbooks" class={panel}>
-		<div data-parallax-bg class="pointer-events-none absolute inset-0 -z-10 scale-110 will-change-transform" aria-hidden="true">
-			<div class="absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-feature-audio/20 to-transparent"></div>
-			<div class="absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-primary-800/25 to-transparent"></div>
+			<PlanFinder client:visible copy={copy.finder} planNames={copy.plans.names} />
 		</div>
-		<Container class="w-full">
-			<div data-parallax-content class="flex flex-col gap-10">
-				<div class="max-w-copy flex flex-col gap-5">
+	</section>
+
+	<section
+		data-playbooks-timeline
+		id="playbooks"
+		class="relative z-10 border-t border-white/10 bg-ink-100"
+	>
+		<div data-parallax-bg class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+			<div class="absolute inset-y-0 left-0 w-1/4 bg-linear-to-r from-feature-audio/20 to-transparent"></div>
+			<div class="absolute inset-y-0 right-0 w-1/3 bg-linear-to-l from-primary-800/25 to-transparent"></div>
+		</div>
+		<div data-playbooks-pin class="relative flex w-full flex-col justify-center bg-ink-100 max-lg:h-auto max-lg:overflow-visible lg:h-svh lg:overflow-hidden">
+			<div class:list={['flex flex-col gap-8 pt-28 pb-8 lg:pt-32', gutter]}>
+				<div class="max-w-copy flex flex-col gap-4">
 					<p class="text-sm font-semibold tracking-[0.14em] text-primary-300 uppercase">{copy.playbooks.eyebrow}</p>
 					<h2 class="text-3xl font-semibold tracking-tight text-balance text-white sm:text-4xl">{copy.playbooks.title}</h2>
 					<p class={body}>{copy.playbooks.intro}</p>
 					<p class={body}>{copy.playbooks.body}</p>
 				</div>
-				<ul class="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-					{copy.playbooks.items.map((item) => (
-						<li class:list={[card, 'flex flex-col gap-3']}>
-							<h3 class="text-xl font-semibold tracking-tight text-balance text-white">{item.title}</h3>
-							<p class="text-base text-pretty text-neutral-200">{item.body}</p>
-						</li>
-					))}
-				</ul>
-			</div>
-		</Container>
-	</section>
-
-	<section data-panel data-motion="styled" data-reveal="up" data-chapter="preguntas" id="preguntas" class:list={[panel]}>
-		<Container class="w-full max-w-copy">
-			<div data-parallax-content class="flex flex-col gap-6">
-				<h2 class="text-3xl font-semibold tracking-tight text-balance text-white sm:text-4xl">{copy.faq.title}</h2>
-				<div class="flex flex-col gap-2">
-					{copy.faq.items.map((item) => (
-						<details class="group rounded-xl border border-white/10 bg-ink p-5 open:border-primary/40 sm:p-6">
-							<summary class="cursor-pointer list-none text-lg font-semibold text-balance text-white marker:content-none [&::-webkit-details-marker]:hidden">
-								<span class="inline-flex w-full items-start justify-between gap-4">
-									{item.q}
-									<span class="mt-1 shrink-0 text-primary-300 transition-transform group-open:rotate-45" aria-hidden="true">+</span>
-								</span>
-							</summary>
-							<p class="mt-4 text-base text-pretty text-neutral-200">{item.a}</p>
-						</details>
-					))}
+				<div class="relative h-px w-full bg-white/15 max-lg:hidden" aria-hidden="true">
+					<div data-playbooks-progress class="absolute inset-y-0 left-0 w-0 bg-primary"></div>
 				</div>
 			</div>
-		</Container>
+			<div data-h-scroll class="min-h-0 flex-1 touch-none select-none overflow-hidden pb-10 lg:touch-auto">
+				<div
+					data-playbooks-track
+					data-h-scroll-track
+					class="flex h-full snap-x snap-mandatory items-stretch gap-4 overflow-x-auto pl-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-5 sm:pl-8 lg:gap-6 lg:snap-none lg:overflow-visible lg:pl-10 lg:will-change-transform"
+				>
+					{
+						copy.playbooks.items.map((item, index) => (
+							<article
+								data-playbooks-card
+								class="flex w-[min(20rem,78vw)] shrink-0 snap-start flex-col justify-between gap-6 rounded-xl border border-white/10 bg-ink-200 p-5 sm:w-[22rem] sm:p-6"
+							>
+								<div class="flex flex-col gap-4">
+									<p class="font-display text-xs font-semibold tracking-[0.18em] text-primary-300 uppercase">
+										{String(index + 1).padStart(2, '0')} / {String(copy.playbooks.items.length).padStart(2, '0')}
+									</p>
+									<h3 class="font-display text-2xl font-semibold tracking-tight text-balance text-white sm:text-3xl">
+										{item.title}
+									</h3>
+									<p class="text-base text-pretty text-neutral-200">{item.body}</p>
+								</div>
+								<span class="block h-px w-10 bg-primary" aria-hidden="true"></span>
+							</article>
+						))
+					}
+					<div class="w-5 shrink-0 sm:w-8 lg:w-10" aria-hidden="true"></div>
+				</div>
+			</div>
+		</div>
 	</section>
 
-	<section data-panel data-motion="styled" data-reveal="left" class:list={[panel]}>
-		<div class="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-primary-800/35 to-transparent" aria-hidden="true"></div>
-		<div class="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-feature-video/20 to-transparent" aria-hidden="true"></div>
-		<Container class="relative w-full">
-			<div data-parallax-content class="flex max-w-copy flex-col items-start gap-6">
-				<h2 class="text-4xl font-semibold tracking-tight text-balance text-white sm:text-5xl">{copy.final.title}</h2>
-				<p class={body}>{copy.final.body}</p>
-				<Button href={signupUrl}>{copy.final.cta}</Button>
-				<ul class="flex flex-col gap-2 text-base text-neutral-200">
+	<section
+		data-panel
+		data-motion="styled"
+		data-reveal="left"
+		id="blog"
+		class:list={[panel]}
+	>
+		<div data-parallax-content class="flex w-full flex-col">
+			<div class="flex flex-col gap-6 pb-10 lg:flex-row lg:items-end lg:justify-between">
+				<div class="max-w-copy flex flex-col gap-4">
+					<p class="text-sm font-semibold tracking-[0.14em] text-primary-300 uppercase">{copy.blog.eyebrow}</p>
+					<h2 class="text-3xl font-semibold tracking-tight text-balance text-white sm:text-4xl">{copy.blog.title}</h2>
+					<p class={body}>{copy.blog.body}</p>
+				</div>
+				<div class="shrink-0">
+					<Button href={blogHref} variant="secondary">{copy.blog.cta}</Button>
+				</div>
+			</div>
+			<div class="border-t border-white/15 pt-10">
+				{
+					latestPosts.length === 0 ? (
+						<p class="text-base text-pretty text-neutral-300">{copy.blog.empty}</p>
+					) : (
+						<ul class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+							{latestPosts.map((post) => (
+								<li>
+									<article class="group relative flex h-full flex-col gap-4 rounded-xl border border-white/10 bg-ink-200 p-5 transition-colors hover:border-white/25 sm:p-6">
+										{
+											post.coverUrl ? (
+												<div class="aspect-[16/10] overflow-hidden rounded-lg bg-ink">
+													<img
+														src={post.coverUrl}
+														alt={post.coverAlt ?? ''}
+														class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+														loading="lazy"
+													/>
+												</div>
+											) : null
+										}
+										<h3 class="font-display text-xl font-semibold tracking-tight text-balance text-white sm:text-2xl">
+											<a href={blogPostPath(locale, post.slug)} class="after:absolute after:inset-0">
+												{post.title}
+											</a>
+										</h3>
+										<p class="flex-1 text-sm text-pretty text-neutral-300 sm:text-base">{post.excerpt}</p>
+										<div class="flex items-center justify-between gap-3 text-sm font-semibold text-primary-300">
+											<time datetime={post.publishedAt?.toISOString()}>
+												{new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(
+													post.publishedAt ?? post.createdAt,
+												)}
+											</time>
+											<span class="inline-flex items-center gap-1" aria-hidden="true">
+												{copy.blog.read}
+												<ArrowUpRight size={16} />
+											</span>
+										</div>
+									</article>
+								</li>
+							))}
+						</ul>
+					)
+				}
+			</div>
+		</div>
+	</section>
+
+	<section
+		data-panel
+		data-motion="styled"
+		data-reveal="up"
+		data-chapter="preguntas"
+		id="preguntas"
+		class="relative border-t border-white/10 bg-ink-100"
+	>
+		<div class="grid w-full grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
+			<aside
+				class:list={[
+					'flex flex-col justify-start gap-5 p-10 lg:sticky lg:top-0 lg:self-start',
+					gutter,
+				]}
+			>
+				<h2 class="max-w-[14ch] font-display text-[clamp(1.85rem,4.6vw,3.5rem)] leading-[1.02] font-semibold tracking-tight text-balance text-white">
+					{copy.faq.title}
+				</h2>
+				<p class="max-w-md text-base text-pretty text-neutral-400 sm:text-lg">{copy.faq.lead}</p>
+			</aside>
+
+			<div
+				class:list={[
+					'border-white/15 px-10 lg:border-l',
+					gutter,
+				]}
+			>
+				<div data-faq-list class="flex flex-col border-t border-white/15 select-none">
+					{
+						copy.faq.items.map((item) => (
+							<details class="group border-b border-white/15 transition-colors duration-500 open:cursor-pointer open:border-transparent open:bg-white">
+								<summary class="cursor-pointer list-none px-4 py-6 marker:content-none sm:px-5 sm:py-7 [&::-webkit-details-marker]:hidden">
+									<span class="flex w-full items-start gap-4 sm:gap-5">
+										<span
+											class="mt-0.5 shrink-0 font-display text-xl leading-none text-primary-300 transition-[transform,color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-open:rotate-45 group-open:text-ink"
+											aria-hidden="true"
+										>
+											+
+										</span>
+										<span class="text-lg font-semibold text-balance text-white transition-colors duration-500 group-open:text-ink sm:text-xl">
+											{item.q}
+										</span>
+									</span>
+								</summary>
+								<div data-faq-panel class="overflow-hidden">
+									<p class="px-4 pb-6 pl-9 text-base text-pretty text-neutral-300 transition-colors duration-500 group-open:text-ink/70 sm:px-5 sm:pb-7 sm:pl-10 sm:text-lg">
+										{item.a}
+									</p>
+								</div>
+							</details>
+						))
+					}
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section
+		data-panel
+		data-motion="styled"
+		data-reveal="left"
+		class="relative flex min-h-svh w-full overflow-hidden border-t border-white/10 bg-ink-100"
+	>
+		<div class="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-linear-to-r from-primary-800/35 to-transparent" aria-hidden="true"></div>
+		<div class="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-linear-to-l from-feature-video/20 to-transparent" aria-hidden="true"></div>
+		<div
+			data-parallax-content
+			class="grid h-full w-full min-h-svh grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]"
+		>
+			<div
+				class:list={[
+					'flex flex-col justify-center gap-6 border-white/15 pt-28 pb-10 lg:border-r lg:pt-32 lg:pb-12',
+					gutter,
+				]}
+			>
+				<h2 class="max-w-[16ch] font-display text-[clamp(1.85rem,4.6vw,3.5rem)] leading-[1.02] font-semibold tracking-tight text-balance text-white">
+					{copy.final.title}
+				</h2>
+				<p class="max-w-md text-base text-pretty text-neutral-300 sm:text-lg">{copy.final.body}</p>
+				<ul class="flex max-w-md flex-col gap-2 text-base text-neutral-200">
 					{copy.final.lines.map((line) => (
 						<li class="flex gap-3">
 							<span class="mt-2 size-1.5 shrink-0 rounded-full bg-primary" aria-hidden="true"></span>
@@ -780,9 +1275,21 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 						</li>
 					))}
 				</ul>
-				<a class="text-sm font-semibold text-primary-200 hover:text-white" href={alertaUrl}>{copy.footer.alerta}</a>
+				<div class="flex flex-wrap items-center gap-3 pt-2">
+					<Button href={signupUrl}>{copy.final.cta}</Button>
+					<Button href={alertaUrl} variant="secondary">{copy.final.alertaCta}</Button>
+				</div>
 			</div>
-		</Container>
+			<div class:list={['flex min-h-[18rem] flex-col justify-center py-10 lg:min-h-0 lg:py-12', gutter]}>
+				<div
+					class="flex aspect-[4/5] w-full max-h-[min(36rem,70vh)] items-end justify-start rounded-xl border border-dashed border-white/15 bg-ink p-6 sm:aspect-[5/6]"
+					role="img"
+					aria-label={copy.final.imageAlt}
+				>
+					<p class="text-sm text-neutral-500">{copy.final.imageAlt}</p>
+				</div>
+			</div>
+		</div>
 	</section>
 
 
