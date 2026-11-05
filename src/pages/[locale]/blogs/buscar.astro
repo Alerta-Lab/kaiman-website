@@ -7,6 +7,7 @@ import PublicHeader from '../../../components/blog/organisms/PublicHeader.astro'
 import { isLocale, locales, type Locale } from '../../../i18n';
 import BlogLayout from '../../../layouts/BlogLayout.astro';
 import { blogSearchPath } from '../../../lib/blog-paths';
+import { localeUrl } from '../../../lib/locale-url';
 import { listPublishedPosts } from '../../../server/repositories/posts';
 
 export const prerender = true;
@@ -16,7 +17,7 @@ export function getStaticPaths() {
 }
 
 const param = Astro.params.locale;
-if (!param || !isLocale(param)) return Astro.redirect('/es/blogs/buscar');
+if (!param || !isLocale(param)) return Astro.redirect(localeUrl('es', 'blogs/buscar'));
 const locale = param as Locale;
 
 const query = Astro.url.searchParams.get('q')?.trim() ?? '';

@@ -2,7 +2,7 @@
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import { ChevronDown, ChevronUp, Languages } from 'lucide-react';
 import { localeLabels, locales, type Locale } from '../../i18n';
-import { pathWithoutLocale, swapBlogLocalePath } from '../../lib/blog-paths';
+import { pathWithoutLocale } from '../../lib/blog-paths';
 
 interface Props {
 	locale: Locale;
@@ -15,6 +15,7 @@ interface Props {
 
 const { locale, label, path, placement = 'bottom' } = Astro.props;
 const currentPath = path ?? pathWithoutLocale(Astro.url.pathname);
+const pathForLocale = currentPath === '/' ? '/' : currentPath.replace(/^\//, '');
 const dropUp = placement === 'top';
 ---
 
@@ -49,10 +50,7 @@ const dropUp = placement === 'top';
 	>
 		{
 			locales.map((code) => {
-				const href =
-					currentPath.startsWith('/blogs')
-						? swapBlogLocalePath(`/${locale}${currentPath === '/' ? '' : currentPath}`, code)
-						: getRelativeLocaleUrl(code, currentPath === '/' ? '/' : currentPath);
+				const href = getRelativeLocaleUrl(code, pathForLocale);
 				return (
 					<a
 						href={href}

@@ -12,6 +12,13 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-05 — GitHub Pages: redirect sin `base`
+
+- Síntoma: `/kaiman-website/` redirigía a `/es/` (raíz del org) → 404; `/kaiman-website/es/` sí respondía 200.
+- Causa: `Astro.redirect('/es/')` ignora `base: '/kaiman-website/'`.
+- Fix: `localeUrl()` vía `getRelativeLocaleUrl` en `index` y redirects de locale/blog.
+- Language switch: `pathWithoutLocale` no quitaba el base → URLs tipo `/en/kaiman-website/es/`. Ahora `stripBase` + `getRelativeLocaleUrl`.
+
 ### 2026-11-04 — Problem facets + secreto
 
 - Facets con `Card`: imagen + footer label (Colores / Tipografías / Tono… / Estilo) + índice; sin «su/sus».

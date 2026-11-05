@@ -559,14 +559,16 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 					</p>
 					<p class="mt-2 text-sm text-neutral-400">{wf.value.leftNote}</p>
 				</div>
-				<div class="rounded-2xl bg-primary p-8 text-white sm:p-9">
+				<div class="flex h-full flex-col rounded-2xl bg-primary p-8 text-white sm:p-9">
 					<p class="text-sm text-primary-100">{wf.value.rightLabel}</p>
 					<p class="mt-4 font-display text-xl leading-snug font-semibold tracking-tight sm:text-2xl">{wf.value.rightTitle}</p>
-					<p class="mt-8 font-display text-4xl font-semibold">
-						{wf.value.rightPrice}
-						<span class="text-lg font-medium text-primary-100"> {wf.value.rightPer}</span>
-					</p>
-					<p class="mt-2 text-sm text-primary-100">{wf.value.rightNote}</p>
+					<div class="mt-auto pt-8">
+						<p class="font-display text-4xl font-semibold">
+							{wf.value.rightPrice}
+							<span class="text-lg font-medium text-primary-100"> {wf.value.rightPer}</span>
+						</p>
+						<p class="mt-2 text-sm text-primary-100">{wf.value.rightNote}</p>
+					</div>
 				</div>
 			</div>
 			<div

@@ -7,6 +7,7 @@ import PublicHeader from '../../../../components/blog/organisms/PublicHeader.ast
 import { isLocale, locales, type Locale } from '../../../../i18n';
 import BlogLayout from '../../../../layouts/BlogLayout.astro';
 import { blogCategoryPath } from '../../../../lib/blog-paths';
+import { localeUrl } from '../../../../lib/locale-url';
 import { listPublishedPosts, tagDisplayName } from '../../../../server/repositories/posts';
 
 export const prerender = true;
@@ -24,7 +25,7 @@ export async function getStaticPaths() {
 }
 
 const param = Astro.params.locale;
-if (!param || !isLocale(param)) return Astro.redirect('/es/blogs');
+if (!param || !isLocale(param)) return Astro.redirect(localeUrl('es', 'blogs'));
 const locale = param as Locale;
 const slug = Astro.params.slug ?? '';
 
