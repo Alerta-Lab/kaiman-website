@@ -5,7 +5,7 @@ El panel incluye vista previa de Word, guardado de cada tema como borradores vin
 ## Importación y revisión
 
 1. Subir un Word y detectar temas y versiones de idioma. La vista previa permite guardar cada tema por separado.
-2. Extraer y mapear contenido por tema e idioma. El lector no usa IA para el formato reconocido; siempre hay que comparar el resultado con el original, especialmente si cambia la estructura del Word. No existe una garantía de detección de todos los campos desconocidos.
+2. Extraer y mapear contenido por tema e idioma. La IA identifica las versiones y sus campos con solicitudes de texto; el contenido se copia de los bloques extraídos del Word. El análisis consume créditos, y el número de solicitudes aumenta con las versiones. Hay que comparar el resultado con el original y revisar los bloques omitidos: no se garantiza una detección perfecta de todos los formatos.
 3. Revisar y editar los campos en la vista previa. El servidor valida los datos y evita sobrescribir slugs existentes; no genera automáticamente sugerencias para corregir conflictos. Se guardan borradores, nunca se publica automáticamente.
 4. Si solo existe español, ofrecer «Crear versión en inglés»; ejecutar la traducción únicamente cuando el usuario la solicite. Si solo existe inglés, ofrecer español del mismo modo. Si existen ambas versiones, conservarlas y vincularlas sin mostrar la oferta de traducción ni llamar a IA para traducir.
 5. El usuario revisa y acepta cada borrador individualmente. La aceptación indica que el texto está listo para el paso visual: no cambia el estado a publicado.
@@ -16,7 +16,7 @@ El panel incluye vista previa de Word, guardado de cada tema como borradores vin
 | Etiqueta o información del Word | Destino previsto | Estado actual |
 | --- | --- | --- |
 | TOPIC | Grupo editorial de un artículo y sus versiones; no se publica como título | Detección y guardado por tema implementados |
-| ENGLISH VERSION / SPANISH VERSION | Idioma y asociación entre versiones del mismo tema | Detección de etiquetas y asociación implementadas; revisar variantes no reconocidas |
+| Versiones en inglés y español | Idioma y asociación entre versiones del mismo tema | La IA identifica las versiones; revisar que cada texto corresponda al idioma indicado |
 | TITLE | Título visible, por idioma | Campo existente |
 | SLUG | Ruta propia por idioma; validar unicidad | Importado, editable y con unicidad en la base de datos |
 | META TITLE | Título SEO, por idioma | Campo existente |
@@ -33,7 +33,7 @@ El panel incluye vista previa de Word, guardado de cada tema como borradores vin
 | IN-ARTICLE IMAGE ALT TEXT / CAPTION | Texto alternativo y pie de imagen interior, por idioma | Guardados como datos editoriales |
 | FAQ con preguntas y respuestas | Sección visible del artículo | Convertida a Markdown; revisar formato |
 | CLOSING CTA — HOOK LINE / HEADLINE | Texto final editable | Convertido a texto Markdown; botón y URL específicos no se generan automáticamente |
-| Categoría y etiquetas (el Word no las trae) | Categoría = sector del negocio, una por artículo y compartida entre idiomas; etiquetas = temas | Asignadas por IA (gpt-4o-mini) al guardar cada tema; reutiliza las 6 categorías base o crea una nueva si ninguna encaja. Editables en el editor |
+| Categoría y palabras clave (el Word no las trae) | Categoría = sector del negocio, una por artículo y compartida entre idiomas; palabras clave = temas | La IA las sugiere en la vista previa para revisión y edición en ambos idiomas; al guardar se aplica lo revisado. Si la sugerencia falla se puede guardar sin clasificación y completarla en el editor. |
 | Autor, fuentes y relacionados | Campos editoriales opcionales; nunca inventar fuentes | Requiere trabajo o modelo específico |
 | Fechas, canonical, Open Graph, datos estructurados y sitemap | Señales automáticas a partir del artículo publicado | Parciales; revisar y completar |
 

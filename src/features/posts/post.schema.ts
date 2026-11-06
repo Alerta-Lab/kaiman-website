@@ -10,9 +10,9 @@ export const slugify = (value: string) =>
 		.replace(/^-|-$/g, '');
 
 export const postInputSchema = z.object({
-	title: z.string().trim().min(3).max(120),
+	title: z.string().trim().min(3),
 	slug: z.string().trim().min(3).max(140).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
-	excerpt: z.string().trim().min(20).max(320),
+	excerpt: z.string().trim().min(20),
 	markdown: z.string().trim().min(20),
 	status: z.enum(['draft', 'published']).default('draft'),
 	locale: z.enum(['es', 'en']).default('es'),

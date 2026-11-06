@@ -484,7 +484,6 @@ export function PostEditor({
 							className={`${field} mt-2`}
 							required
 							minLength={3}
-							maxLength={120}
 							value={data.title}
 							onChange={(e) => update('title', e.target.value)}
 						/>
@@ -508,7 +507,6 @@ export function PostEditor({
 							className={`${field} mt-2 min-h-24`}
 							required
 							minLength={20}
-							maxLength={320}
 							value={data.excerpt}
 							onChange={(e) => update('excerpt', e.target.value)}
 						/>
