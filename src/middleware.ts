@@ -6,10 +6,12 @@ const protectedPath = (pathname: string) =>
 
 export const onRequest = defineMiddleware(async (context, next) => {
 	context.locals.admin = null;
-	try {
-		context.locals.admin = await getSessionUser(context.cookies);
-	} catch {
-		// Public pages remain available before infrastructure is provisioned.
+	if (!context.isPrerendered) {
+		try {
+			context.locals.admin = await getSessionUser(context.cookies);
+		} catch {
+			// Public pages remain available before infrastructure is provisioned.
+		}
 	}
 
 	if (protectedPath(context.url.pathname) && !context.locals.admin) {
