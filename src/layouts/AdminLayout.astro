@@ -1,5 +1,5 @@
 ---
-import { BarChart3, FileText, Image, LayoutDashboard, LogOut, Menu, Tags, X } from 'lucide-react';
+import { BarChart3, FileText, FolderTree, Image, LayoutDashboard, LogOut, Menu, Tags, X } from 'lucide-react';
 import Kbd from '../components/ui/atoms/Kbd.astro';
 import { getAdminLocale } from '../server/admin-locale';
 import BlogLayout from './BlogLayout.astro';
@@ -13,6 +13,7 @@ const adminLocale = getAdminLocale(Astro.cookies);
 const links = [
 	{ href: '/admin', label: 'Resumen', icon: LayoutDashboard, key: 'R' },
 	{ href: '/admin/posts', label: 'Artículos', icon: FileText, key: 'A' },
+	{ href: '/admin/categorias', label: 'Categorías', icon: FolderTree, key: 'C' },
 	{ href: '/admin/tags', label: 'Etiquetas', icon: Tags, key: 'E' },
 	{ href: '/admin/media', label: 'Imágenes', icon: Image, key: 'I' },
 	{ href: '/admin/analytics', label: 'Analítica', icon: BarChart3, key: 'L' },

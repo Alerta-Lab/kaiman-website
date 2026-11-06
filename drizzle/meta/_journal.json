@@ -15,6 +15,20 @@
       "when": 1793700000000,
       "tag": "0001_i18n_posts",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793800000000,
+      "tag": "0002_post_editorial",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793900000000,
+      "tag": "0003_categories",
+      "breakpoints": true
     }
   ]
 }

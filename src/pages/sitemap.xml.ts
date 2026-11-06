@@ -1,16 +1,16 @@
 import type { APIRoute } from 'astro';
-import { blogCategoryPath, blogIndexPath, blogPostPath } from '../lib/blog-paths';
-import { listPublishedPosts, listTags } from '../server/repositories/posts';
-
-export const prerender = true;
+import { blogCategoryPath, blogIndexPath, blogPostPath, blogTagPath } from '../lib/blog-paths';
+import { listPublishedCategories, listPublishedPosts, listTags } from '../server/repositories/posts';
 
 const escape = (value: string) => value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 
 export const GET: APIRoute = async ({ site }) => {
-	const [esPosts, enPosts, tags] = await Promise.all([
+	const [esPosts, enPosts, tags, esCategories, enCategories] = await Promise.all([
 		listPublishedPosts({ limit: 1000, locale: 'es' }),
 		listPublishedPosts({ limit: 1000, locale: 'en' }),
 		listTags(),
+		listPublishedCategories('es'),
+		listPublishedCategories('en'),
 	]);
 	const base = site ?? new URL('http://localhost:4321');
 	const urls = [
@@ -20,9 +20,11 @@ export const GET: APIRoute = async ({ site }) => {
 		{ loc: new URL(blogIndexPath('en'), base).toString(), modified: new Date() },
 		...esPosts.map((post) => ({ loc: new URL(blogPostPath('es', post.slug), base).toString(), modified: post.updatedAt })),
 		...enPosts.map((post) => ({ loc: new URL(blogPostPath('en', post.slug), base).toString(), modified: post.updatedAt })),
+		...esCategories.map((category) => ({ loc: new URL(blogCategoryPath('es', category.slug), base).toString(), modified: category.createdAt })),
+		...enCategories.map((category) => ({ loc: new URL(blogCategoryPath('en', category.slug), base).toString(), modified: category.createdAt })),
 		...tags.flatMap((tag) => [
-			{ loc: new URL(blogCategoryPath('es', tag.slug), base).toString(), modified: tag.createdAt },
-			{ loc: new URL(blogCategoryPath('en', tag.slug), base).toString(), modified: tag.createdAt },
+			{ loc: new URL(blogTagPath('es', tag.slug), base).toString(), modified: tag.createdAt },
+			{ loc: new URL(blogTagPath('en', tag.slug), base).toString(), modified: tag.createdAt },
 		]),
 	];
 	const xml = `<?xml version="1.0" encoding="UTF-8"?>

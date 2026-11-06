@@ -31,7 +31,7 @@ const {
 const night = atmosphere === 'night';
 const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
 const defaultImage = new URL('/og-default.png', Astro.site).toString();
-const socialImage = image || defaultImage;
+const socialImage = image ? new URL(image, Astro.site).toString() : defaultImage;
 ---
 
 <!doctype html>

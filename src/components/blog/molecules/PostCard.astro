@@ -2,7 +2,7 @@
 import type { Locale } from '../../../i18n';
 import { blogPostPath } from '../../../lib/blog-paths';
 import type { PostWithTags } from '../../../server/repositories/posts';
-import { tagDisplayName } from '../../../server/repositories/posts';
+import { categoryDisplayName, tagDisplayName } from '../../../server/repositories/posts';
 
 interface Props {
 	post: PostWithTags;
@@ -11,7 +11,6 @@ interface Props {
 
 const { post, locale } = Astro.props;
 const href = blogPostPath(locale, post.slug);
-const category = post.tags[0];
 ---
 
 <a
@@ -33,6 +32,24 @@ const category = post.tags[0];
 			}
 		</div>
 		<div class="flex flex-1 flex-col md:p-gap-block">
+			{
+				post.category ? (
+					<span class="mb-2 text-sm font-bold uppercase tracking-wide text-primary-800">
+						{categoryDisplayName(post.category, locale)}
+					</span>
+				) : null
+			}
+			{
+				post.tags.length > 0 ? (
+					<div class="mb-gap-control flex flex-wrap gap-gap-chip">
+						{post.tags.slice(0, 3).map((tag) => (
+							<span class="rounded-md bg-primary-100 px-2.5 py-1 text-sm font-bold text-primary-800">
+								{tagDisplayName(tag, locale)}
+							</span>
+						))}
+					</div>
+				) : null
+			}
 			<h2 class="font-headline text-xl font-bold leading-snug tracking-tight text-black group-hover:text-primary-800">
 				{post.title}
 			</h2>
@@ -41,7 +58,6 @@ const category = post.tags[0];
 				<time datetime={post.publishedAt?.toISOString()}>
 					{new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(post.publishedAt ?? post.createdAt)}
 				</time>
-				{category ? <span class="truncate text-right">{tagDisplayName(category, locale)}</span> : null}
 			</div>
 		</div>
 	</article>

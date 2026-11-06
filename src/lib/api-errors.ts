@@ -12,6 +12,7 @@ const fieldLabels: Record<string, string> = {
 	coverUrl: 'URL de portada',
 	coverAlt: 'Texto alternativo',
 	tags: 'Etiquetas',
+	categoryId: 'Categoría',
 };
 
 function labelFor(path: PropertyKey[]) {

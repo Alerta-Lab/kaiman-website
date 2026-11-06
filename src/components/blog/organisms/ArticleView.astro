@@ -1,0 +1,59 @@
+---
+import { ArrowLeft } from 'lucide-react';
+import type { Locale } from '../../../i18n';
+import { blogCategoryPath, blogIndexPath, blogTagPath } from '../../../lib/blog-paths';
+import { renderMarkdown } from '../../../lib/markdown';
+import { categoryDisplayName, getPostById, tagDisplayName } from '../../../server/repositories/posts';
+
+/** Article body shared by the public page and the admin preview, so both render identically. */
+interface Props {
+	post: NonNullable<Awaited<ReturnType<typeof getPostById>>>;
+	locale: Locale;
+}
+
+const { post, locale } = Astro.props;
+
+const imageAlt = (post.editorial?.bodyAlt ?? '').replace(/[\[\]\\]/g, '\\$&');
+const imageCaption = post.editorial?.bodyCaption ?? '';
+const imageMarkdown = post.editorial?.bodyImageUrl
+	? `![${imageAlt}](${post.editorial.bodyImageUrl})${imageCaption ? `\n\n*${imageCaption}*` : ''}`
+	: '';
+const html = await renderMarkdown(post.markdown.replace('[IMAGEN_INTERIOR]', imageMarkdown));
+const backLabel = locale === 'en' ? 'Back to blog' : 'Volver al blog';
+---
+
+<article class="mx-auto max-w-3xl px-5 py-14 md:py-20">
+	<a href={blogIndexPath(locale)} class="mb-gap-page inline-flex min-h-11 items-center gap-2 font-bold text-primary-800 hover:text-primary">
+		<ArrowLeft aria-hidden="true" size={18} /> {backLabel}
+	</a>
+	{post.category && (
+		<a href={blogCategoryPath(locale, post.category.slug)} class="mb-3 inline-block text-sm font-bold uppercase tracking-wide text-primary-800 hover:text-primary">
+			{categoryDisplayName(post.category, locale)}
+		</a>
+	)}
+	<div class="mb-gap-block flex flex-wrap gap-gap-chip">
+		{post.tags.map((tag) => (
+			<a href={blogTagPath(locale, tag.slug)} class="rounded-md bg-primary-100 px-2.5 py-1 text-sm font-bold text-primary-800 hover:bg-primary-200">
+				{tagDisplayName(tag, locale)}
+			</a>
+		))}
+	</div>
+	<h1 class="font-headline text-4xl font-bold leading-[1.05] tracking-tight text-black md:text-6xl">{post.title}</h1>
+	<p class="mt-gap-block max-w-[42rem] text-xl leading-relaxed text-black/75">{post.excerpt}</p>
+	{post.coverUrl && (
+		<figure>
+			<img
+				src={post.coverUrl}
+				alt={post.coverAlt ?? ''}
+				width="1200"
+				height="675"
+				class="mt-gap-page aspect-video w-full rounded-xl object-cover"
+			/>
+			{post.editorial?.coverCaption && <figcaption class="mt-2 text-sm text-black/70">{post.editorial.coverCaption}</figcaption>}
+		</figure>
+	)}
+	<div
+		class="prose prose-lg mt-12 max-w-none prose-headings:font-headline prose-headings:tracking-tight prose-a:font-bold prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-p:text-black/80"
+		set:html={html}
+	/>
+</article>

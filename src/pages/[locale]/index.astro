@@ -6,8 +6,6 @@ import { getLanding, isLocale, locales, type Locale } from '../../i18n';
 import { localeUrl } from '../../lib/locale-url';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
-export const prerender = true;
-
 export function getStaticPaths() {
 	return locales.map((locale) => ({ params: { locale } }));
 }

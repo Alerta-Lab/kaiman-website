@@ -3,12 +3,6 @@ import { login } from '../../../server/auth';
 
 const attempts = new Map<string, { count: number; reset: number }>();
 
-function errorMessage(error: unknown) {
-	if (!(error instanceof Error)) return 'Error desconocido';
-	const cause = 'cause' in error && error.cause instanceof Error ? error.cause.message : undefined;
-	return cause ? `${error.message} (${cause})` : error.message;
-}
-
 export const POST: APIRoute = async ({ request, cookies, redirect, clientAddress }) => {
 	const now = Date.now();
 	const current = attempts.get(clientAddress);
@@ -29,6 +23,6 @@ export const POST: APIRoute = async ({ request, cookies, redirect, clientAddress
 		return redirect(next.startsWith('/admin') ? next : '/admin');
 	} catch (error) {
 		console.error('[auth/login]', error);
-		return redirect(`/admin/login?setup=1&reason=${encodeURIComponent(errorMessage(error))}`);
+		return redirect('/admin/login?setup=1');
 	}
 };

@@ -10,8 +10,6 @@ import { blogSearchPath } from '../../../lib/blog-paths';
 import { localeUrl } from '../../../lib/locale-url';
 import { listPublishedPosts } from '../../../server/repositories/posts';
 
-export const prerender = true;
-
 export function getStaticPaths() {
 	return locales.map((locale) => ({ params: { locale } }));
 }

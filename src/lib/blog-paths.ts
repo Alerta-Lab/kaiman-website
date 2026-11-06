@@ -23,8 +23,14 @@ export function blogPostPath(locale: Locale, slug: string) {
 	return localeUrl(locale, `blogs/${slug}`).replace(/\/$/, '');
 }
 
+/** Business-sector category (one per article). */
 export function blogCategoryPath(locale: Locale, slug: string) {
 	return localeUrl(locale, `blogs/categoria/${slug}`).replace(/\/$/, '');
+}
+
+/** Topic tag (several per article). */
+export function blogTagPath(locale: Locale, slug: string) {
+	return `/${locale}/blogs/etiqueta/${slug}`;
 }
 
 export function blogSearchPath(locale: Locale) {

@@ -2,6 +2,7 @@ import { desc, eq, ilike, or, sql } from 'drizzle-orm';
 import { del } from '@vercel/blob';
 import { getDb, requireDb } from '../db/client';
 import { media } from '../db/schema';
+import { getEnv } from '../env';
 
 export type MediaItem = typeof media.$inferSelect;
 
@@ -52,7 +53,7 @@ export async function deleteMedia(id: string) {
 	const database = requireDb();
 	const [item] = await database.select().from(media).where(eq(media.id, id)).limit(1);
 	if (!item) return false;
-	await del(item.url, { token: import.meta.env.BLOB_READ_WRITE_TOKEN }).catch(() => undefined);
+	await del(item.url, { token: getEnv('BLOB_READ_WRITE_TOKEN') }).catch(() => undefined);
 	await database.delete(media).where(eq(media.id, id));
 	return true;
 }
