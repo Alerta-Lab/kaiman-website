@@ -12,6 +12,21 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-06 — Admin i18n ES/EN
+
+- Diccionarios `src/i18n/locales/{es,en}/admin.ts` + `getAdmin(locale)`.
+- Selector ES/EN del sidebar traduce shell, resumen, posts, tags, categorías, media, editor, analítica, login y vista previa (nombres de contenido vía `name`/`nameEn`).
+
+### 2026-11-06 — Admin categorías tipo etiquetas + borde tabla
+
+- Categorías: cards con preview/edición (lápiz, check, X); pie space-between slug + conteo; sin párrafo intro.
+- Tabla artículos: contorno blanco con ring suave.
+
+### 2026-11-06 — Admin artículos: toolbar, search y paginación
+
+- Tabla en `text-sm` (14px, `font-body`). Toolbar full-width: selección izq. / acciones der.; eliminar solo icono.
+- Buscador con debounce + skeleton; paginación vía `GET /api/admin/posts`.
+
 ### 2026-11-06 — Admin toast compacto + nav hamburguesa
 
 - Toast sin detalle: card horizontal compacta (`items-center`, padding reducido).

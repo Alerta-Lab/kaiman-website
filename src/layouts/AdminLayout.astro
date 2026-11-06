@@ -1,6 +1,7 @@
 ---
 import { BarChart3, FileText, FolderTree, Image, LayoutDashboard, LogOut, Menu, Tags, X } from 'lucide-react';
 import Kbd from '../components/ui/atoms/Kbd.astro';
+import { getAdmin } from '../i18n';
 import { getAdminLocale } from '../server/admin-locale';
 import BlogLayout from './BlogLayout.astro';
 
@@ -10,33 +11,39 @@ interface Props {
 
 const { title } = Astro.props;
 const adminLocale = getAdminLocale(Astro.cookies);
+const t = getAdmin(adminLocale);
 const links = [
-	{ href: '/admin', label: 'Resumen', icon: LayoutDashboard, key: 'R' },
-	{ href: '/admin/posts', label: 'Artículos', icon: FileText, key: 'A' },
-	{ href: '/admin/categorias', label: 'Categorías', icon: FolderTree, key: 'C' },
-	{ href: '/admin/tags', label: 'Etiquetas', icon: Tags, key: 'E' },
-	{ href: '/admin/media', label: 'Imágenes', icon: Image, key: 'I' },
-	{ href: '/admin/analytics', label: 'Analítica', icon: BarChart3, key: 'L' },
+	{ href: '/admin', label: t.shell.nav.dashboard, icon: LayoutDashboard, key: 'R' },
+	{ href: '/admin/posts', label: t.shell.nav.posts, icon: FileText, key: 'A' },
+	{ href: '/admin/categorias', label: t.shell.nav.categories, icon: FolderTree, key: 'C' },
+	{ href: '/admin/tags', label: t.shell.nav.tags, icon: Tags, key: 'E' },
+	{ href: '/admin/media', label: t.shell.nav.media, icon: Image, key: 'I' },
+	{ href: '/admin/analytics', label: t.shell.nav.analytics, icon: BarChart3, key: 'L' },
 ] as const;
 
 const shortcutMap = Object.fromEntries(links.map((link) => [link.key.toLowerCase(), link.href]));
 const redirectPath = Astro.url.pathname + Astro.url.search;
 ---
 
-<BlogLayout title={`${title} — Admin Kaiman`} description="Panel de administración de Kaiman Blog." noindex>
+<BlogLayout
+	title={`${title} — ${t.meta.titleSuffix}`}
+	description={t.meta.description}
+	locale={adminLocale}
+	noindex
+>
 	<div class="min-h-screen bg-primary-100">
 		<button
 			type="button"
 			id="admin-nav-overlay"
 			class="fixed inset-0 z-30 hidden bg-black/50 lg:hidden"
-			aria-label="Cerrar menú"
+			aria-label={t.shell.closeMenu}
 			hidden
 		></button>
 
 		<aside
 			id="admin-sidebar"
 			class="fixed inset-y-0 left-0 z-40 flex h-dvh w-[min(100%,15.5rem)] -translate-x-full flex-col overflow-y-auto border-r border-black-stroke bg-black-panel p-5 text-white transition-transform duration-200 ease-out lg:translate-x-0"
-			aria-label="Navegación del panel"
+			aria-label={t.shell.navAsideAria}
 		>
 			<div class="flex items-center justify-between gap-2">
 				<a href="/admin" class="inline-flex items-center gap-3 font-headline text-xl font-bold tracking-tight">
@@ -47,14 +54,14 @@ const redirectPath = Astro.url.pathname + Astro.url.search;
 					type="button"
 					id="admin-nav-close"
 					class="inline-flex size-11 items-center justify-center rounded-lg text-white/80 hover:bg-black-capsule lg:hidden"
-					aria-label="Cerrar menú"
+					aria-label={t.shell.closeMenu}
 				>
 					<X aria-hidden="true" size={20} />
 				</button>
 			</div>
-			<form action="/api/admin/locale" method="post" class="mt-6" aria-label="Idioma de contenido">
+			<form action="/api/admin/locale" method="post" class="mt-6" aria-label={t.shell.languageAria}>
 				<input type="hidden" name="redirect" value={redirectPath} />
-				<p class="mb-2 px-1 text-xs font-bold uppercase tracking-wide text-white/55">Idioma</p>
+				<p class="mb-2 px-1 text-xs font-bold uppercase tracking-wide text-white/55">{t.shell.language}</p>
 				<div class="grid h-8 grid-cols-2 gap-1 rounded-lg bg-black-capsule p-0.5">
 					<button
 						type="submit"
@@ -76,7 +83,7 @@ const redirectPath = Astro.url.pathname + Astro.url.search;
 					</button>
 				</div>
 			</form>
-			<nav aria-label="Panel administrativo" class="mt-6 flex flex-col gap-2">
+			<nav aria-label={t.shell.navAria} class="mt-6 flex flex-col gap-2">
 				{
 					links.map(({ href, label, icon: Icon, key }) => (
 						<a
@@ -90,7 +97,7 @@ const redirectPath = Astro.url.pathname + Astro.url.search;
 						>
 							<Icon aria-hidden="true" size={19} />
 							<span class="flex-1">{label}</span>
-							<Kbd tone="onPrimary" label={`Atajo ${key}`} class="ml-auto opacity-90">
+							<Kbd tone="onPrimary" label={`${t.shell.shortcut} ${key}`} class="ml-auto opacity-90">
 								{key}
 							</Kbd>
 						</a>
@@ -99,7 +106,7 @@ const redirectPath = Astro.url.pathname + Astro.url.search;
 			</nav>
 			<form action="/api/auth/logout" method="post" class="mt-auto pt-8">
 				<button class="flex min-h-11 w-full items-center gap-3 rounded-lg px-3 font-bold text-white/80 hover:bg-black-capsule hover:text-white">
-					<LogOut aria-hidden="true" size={19} /> Salir
+					<LogOut aria-hidden="true" size={19} /> {t.shell.logout}
 				</button>
 			</form>
 		</aside>
@@ -112,7 +119,7 @@ const redirectPath = Astro.url.pathname + Astro.url.search;
 					class="inline-flex size-11 shrink-0 items-center justify-center rounded-lg border border-black/10 bg-white text-black hover:bg-primary-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary lg:hidden"
 					aria-controls="admin-sidebar"
 					aria-expanded="false"
-					aria-label="Abrir menú"
+					aria-label={t.shell.openMenu}
 				>
 					<Menu aria-hidden="true" size={20} />
 				</button>

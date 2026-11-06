@@ -1,12 +1,28 @@
 ---
 import { PostEditor } from '../../../features/posts/PostEditor';
+import { getAdmin } from '../../../i18n';
 import AdminLayout from '../../../layouts/AdminLayout.astro';
-import { listCategories } from '../../../server/repositories/posts';
+import { getAdminLocale } from '../../../server/admin-locale';
+import { categoryDisplayName, listCategories } from '../../../server/repositories/posts';
 
+const locale = getAdminLocale(Astro.cookies);
+const t = getAdmin(locale);
 const categories = await listCategories();
 ---
 
-<AdminLayout title="Nuevo artículo">
-	<a href="/admin/importar" class="mb-6 inline-flex min-h-11 items-center rounded-lg border border-primary-700 px-4 font-bold text-primary-800">Revisar Word con varios artículos</a>
-	<PostEditor client:load categories={categories.map(({ id, name }) => ({ id, name }))} />
+<AdminLayout title={t.editor.newTitle}>
+	<a
+		href="/admin/importar"
+		class="mb-6 inline-flex min-h-11 items-center rounded-lg border border-primary-700 px-4 font-bold text-primary-800"
+	>
+		{t.editor.reviewMultiWord}
+	</a>
+	<PostEditor
+		client:load
+		copy={t.editor}
+		categories={categories.map((category) => ({
+			id: category.id,
+			name: categoryDisplayName(category, locale),
+		}))}
+	/>
 </AdminLayout>

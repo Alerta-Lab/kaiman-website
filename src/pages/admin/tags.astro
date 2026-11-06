@@ -1,40 +1,42 @@
 ---
 import { Check, Pencil, Plus, Trash2, X } from 'lucide-react';
+import { fillAdmin, getAdmin } from '../../i18n';
 import AdminLayout from '../../layouts/AdminLayout.astro';
 import { getAdminLocale } from '../../server/admin-locale';
 import { listTags, tagDisplayName } from '../../server/repositories/posts';
 
 const locale = getAdminLocale(Astro.cookies);
+const t = getAdmin(locale);
 const tags = await listTags();
 const inputClass = 'min-h-11 min-w-0 w-full rounded-lg border border-black-stroke px-3 font-medium';
 ---
 
-<AdminLayout title="Etiquetas">
+<AdminLayout title={t.tags.title}>
 	<form action="/api/admin/tags" method="post" class="w-full rounded-2xl border border-black/10 bg-white p-5">
 		<div class="grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
 			<div>
-				<label class="mb-1.5 block text-sm font-bold text-black/70" for="name">Español</label>
+				<label class="mb-1.5 block text-sm font-bold text-black/70" for="name">{t.tags.spanish}</label>
 				<input
 					id="name"
 					name="name"
 					required
 					minlength="2"
-					placeholder="Nueva etiqueta"
+					placeholder={t.tags.newPlaceholderEs}
 					class={inputClass}
 				/>
 			</div>
 			<div>
-				<label class="mb-1.5 block text-sm font-bold text-black/70" for="nameEn">English</label>
+				<label class="mb-1.5 block text-sm font-bold text-black/70" for="nameEn">{t.tags.english}</label>
 				<input
 					id="nameEn"
 					name="nameEn"
 					minlength="2"
-					placeholder="New tag"
+					placeholder={t.tags.newPlaceholderEn}
 					class={inputClass}
 				/>
 			</div>
 			<button class="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-lg bg-primary px-4 font-bold text-white hover:bg-primary-700">
-				<Plus aria-hidden="true" size={18} /> Crear
+				<Plus aria-hidden="true" size={18} /> {t.tags.create}
 			</button>
 		</div>
 	</form>
@@ -57,7 +59,7 @@ const inputClass = 'min-h-11 min-w-0 w-full rounded-lg border border-black-strok
 							<button
 								type="button"
 								class="inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-primary hover:bg-primary-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-								aria-label={`Editar ${preview}`}
+								aria-label={fillAdmin(t.tags.edit, { name: preview })}
 								data-edit
 							>
 								<Pencil aria-hidden="true" size={18} />
@@ -66,7 +68,7 @@ const inputClass = 'min-h-11 min-w-0 w-full rounded-lg border border-black-strok
 								<input type="hidden" name="_method" value="delete" />
 								<button
 									type="submit"
-									aria-label={`Eliminar ${preview}`}
+									aria-label={fillAdmin(t.tags.delete, { name: preview })}
 									class="inline-flex size-11 items-center justify-center rounded-lg text-error-700 hover:bg-error-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
 								>
 									<Trash2 aria-hidden="true" size={18} />
@@ -83,7 +85,7 @@ const inputClass = 'min-h-11 min-w-0 w-full rounded-lg border border-black-strok
 							<input type="hidden" name="_method" value="update" />
 							<div>
 								<label class="mb-1.5 block text-sm font-bold text-black/70" for={`tag-es-${tag.id}`}>
-									Español
+									{t.tags.spanish}
 								</label>
 								<input
 									id={`tag-es-${tag.id}`}
@@ -98,7 +100,7 @@ const inputClass = 'min-h-11 min-w-0 w-full rounded-lg border border-black-strok
 							</div>
 							<div>
 								<label class="mb-1.5 block text-sm font-bold text-black/70" for={`tag-en-${tag.id}`}>
-									English
+									{t.tags.english}
 								</label>
 								<input
 									id={`tag-en-${tag.id}`}
@@ -114,14 +116,14 @@ const inputClass = 'min-h-11 min-w-0 w-full rounded-lg border border-black-strok
 								<button
 									type="submit"
 									class="inline-flex size-11 items-center justify-center rounded-lg text-success-700 hover:bg-success-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-									aria-label={`Guardar ${preview}`}
+									aria-label={fillAdmin(t.tags.save, { name: preview })}
 								>
 									<Check aria-hidden="true" size={18} />
 								</button>
 								<button
 									type="button"
 									class="inline-flex size-11 items-center justify-center rounded-lg text-black/70 hover:bg-primary-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-									aria-label={`Cancelar edición de ${preview}`}
+									aria-label={fillAdmin(t.tags.cancel, { name: preview })}
 									data-cancel
 								>
 									<X aria-hidden="true" size={18} />

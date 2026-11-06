@@ -144,10 +144,50 @@ export async function getPostById(id: string) {
 	return post ? (await attachTags([post]))[0] : null;
 }
 
-export async function listAllPosts() {
+export type AdminPostListResult = {
+	items: PostWithTags[];
+	total: number;
+	page: number;
+	pageSize: number;
+	totalPages: number;
+};
+
+export async function listAllPosts(
+	options: { query?: string; page?: number; pageSize?: number } = {},
+): Promise<AdminPostListResult> {
+	const page = Math.max(1, options.page ?? 1);
+	const pageSize = Math.min(50, Math.max(1, options.pageSize ?? 10));
+	const query = options.query?.trim();
 	const db = getDb();
-	if (!db) return [demoPost, demoPostEn];
-	return attachTags(await db.select().from(posts).orderBy(desc(posts.updatedAt)));
+
+	if (!db) {
+		const demo = [demoPost, demoPostEn].filter((post) => {
+			if (!query) return true;
+			const haystack = `${post.title} ${post.excerpt} ${post.slug}`.toLowerCase();
+			return haystack.includes(query.toLowerCase());
+		});
+		const total = demo.length;
+		const totalPages = total === 0 ? 0 : Math.ceil(total / pageSize);
+		const start = (page - 1) * pageSize;
+		return { items: demo.slice(start, start + pageSize), total, page, pageSize, totalPages };
+	}
+
+	const where = query
+		? or(ilike(posts.title, `%${query}%`), ilike(posts.slug, `%${query}%`), ilike(posts.excerpt, `%${query}%`))
+		: undefined;
+
+	const [totalRow] = await db.select({ count: sql<number>`count(*)::int` }).from(posts).where(where);
+	const total = totalRow?.count ?? 0;
+	const totalPages = total === 0 ? 0 : Math.ceil(total / pageSize);
+	const rows = await db
+		.select()
+		.from(posts)
+		.where(where)
+		.orderBy(desc(posts.updatedAt))
+		.limit(pageSize)
+		.offset((page - 1) * pageSize);
+
+	return { items: await attachTags(rows), total, page, pageSize, totalPages };
 }
 
 export async function listTags() {

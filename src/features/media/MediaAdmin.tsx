@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useId, useRef, useState, useTransition, type FormEvent } from 'react';
 import { Toast } from '../../components/blog/molecules/Toast';
+import type { AdminCopy } from '../../i18n/locales/es/admin';
 import type { ContentLocale } from '../../server/db/schema';
 
 export type MediaRecord = {
@@ -38,16 +39,15 @@ type ViewMode = 'grid' | 'list';
 type Props = {
 	initial: MediaListPayload;
 	locale: ContentLocale;
+	copy: AdminCopy['media'];
 };
 
 const SEARCH_DEBOUNCE_MS = 350;
 
-const copyToastTitle: Record<ContentLocale, string> = {
-	es: 'Enlace copiado',
-	en: 'Link copied',
-};
+const fill = (template: string, values: Record<string, string | number>) =>
+	Object.entries(values).reduce((text, [key, value]) => text.replaceAll(`{${key}}`, String(value)), template);
 
-export function MediaAdmin({ initial, locale }: Props) {
+export function MediaAdmin({ initial, copy, locale: _locale }: Props) {
 	const fileInputId = useId();
 	const altInputId = useId();
 	const searchId = useId();
@@ -106,11 +106,11 @@ export function MediaAdmin({ initial, locale }: Props) {
 				if (query) params.set('q', query);
 				const response = await fetch(`/api/admin/media?${params}`, { signal: controller.signal });
 				const result = (await response.json()) as MediaListPayload & { error?: string };
-				if (!response.ok) throw new Error(result.error ?? 'No se pudo cargar la biblioteca.');
+				if (!response.ok) throw new Error(result.error ?? copy.loadError);
 				startTransition(() => setData(result));
 			} catch (error) {
 				if ((error as Error).name === 'AbortError') return;
-				setListError(error instanceof Error ? error.message : 'Error al cargar.');
+				setListError(error instanceof Error ? error.message : copy.loadError);
 			} finally {
 				setLoadingList(false);
 			}
@@ -118,7 +118,7 @@ export function MediaAdmin({ initial, locale }: Props) {
 
 		void load();
 		return () => controller.abort();
-	}, [page, query, initial.pageSize]);
+	}, [page, query, initial.pageSize, copy.loadError]);
 
 	useEffect(() => {
 		return () => {
@@ -146,11 +146,11 @@ export function MediaAdmin({ initial, locale }: Props) {
 		const next = files?.[0] ?? null;
 		if (!next) return;
 		if (!next.type.startsWith('image/')) {
-			setStatus('Selecciona un archivo de imagen.');
+			setStatus(copy.invalidType);
 			return;
 		}
 		if (next.size > 8 * 1024 * 1024) {
-			setStatus('La imagen debe pesar como máximo 8 MB.');
+			setStatus(copy.tooLarge);
 			return;
 		}
 		setStatus('');
@@ -165,7 +165,7 @@ export function MediaAdmin({ initial, locale }: Props) {
 		if (nextQuery) params.set('q', nextQuery);
 		const response = await fetch(`/api/admin/media?${params}`);
 		const payload = (await response.json()) as MediaListPayload & { error?: string };
-		if (!response.ok) throw new Error(payload.error ?? 'No se pudo cargar la biblioteca.');
+		if (!response.ok) throw new Error(payload.error ?? copy.loadError);
 		setData(payload);
 		return payload;
 	};
@@ -173,15 +173,15 @@ export function MediaAdmin({ initial, locale }: Props) {
 	const onUpload = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		if (!file) {
-			setStatus('Selecciona una imagen.');
+			setStatus(copy.selectImage);
 			return;
 		}
 		if (!alt.trim()) {
-			setStatus('El texto alternativo es obligatorio.');
+			setStatus(copy.needAlt);
 			return;
 		}
 		setUploading(true);
-		setStatus('Subiendo…');
+		setStatus(copy.uploading);
 		const body = new FormData();
 		body.set('image', file);
 		body.set('alt', alt.trim());
@@ -189,19 +189,19 @@ export function MediaAdmin({ initial, locale }: Props) {
 			const response = await fetch('/api/admin/media', { method: 'POST', body });
 			const result = (await response.json()) as { error?: string };
 			if (!response.ok) {
-				setStatus(result.error ?? 'No se pudo subir la imagen.');
+				setStatus(result.error ?? copy.uploadError);
 				return;
 			}
 			setSelectedFile(null);
 			setAlt('');
-			setStatus('Imagen subida.');
+			setStatus(copy.uploaded);
 			skipNextFetch.current = true;
 			setSearchInput('');
 			setQuery('');
 			setPage(1);
 			await refreshList(1, '');
 		} catch {
-			setStatus('Error de red al subir.');
+			setStatus(copy.networkError);
 		} finally {
 			setUploading(false);
 		}
@@ -241,7 +241,7 @@ export function MediaAdmin({ initial, locale }: Props) {
 			});
 			if (!response.ok) {
 				const result = (await response.json()) as { error?: string };
-				setListError(result.error ?? 'No se pudo eliminar.');
+				setListError(result.error ?? copy.deleteError);
 				return;
 			}
 			setPendingDelete(null);
@@ -252,14 +252,16 @@ export function MediaAdmin({ initial, locale }: Props) {
 				await refreshList(payload.page - 1, query);
 			}
 		} catch (error) {
-			setListError(error instanceof Error ? error.message : 'Error al actualizar la lista.');
+			setListError(error instanceof Error ? error.message : copy.updateError);
 		} finally {
 			setDeleting(false);
 		}
 	};
 
 	const countLabel =
-		data.total === 1 ? '1 imagen' : `${data.total} imágenes${query ? ' encontradas' : ''}`;
+		data.total === 1
+			? copy.countOne
+			: `${fill(copy.countMany, { count: data.total })}${query ? copy.countFound : ''}`;
 
 	return (
 		<div className="space-y-8">
@@ -288,12 +290,12 @@ export function MediaAdmin({ initial, locale }: Props) {
 										className="inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg bg-white px-2 text-sm font-bold text-black hover:bg-primary-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
 										onClick={() => fileRef.current?.click()}
 									>
-										<Upload aria-hidden="true" size={16} /> Otra
+										<Upload aria-hidden="true" size={16} /> {copy.replace}
 									</button>
 									<button
 										type="button"
 										className="inline-flex size-11 items-center justify-center rounded-lg bg-white text-error-700 hover:bg-error-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-										aria-label="Quitar imagen seleccionada"
+										aria-label={copy.removeSelected}
 										onClick={() => setSelectedFile(null)}
 									>
 										<Trash2 aria-hidden="true" size={16} />
@@ -306,8 +308,8 @@ export function MediaAdmin({ initial, locale }: Props) {
 								className="flex aspect-square w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-black/25 bg-primary-100 px-3 text-center text-sm font-bold text-black/70 transition hover:border-primary hover:bg-primary-200 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary"
 							>
 								<ImagePlus aria-hidden="true" size={28} className="text-primary" />
-								<span>Subir archivo</span>
-								<span className="font-medium text-black/50">Hasta 8 MB</span>
+								<span>{copy.uploadFile}</span>
+								<span className="font-medium text-black/50">{copy.maxSize}</span>
 							</label>
 						)}
 					</div>
@@ -315,7 +317,7 @@ export function MediaAdmin({ initial, locale }: Props) {
 					<div className="flex min-w-0 flex-col gap-4">
 						<div>
 							<label htmlFor={altInputId} className="mb-1.5 block text-sm font-bold text-black/70">
-								Texto alternativo
+								{copy.altLabel}
 							</label>
 							<input
 								id={altInputId}
@@ -324,7 +326,7 @@ export function MediaAdmin({ initial, locale }: Props) {
 								onChange={(event) => setAlt(event.target.value)}
 								required
 								minLength={2}
-								placeholder="Describe la imagen"
+								placeholder={copy.altPlaceholder}
 								className="min-h-11 w-full rounded-lg border border-black-stroke px-3 font-medium"
 							/>
 						</div>
@@ -334,7 +336,7 @@ export function MediaAdmin({ initial, locale }: Props) {
 							className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 font-bold text-white hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
 						>
 							<ImagePlus aria-hidden="true" size={18} />
-							{uploading ? 'Subiendo…' : 'Subir imagen'}
+							{uploading ? copy.uploading : copy.upload}
 						</button>
 						<p aria-live="polite" className="min-h-5 text-sm font-bold text-black/70">
 							{status}
@@ -351,12 +353,12 @@ export function MediaAdmin({ initial, locale }: Props) {
 					<div
 						className="flex items-center gap-0.5 rounded-lg border border-black/10 bg-white p-0.5"
 						role="group"
-						aria-label="Modo de vista"
+						aria-label={copy.viewMode}
 					>
 						<button
 							type="button"
 							aria-pressed={view === 'grid'}
-							aria-label="Vista en cuadrícula"
+							aria-label={copy.grid}
 							onClick={() => setView('grid')}
 							className="inline-flex size-9 items-center justify-center rounded-md text-black/70 hover:bg-primary-100 aria-[pressed=true]:bg-primary aria-[pressed=true]:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
 						>
@@ -365,7 +367,7 @@ export function MediaAdmin({ initial, locale }: Props) {
 						<button
 							type="button"
 							aria-pressed={view === 'list'}
-							aria-label="Vista en columnas"
+							aria-label={copy.list}
 							onClick={() => setView('list')}
 							className="inline-flex size-9 items-center justify-center rounded-md text-black/70 hover:bg-primary-100 aria-[pressed=true]:bg-primary aria-[pressed=true]:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
 						>
@@ -373,7 +375,7 @@ export function MediaAdmin({ initial, locale }: Props) {
 						</button>
 					</div>
 					<label className="relative w-full min-w-0 basis-full">
-						<span className="sr-only">Buscar por nombre</span>
+						<span className="sr-only">{copy.searchAria}</span>
 						<Search
 							aria-hidden="true"
 							size={16}
@@ -384,7 +386,7 @@ export function MediaAdmin({ initial, locale }: Props) {
 							type="search"
 							value={searchInput}
 							onChange={(event) => setSearchInput(event.target.value)}
-							placeholder="Buscar por nombre"
+							placeholder={copy.searchPlaceholder}
 							className="min-h-11 w-full rounded-lg border border-black-stroke bg-white py-2 pl-9 pr-3 font-medium"
 						/>
 					</label>
@@ -398,7 +400,7 @@ export function MediaAdmin({ initial, locale }: Props) {
 
 				{data.items.length === 0 ? (
 					<p className="rounded-xl border border-dashed border-black/15 bg-white p-8 text-center font-medium text-black/60">
-						{query ? 'No hay imágenes con ese nombre.' : 'Aún no hay imágenes en la biblioteca.'}
+						{query ? copy.emptySearch : copy.empty}
 					</p>
 				) : (
 					<ul
@@ -445,8 +447,8 @@ export function MediaAdmin({ initial, locale }: Props) {
 											type="button"
 											aria-label={
 												copiedId === item.id
-													? `URL de ${item.filename} copiada`
-													: `Copiar URL de ${item.filename}`
+													? fill(copy.copiedUrl, { name: item.filename })
+													: fill(copy.copyUrl, { name: item.filename })
 											}
 											onClick={() => void copyUrl(item)}
 											className="inline-flex size-11 items-center justify-center rounded-lg text-primary hover:bg-primary-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
@@ -459,7 +461,7 @@ export function MediaAdmin({ initial, locale }: Props) {
 										</button>
 										<button
 											type="button"
-											aria-label={`Eliminar ${item.filename}`}
+											aria-label={fill(copy.delete, { name: item.filename })}
 											onClick={() => setPendingDelete(item)}
 											className="inline-flex size-11 items-center justify-center rounded-lg text-error-700 hover:bg-error-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
 										>
@@ -474,7 +476,7 @@ export function MediaAdmin({ initial, locale }: Props) {
 
 				{data.totalPages > 1 ? (
 					<nav
-						aria-label="Paginación de imágenes"
+						aria-label={copy.paginationAria}
 						className="flex flex-wrap items-center justify-center gap-3 pt-2"
 					>
 						<button
@@ -483,10 +485,10 @@ export function MediaAdmin({ initial, locale }: Props) {
 							onClick={() => setPage((current) => Math.max(1, current - 1))}
 							className="inline-flex min-h-11 items-center gap-1 rounded-lg border border-black/10 bg-white px-3 font-bold text-black hover:bg-primary-100 disabled:cursor-not-allowed disabled:opacity-45"
 						>
-							<ChevronLeft aria-hidden="true" size={18} /> Anterior
+							<ChevronLeft aria-hidden="true" size={18} /> {copy.previous}
 						</button>
 						<p className="font-bold text-black/70">
-							Página {data.page} de {data.totalPages}
+							{fill(copy.pageOf, { page: data.page, totalPages: data.totalPages })}
 						</p>
 						<button
 							type="button"
@@ -494,7 +496,7 @@ export function MediaAdmin({ initial, locale }: Props) {
 							onClick={() => setPage((current) => current + 1)}
 							className="inline-flex min-h-11 items-center gap-1 rounded-lg border border-black/10 bg-white px-3 font-bold text-black hover:bg-primary-100 disabled:cursor-not-allowed disabled:opacity-45"
 						>
-							Siguiente <ChevronRight aria-hidden="true" size={18} />
+							{copy.next} <ChevronRight aria-hidden="true" size={18} />
 						</button>
 					</nav>
 				) : null}
@@ -503,7 +505,7 @@ export function MediaAdmin({ initial, locale }: Props) {
 			<Toast
 				open={copyToastOpen}
 				tone="success"
-				title={copyToastTitle[locale]}
+				title={copy.linkCopied}
 				onClose={closeCopyToast}
 				autoHideMs={2500}
 			/>
@@ -513,7 +515,7 @@ export function MediaAdmin({ initial, locale }: Props) {
 					<button
 						type="button"
 						className="absolute inset-0 bg-black/50"
-						aria-label="Cerrar diálogo"
+						aria-label={copy.closeDialog}
 						disabled={deleting}
 						onClick={() => setPendingDelete(null)}
 					/>
@@ -526,12 +528,12 @@ export function MediaAdmin({ initial, locale }: Props) {
 					>
 						<div className="flex items-start justify-between gap-3">
 							<h2 id="delete-media-title" className="font-headline text-xl font-bold text-black">
-								Eliminar imagen
+								{copy.deleteTitle}
 							</h2>
 							<button
 								type="button"
 								className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-black/60 hover:bg-primary-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-								aria-label="Cerrar"
+								aria-label={copy.close}
 								disabled={deleting}
 								onClick={() => setPendingDelete(null)}
 							>
@@ -545,8 +547,7 @@ export function MediaAdmin({ initial, locale }: Props) {
 								className="size-16 shrink-0 rounded-lg object-cover"
 							/>
 							<p id="delete-media-desc" className="min-w-0 font-medium text-black/75">
-								¿Eliminar <span className="font-bold text-black">{pendingDelete.filename}</span> de
-								la biblioteca? Esta acción no se puede deshacer.
+								{fill(copy.deleteDesc, { name: pendingDelete.filename })}
 							</p>
 						</div>
 						<div className="mt-6 flex flex-wrap justify-end gap-3">
@@ -557,7 +558,7 @@ export function MediaAdmin({ initial, locale }: Props) {
 								onClick={() => setPendingDelete(null)}
 								className="inline-flex min-h-11 items-center justify-center rounded-lg border border-black/15 px-4 font-bold text-black hover:bg-primary-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50"
 							>
-								Cancelar
+								{copy.cancel}
 							</button>
 							<button
 								type="button"
@@ -566,7 +567,7 @@ export function MediaAdmin({ initial, locale }: Props) {
 								className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-error-700 px-4 font-bold text-white hover:bg-error-700/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50"
 							>
 								<Trash2 aria-hidden="true" size={16} />
-								{deleting ? 'Eliminando…' : 'Eliminar'}
+								{deleting ? copy.deleting : copy.deleteTitle}
 							</button>
 						</div>
 					</div>

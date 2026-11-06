@@ -1,10 +1,12 @@
 ---
 import { MediaAdmin, type MediaListPayload } from '../../features/media/MediaAdmin';
+import { getAdmin } from '../../i18n';
 import AdminLayout from '../../layouts/AdminLayout.astro';
 import { getAdminLocale } from '../../server/admin-locale';
 import { listMedia } from '../../server/repositories/media';
 
 const locale = getAdminLocale(Astro.cookies);
+const t = getAdmin(locale);
 const result = await listMedia({ page: 1, pageSize: 12 });
 const initial: MediaListPayload = {
 	...result,
@@ -15,6 +17,6 @@ const initial: MediaListPayload = {
 };
 ---
 
-<AdminLayout title="Imágenes">
-	<MediaAdmin client:load initial={initial} locale={locale} />
+<AdminLayout title={t.media.title}>
+	<MediaAdmin client:load initial={initial} locale={locale} copy={t.media} />
 </AdminLayout>

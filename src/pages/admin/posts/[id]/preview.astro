@@ -3,35 +3,58 @@ import { ExternalLink, Pencil } from 'lucide-react';
 import ArticleView from '../../../../components/blog/organisms/ArticleView.astro';
 import PublicFooter from '../../../../components/blog/organisms/PublicFooter.astro';
 import PublicHeader from '../../../../components/blog/organisms/PublicHeader.astro';
+import { fillAdmin, getAdmin } from '../../../../i18n';
 import BlogLayout from '../../../../layouts/BlogLayout.astro';
 import { blogPostPath } from '../../../../lib/blog-paths';
+import { getAdminLocale } from '../../../../server/admin-locale';
 import { getPostById } from '../../../../server/repositories/posts';
 
 // Admin-only (middleware requires a session): renders the saved post, draft or published, exactly as the public page would.
 const post = await getPostById(Astro.params.id ?? '');
 if (!post) return Astro.redirect('/admin/posts');
 
+const adminLocale = getAdminLocale(Astro.cookies);
+const t = getAdmin(adminLocale);
 const published = post.status === 'published';
 const publicPath = blogPostPath(post.locale, post.slug);
 Astro.response.headers.set('Cache-Control', 'private, no-store');
 ---
 
-<BlogLayout title={`Vista previa: ${post.seoTitle}`} description={post.seoDescription} locale={post.locale} image={post.coverUrl} noindex>
+<BlogLayout
+	title={`${t.preview.titlePrefix}: ${post.seoTitle}`}
+	description={post.seoDescription}
+	locale={post.locale}
+	image={post.coverUrl}
+	noindex
+>
 	<div role="status" class="sticky top-0 z-50 border-b border-black/10 bg-warning px-5 py-3 text-black">
 		<div class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3">
 			<p class="font-bold">
-				Vista previa · {published ? 'Publicado' : 'Borrador (no visible para el público)'} · {post.locale.toUpperCase()}
-				<span class="block text-sm font-normal">Muestra la última versión guardada; los cambios sin guardar del editor no aparecen.</span>
+				{
+					fillAdmin(t.preview.banner, {
+						status: published ? t.preview.published : t.preview.draft,
+						locale: post.locale.toUpperCase(),
+					})
+				}
+				<span class="block text-sm font-normal">{t.preview.note}</span>
 			</p>
 			<div class="flex flex-wrap gap-2">
-				<a href={`/admin/posts/${post.id}`} class="inline-flex min-h-11 items-center gap-2 rounded-lg bg-black px-4 font-bold text-white">
-					<Pencil aria-hidden="true" size={17} /> Volver al editor
+				<a
+					href={`/admin/posts/${post.id}`}
+					class="inline-flex min-h-11 items-center gap-2 rounded-lg bg-black px-4 font-bold text-white"
+				>
+					<Pencil aria-hidden="true" size={17} /> {t.preview.backToEditor}
 				</a>
-				{published && (
-					<a href={publicPath} class="inline-flex min-h-11 items-center gap-2 rounded-lg border border-black bg-white px-4 font-bold">
-						<ExternalLink aria-hidden="true" size={17} /> Ver página publicada
-					</a>
-				)}
+				{
+					published && (
+						<a
+							href={publicPath}
+							class="inline-flex min-h-11 items-center gap-2 rounded-lg border border-black bg-white px-4 font-bold"
+						>
+							<ExternalLink aria-hidden="true" size={17} /> {t.preview.viewPublished}
+						</a>
+					)
+				}
 			</div>
 		</div>
 	</div>
