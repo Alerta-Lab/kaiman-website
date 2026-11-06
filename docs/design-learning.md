@@ -12,6 +12,22 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-06 — Editor: file picker i18n + tabs contraste
+
+- Selector de archivo custom: botón primary + textos `chooseFile` / `noFileChosen` (ES/EN).
+- Tabs idioma: track `bg-primary` con borde blanco; inactivo texto blanco, activo blanco/primary.
+
+### 2026-11-06 — Editor: sin breadcrumb ni /admin/importar
+
+- Eliminada miga de pan del editor y la ruta `/admin/importar` (WordPreview).
+- Card «Importar con IA»: fondo blanco, borde blanco, sin icono ni link secundario; fila archivo + Importar.
+
+### 2026-11-06 — Editor create/edit unificado
+
+- Layout por secciones numeradas (info, contenido, configuración, SEO); sin tip ni bloque de imágenes.
+- Labels Quicksand regular (`font-body font-normal text-black/55`).
+- Tabs ES/EN con estado dual; Traducir rellena el tab activo desde el otro vía `/api/admin/posts/translate-fields` (gpt-4o-mini).
+
 ### 2026-11-06 — Admin i18n ES/EN
 
 - Diccionarios `src/i18n/locales/{es,en}/admin.ts` + `getAdmin(locale)`.

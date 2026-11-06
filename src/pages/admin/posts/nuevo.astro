@@ -11,15 +11,11 @@ const categories = await listCategories();
 ---
 
 <AdminLayout title={t.editor.newTitle}>
-	<a
-		href="/admin/importar"
-		class="mb-6 inline-flex min-h-11 items-center rounded-lg border border-primary-700 px-4 font-bold text-primary-800"
-	>
-		{t.editor.reviewMultiWord}
-	</a>
 	<PostEditor
 		client:load
+		mode="create"
 		copy={t.editor}
+		activeLocale="es"
 		categories={categories.map((category) => ({
 			id: category.id,
 			name: categoryDisplayName(category, locale),

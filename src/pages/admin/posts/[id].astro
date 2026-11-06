@@ -1,6 +1,6 @@
 ---
 import { PostEditor } from '../../../features/posts/PostEditor';
-import { fillAdmin, getAdmin } from '../../../i18n';
+import { getAdmin } from '../../../i18n';
 import AdminLayout from '../../../layouts/AdminLayout.astro';
 import { getAdminLocale } from '../../../server/admin-locale';
 import {
@@ -8,41 +8,48 @@ import {
 	getPostById,
 	getSiblingPost,
 	listCategories,
+	tagDisplayName,
 } from '../../../server/repositories/posts';
 
-const locale = getAdminLocale(Astro.cookies);
-const t = getAdmin(locale);
+const adminLocale = getAdminLocale(Astro.cookies);
+const t = getAdmin(adminLocale);
 const post = await getPostById(Astro.params.id ?? '');
 if (!post) return Astro.redirect('/admin/posts');
+
 const sibling = await getSiblingPost(post.translationGroupId, post.locale === 'es' ? 'en' : 'es');
 const categories = await listCategories();
+
+const toVersion = (item: NonNullable<typeof post>) => ({
+	locale: item.locale,
+	id: item.id,
+	updatedAt: item.updatedAt.toISOString(),
+	title: item.title,
+	excerpt: item.excerpt,
+	markdown: item.markdown,
+	status: item.status,
+	seoTitle: item.seoTitle,
+	seoDescription: item.seoDescription,
+	coverUrl: item.coverUrl ?? '',
+	coverAlt: item.coverAlt ?? '',
+	tags: item.tags.map((tag) => tagDisplayName(tag, item.locale)).join(', '),
+});
+
+const versions = [toVersion(post), ...(sibling ? [toVersion(sibling)] : [])];
 ---
 
-<AdminLayout title={fillAdmin(t.editor.editTitle, { locale: post.locale.toUpperCase() })}>
+<AdminLayout title={t.editor.editTitle}>
 	<PostEditor
 		client:load
+		mode="edit"
 		copy={t.editor}
+		activeLocale={post.locale}
+		translationGroupId={post.translationGroupId}
+		initialSlug={post.slug}
+		initialCategoryId={post.categoryId ?? ''}
+		initialVersions={versions}
 		categories={categories.map((category) => ({
 			id: category.id,
-			name: categoryDisplayName(category, locale),
+			name: categoryDisplayName(category, adminLocale),
 		}))}
-		initial={{
-			id: post.id,
-			updatedAt: post.updatedAt.toISOString(),
-			title: post.title,
-			slug: post.slug,
-			excerpt: post.excerpt,
-			markdown: post.markdown,
-			status: post.status,
-			locale: post.locale,
-			seoTitle: post.seoTitle,
-			seoDescription: post.seoDescription,
-			coverUrl: post.coverUrl,
-			coverAlt: post.coverAlt,
-			categoryId: post.categoryId,
-			hasSibling: Boolean(sibling),
-			editorial: post.editorial,
-			tags: post.tags.map((tag) => (post.locale === 'en' && tag.nameEn ? tag.nameEn : tag.name)),
-		}}
 	/>
 </AdminLayout>

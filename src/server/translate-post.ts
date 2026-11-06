@@ -14,12 +14,23 @@ const translatedSchema = z.object({
 	tags: z.array(z.string().min(2).max(50)).max(8),
 });
 
+export type TranslatableFields = {
+	locale: ContentLocale;
+	title: string;
+	excerpt: string;
+	markdown: string;
+	seoTitle: string;
+	seoDescription: string;
+	coverAlt?: string | null;
+	tags: string[];
+};
+
 const localeLabel: Record<ContentLocale, string> = {
 	es: 'Spanish',
 	en: 'English',
 };
 
-export async function translatePostContent(source: PostWithTags, targetLocale: ContentLocale) {
+export async function translateFields(source: TranslatableFields, targetLocale: ContentLocale) {
 	const OPENAI_API_KEY = getEnv('OPENAI_API_KEY');
 	if (!OPENAI_API_KEY) throw new Error('OPENAI_API_KEY no está configurada.');
 
@@ -45,7 +56,7 @@ export async function translatePostContent(source: PostWithTags, targetLocale: C
 					seoTitle: source.seoTitle,
 					seoDescription: source.seoDescription,
 					coverAlt: source.coverAlt,
-					tags: source.tags.map((tag) => tag.name),
+					tags: source.tags,
 				}),
 			},
 		],
@@ -54,4 +65,20 @@ export async function translatePostContent(source: PostWithTags, targetLocale: C
 	const raw = response.choices[0]?.message?.content;
 	if (!raw) throw new Error('La traducción no devolvió contenido.');
 	return translatedSchema.parse(JSON.parse(raw));
+}
+
+export async function translatePostContent(source: PostWithTags, targetLocale: ContentLocale) {
+	return translateFields(
+		{
+			locale: source.locale,
+			title: source.title,
+			excerpt: source.excerpt,
+			markdown: source.markdown,
+			seoTitle: source.seoTitle,
+			seoDescription: source.seoDescription,
+			coverAlt: source.coverAlt,
+			tags: source.tags.map((tag) => (source.locale === 'en' && tag.nameEn ? tag.nameEn : tag.name)),
+		},
+		targetLocale,
+	);
 }
