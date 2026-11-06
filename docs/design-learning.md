@@ -12,9 +12,14 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-06 — Volver arriba: solo icono, encima del chat
+
+- «Volver arriba» flotante: solo flecha, `size-12` circular (mismo tamaño que el orbe), apilado encima del chat (`right-5`/`bottom` calc sobre el orbe).
+- Texto visible retirado; `aria-label` conserva `footer.backTop`.
+
 ### 2026-11-06 — Orbe de chat público
 
-- Orbe fijo inferior derecho (`ChatOrb`) junto a «Volver arriba» (el back-top queda a su izquierda al flotar).
+- Orbe fijo inferior derecho (`ChatOrb`); «Volver arriba» encima al flotar (mismo tamaño).
 - Panel flotante ES/EN vía `POST /api/public/chat`; copy en `landing.chat`.
 - Glow giratorio: `.chat-orb-spin` en `global.css` (conic + blur). Deep link `?asistente=kaiman` abre el chat.
 - Burbujas estilo WhatsApp; sin sources; panel más grande.
