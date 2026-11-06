@@ -1,0 +1,25 @@
+---
+interface Props {
+	/** Accessible name, e.g. "Atajo N". */
+	label?: string;
+	/** On filled primary buttons use a light key. */
+	tone?: 'default' | 'onPrimary';
+	class?: string;
+}
+
+const { label, tone = 'default', class: className } = Astro.props;
+---
+
+<kbd
+	class:list={[
+		'inline-flex min-w-5 items-center justify-center rounded px-1.5 py-0.5 font-headline text-[0.7rem] font-bold leading-none tracking-wide',
+		tone === 'onPrimary'
+			? 'border border-white/35 border-b-2 border-b-white/70 bg-white/15 text-white'
+			: 'border border-black/15 border-b-2 border-b-black/40 bg-white text-black',
+		className,
+	]}
+	title={label}
+	aria-label={label}
+>
+	<slot />
+</kbd>

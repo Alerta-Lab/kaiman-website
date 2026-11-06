@@ -380,7 +380,7 @@ export const landing = {
 		planLabel: 'Reference plan for this volume',
 		unitLabel: 'Reference cost per credit on that plan',
 		enterprise:
-			'This volume exceeds the 2,500 credits of the Business plan. Corporate is built to fit.',
+			'This volume exceeds the 2,500 credits of the Business plan. Enterprise is built to fit.',
 		perMonth: 'per month',
 		cta: 'Get this plan',
 	},
@@ -401,10 +401,10 @@ export const landing = {
 		custom: 'Custom',
 		enterpriseCta: 'Book a call',
 		names: {
-			start: 'Essential',
-			pro: 'Professional',
+			start: 'Starter',
+			pro: 'Pro',
 			scale: 'Business',
-			enterprise: 'Corporate',
+			enterprise: 'Enterprise',
 		},
 		taglines: {
 			start: 'For individuals getting started with AI-powered marketing.',
@@ -482,7 +482,7 @@ export const landing = {
 			},
 			{
 				q: 'Can I manage more than one brand or business from my account?',
-				a: 'Yes, depending on the plan. Essential includes 1 brand. Professional includes up to 3 brands. Business includes up to 5 brands. Corporate is defined to fit.',
+				a: 'Yes, depending on the plan. Starter includes 1 brand. Pro includes up to 3 brands. Business includes up to 5 brands. Enterprise is defined to fit.',
 			},
 			{
 				q: 'What does the free trial include?',

@@ -12,6 +12,54 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-06 — Admin toast compacto + nav hamburguesa
+
+- Toast sin detalle: card horizontal compacta (`items-center`, padding reducido).
+- Admin &lt; lg: sidebar drawer + overlay; hamburguesa en el header.
+
+### 2026-11-06 — Admin media: upload preview, grid/lista, búsqueda y paginación
+
+- Cuadro de subida con preview, quitar/cambiar archivo y alt a la derecha.
+- Biblioteca: contador + search con debounce, vista grid/lista, copiar URL, eliminar, paginación.
+
+### 2026-11-06 — Admin etiquetas bilingües + selector de idioma
+
+- Etiquetas: `name` (ES) + `nameEn` (EN) al crear y editar; preview muestra solo el idioma del admin.
+- Sidebar admin: selector ES/EN arriba de Resumen (`kaiman_admin_locale`).
+
+### 2026-11-06 — Admin etiquetas: crear full-width + edición inline
+
+- Formulario «Nueva etiqueta» a ancho completo del main.
+- Cards: nombre como texto; lápiz → editar (input + check guardar); papelera → X cancelar en modo edición.
+
+### 2026-11-06 — Atomo Kbd
+
+- `components/ui/atoms/Kbd.astro`: tecla de atajo reutilizable (`border-b` tipo keycap). Tones `default` | `onPrimary`.
+- Admin nav: R Resumen, A Artículos, E Etiquetas, I Imágenes, L Analítica; N → nuevo artículo (global).
+
+### 2026-11-06 — Nombres de planes unificados
+
+- ES/EN: Starter, Pro, Business, Enterprise (mismo texto en ambos idiomas).
+
+### 2026-11-06 — Blog footer tipo directorio
+
+- Footer multi-columna (Explorar / Categorías / Legal / Cuenta+Contacto), barra legal abajo.
+- Responsive: 2 cols → 3 → 4; bloque cuenta con borde en desktop.
+
+### 2026-11-06 — Blog index: hero + card flotante
+
+- Atmósfera `night` en `body` (gradiente fixed, sin corte). Hero con más `py`.
+- Card blanca `overflow-visible`; PostCard sin `overflow-hidden` (hover no se recorta).
+
+### 2026-11-06 — Blog header en dos franjas
+
+- Arriba: logo + idiomas + «Ingresa a Kaiman». Abajo (mini): lupa + categorías del blog.
+
+### 2026-11-06 — Blog cards: portada 16:9
+
+- `PostCard` + cards `#blog`: portada `aspect-video`, título más chico, excerpt `line-clamp-3`.
+- `PostCard`: `<a>` envuelve `article` (click a la nota); sin «Leer»; tags como `span`.
+
 ### 2026-11-06 — FAQ acordeón animado
 
 - `#preguntas`: un ítem abierto a la vez; altura animada ~300ms al expandir/colapsar.

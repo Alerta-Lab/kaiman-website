@@ -1,7 +1,6 @@
 ---
-import { ArrowUpRight } from 'lucide-react';
 import type { Locale } from '../../../i18n';
-import { blogCategoryPath, blogPostPath } from '../../../lib/blog-paths';
+import { blogPostPath } from '../../../lib/blog-paths';
 import type { PostWithTags } from '../../../server/repositories/posts';
 import { tagDisplayName } from '../../../server/repositories/posts';
 
@@ -11,33 +10,39 @@ interface Props {
 }
 
 const { post, locale } = Astro.props;
-const readLabel = locale === 'en' ? 'Read' : 'Leer';
+const href = blogPostPath(locale, post.slug);
+const category = post.tags[0];
 ---
 
-<article class="group relative flex h-full flex-col border-b border-primary-200 py-gap-block first:pt-0 last:border-b-0 md:border md:border-primary-200 md:rounded-xl md:bg-white md:p-gap-block md:transition-colors md:hover:border-primary-400 md:hover:bg-primary-100/40">
-	<div class="mb-gap-control flex flex-wrap gap-gap-chip">
-		{post.tags.map((tag) => (
-			<a
-				href={blogCategoryPath(locale, tag.slug)}
-				class="relative z-10 rounded-md bg-primary-100 px-2.5 py-1 text-sm font-bold text-primary-800 hover:bg-primary-200"
-			>
-				{tagDisplayName(tag, locale)}
-			</a>
-		))}
-	</div>
-	<h2 class="font-headline text-2xl font-bold leading-tight tracking-tight text-black md:text-[1.75rem]">
-		<a href={blogPostPath(locale, post.slug)} class="after:absolute after:inset-0">
-			{post.title}
-		</a>
-	</h2>
-	<p class="mt-gap-control max-w-prose flex-1 leading-relaxed text-black/75">{post.excerpt}</p>
-	<div class="mt-gap-block flex items-center justify-between text-sm font-bold text-primary-800">
-		<time datetime={post.publishedAt?.toISOString()}>
-			{new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(post.publishedAt ?? post.createdAt)}
-		</time>
-		<span class="inline-flex items-center gap-1 text-primary" aria-hidden="true">
-			{readLabel}
-			<ArrowUpRight className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" size={18} />
-		</span>
-	</div>
-</article>
+<a
+	href={href}
+	class="group flex h-full flex-col border-b border-primary-200 py-gap-block first:pt-0 last:border-b-0 md:rounded-xl md:border md:border-primary-200 md:bg-white md:py-0 md:transition-colors md:hover:border-primary-400 md:hover:bg-primary-100/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+>
+	<article class="flex h-full flex-col">
+		<div class="aspect-video overflow-hidden bg-primary-100 md:rounded-t-xl">
+			{
+				post.coverUrl ? (
+					<img
+						src={post.coverUrl}
+						alt={post.coverAlt ?? ''}
+						class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+						loading="lazy"
+						decoding="async"
+					/>
+				) : null
+			}
+		</div>
+		<div class="flex flex-1 flex-col md:p-gap-block">
+			<h2 class="font-headline text-xl font-bold leading-snug tracking-tight text-black group-hover:text-primary-800">
+				{post.title}
+			</h2>
+			<p class="mt-gap-control line-clamp-3 max-w-prose flex-1 leading-relaxed text-black/75">{post.excerpt}</p>
+			<div class="mt-gap-block flex items-center justify-between gap-3 text-sm font-bold text-primary-800">
+				<time datetime={post.publishedAt?.toISOString()}>
+					{new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(post.publishedAt ?? post.createdAt)}
+				</time>
+				{category ? <span class="truncate text-right">{tagDisplayName(category, locale)}</span> : null}
+			</div>
+		</div>
+	</article>
+</a>

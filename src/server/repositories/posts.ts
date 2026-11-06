@@ -241,12 +241,16 @@ export async function deletePost(id: string) {
 	await requireDb().delete(posts).where(eq(posts.id, id));
 }
 
-export async function saveTag(name: string, id?: string) {
-	const value = name.trim();
-	if (value.length < 2) throw new Error('La etiqueta debe tener al menos 2 caracteres.');
+export async function saveTag(input: { name: string; nameEn?: string | null }, id?: string) {
+	const name = input.name.trim();
+	const nameEnRaw = input.nameEn?.trim() ?? '';
+	const nameEn = nameEnRaw.length > 0 ? nameEnRaw : null;
+	if (name.length < 2) throw new Error('La etiqueta en español debe tener al menos 2 caracteres.');
+	if (nameEn && nameEn.length < 2) throw new Error('La etiqueta en inglés debe tener al menos 2 caracteres.');
 	const database = requireDb();
-	if (id) return database.update(tags).set({ name: value, slug: slugify(value) }).where(eq(tags.id, id)).returning();
-	return database.insert(tags).values({ name: value, slug: slugify(value) }).returning();
+	const values = { name, nameEn, slug: slugify(name) };
+	if (id) return database.update(tags).set(values).where(eq(tags.id, id)).returning();
+	return database.insert(tags).values(values).returning();
 }
 
 export async function deleteTag(id: string) {

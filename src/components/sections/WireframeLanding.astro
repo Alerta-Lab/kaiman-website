@@ -710,20 +710,28 @@ const audienceEyebrow = 'font-display text-sm font-semibold tracking-tight text-
 									href={blogPostPath(locale, post.slug)}
 									class="flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-ink-200 transition-colors hover:border-primary/40"
 								>
-									{post.coverUrl ? (
-										<div class="aspect-[16/10] overflow-hidden bg-ink">
-											<img
-												src={post.coverUrl}
-												alt={post.coverAlt ?? ''}
-												class="h-full w-full object-cover"
-												loading="lazy"
-												decoding="async"
-											/>
-										</div>
-									) : null}
+									<div class="aspect-video overflow-hidden bg-ink">
+										{
+											post.coverUrl ? (
+												<img
+													src={post.coverUrl}
+													alt={post.coverAlt ?? ''}
+													class="h-full w-full object-cover"
+													loading="lazy"
+													decoding="async"
+												/>
+											) : null
+										}
+									</div>
 									<div class="flex flex-1 flex-col gap-2 p-5">
-										<h3 class="font-display text-lg font-semibold tracking-tight text-white">{post.title}</h3>
-										{post.excerpt ? <p class="text-sm text-pretty text-neutral-400">{post.excerpt}</p> : null}
+										<h3 class="font-display text-base font-semibold tracking-tight text-balance text-white sm:text-[1.05rem]">
+											{post.title}
+										</h3>
+										{
+											post.excerpt ? (
+												<p class="line-clamp-3 text-sm text-pretty text-neutral-400">{post.excerpt}</p>
+											) : null
+										}
 										<span class="mt-auto pt-3 text-sm font-semibold text-primary-300">{copy.blog.read}</span>
 									</div>
 								</a>

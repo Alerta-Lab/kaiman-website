@@ -379,7 +379,7 @@ export const landing = {
 		planLabel: 'Plan de referencia para este volumen',
 		unitLabel: 'Costo de referencia por crédito en ese plan',
 		enterprise:
-			'Este volumen supera los 2.500 créditos del plan Empresarial. Corporativo se arma a medida.',
+			'Este volumen supera los 2.500 créditos del plan Business. Enterprise se arma a medida.',
 		perMonth: 'al mes',
 		cta: 'Obtener plan',
 	},
@@ -400,10 +400,10 @@ export const landing = {
 		custom: 'A medida',
 		enterpriseCta: 'Agenda una llamada',
 		names: {
-			start: 'Esencial',
-			pro: 'Profesional',
-			scale: 'Empresarial',
-			enterprise: 'Corporativo',
+			start: 'Starter',
+			pro: 'Pro',
+			scale: 'Business',
+			enterprise: 'Enterprise',
 		},
 		taglines: {
 			start: 'Para personas que empiezan con marketing impulsado por IA.',
@@ -481,7 +481,7 @@ export const landing = {
 			},
 			{
 				q: '¿Puedo manejar más de una marca o negocio desde mi cuenta?',
-				a: 'Sí, según el plan. Esencial incluye 1 marca. Profesional incluye hasta 3 marcas. Empresarial incluye hasta 5 marcas. Corporativo se define a medida.',
+				a: 'Sí, según el plan. Starter incluye 1 marca. Pro incluye hasta 3 marcas. Business incluye hasta 5 marcas. Enterprise se define a medida.',
 			},
 			{
 				q: '¿Qué incluye la prueba gratis?',

@@ -1,7 +1,8 @@
 ---
-import { ChevronDown, Languages, LogIn, Search, UserPlus } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { localeLabels, locales, type Locale } from '../../../i18n';
-import { blogIndexPath, blogSearchPath, swapBlogLocalePath } from '../../../lib/blog-paths';
+import { blogCategoryPath, blogIndexPath, blogSearchPath, swapBlogLocalePath } from '../../../lib/blog-paths';
+import { listTags, tagDisplayName } from '../../../server/repositories/posts';
 
 interface Props {
 	locale: Locale;
@@ -10,72 +11,91 @@ interface Props {
 const { locale } = Astro.props;
 const home = blogIndexPath(locale);
 const search = blogSearchPath(locale);
+const categories = await listTags();
 const copy =
 	locale === 'en'
-		? { search: 'Search articles', login: 'Log in', signup: 'Sign up', language: 'Language' }
-		: { search: 'Buscar artículos', login: 'Iniciar sesión', signup: 'Registrarse', language: 'Idioma' };
+		? {
+				search: 'Search articles',
+				enter: 'Enter Kaiman',
+				language: 'Language',
+				mainNav: 'Main navigation',
+				categoriesNav: 'Categories',
+			}
+		: {
+				search: 'Buscar artículos',
+				enter: 'Ingresa a Kaiman',
+				language: 'Idioma',
+				mainNav: 'Navegación principal',
+				categoriesNav: 'Categorías',
+			};
 ---
 
-<header class="border-b border-primary-200 bg-white">
-	<nav aria-label={locale === 'en' ? 'Main navigation' : 'Navegación principal'} class="mx-auto flex max-w-7xl items-center justify-between gap-gap-control px-5 py-4 lg:px-8">
-		<a href={home} class="inline-flex items-center gap-3 font-headline text-2xl font-bold tracking-tight text-black">
-			<img src="/logo.png" alt="" width="40" height="40" class="size-10 rounded-lg bg-black object-contain p-1" />
-			<span>Kaiman <span class="text-primary">Blog</span></span>
+<header class="fixed inset-x-0 top-0 z-50 border-b border-primary-200 bg-white">
+	<nav
+		aria-label={copy.mainNav}
+		class="mx-auto flex h-14 max-w-7xl items-center justify-between gap-gap-control border-b border-primary-200 px-5 lg:px-8"
+	>
+		<a href={home} class="inline-flex items-center gap-2.5 font-headline text-xl font-bold tracking-tight text-black">
+			<img src="/logo.png" alt="" width="32" height="32" class="size-8 rounded-lg bg-black object-contain p-1" />
+			<span>
+				Kaiman <span class="text-primary">Blog</span>
+			</span>
 		</a>
-		<div class="flex items-center gap-gap-tight">
-			<details class="group relative">
-				<summary
-					class="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-lg px-3 text-sm font-bold text-primary-800 marker:content-none hover:bg-primary-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [&::-webkit-details-marker]:hidden"
-					aria-label={copy.language}
-				>
-					<Languages aria-hidden="true" size={18} />
-					<span>{localeLabels[locale]}</span>
-					<ChevronDown
-						aria-hidden="true"
-						size={16}
-						className="transition-transform duration-200 group-open:rotate-180"
-					/>
-				</summary>
-				<div class="absolute right-0 z-50 mt-2 min-w-40 rounded-lg border border-primary-200 bg-white p-2">
-					{
-						locales.map((code) => {
-							const href = swapBlogLocalePath(Astro.url.pathname, code);
-							return (
-								<a
-									href={href}
-									hreflang={code}
-									class:list={[
-										'flex min-h-11 items-center rounded-lg px-3 text-sm font-bold',
-										code === locale ? 'bg-primary text-white' : 'text-primary-800 hover:bg-primary-100',
-									]}
-									aria-current={code === locale ? 'true' : undefined}
-								>
-									{localeLabels[code]}
-								</a>
-							);
-						})
-					}
-				</div>
-			</details>
-			<a
-				aria-label={copy.search}
-				href={search}
-				class="inline-flex size-11 items-center justify-center rounded-lg text-black hover:bg-primary-100 hover:text-primary-800"
-			>
-				<Search aria-hidden="true" size={20} />
-			</a>
+		<div class="flex items-center gap-3 sm:gap-4">
+			<div class="flex items-center gap-3" role="group" aria-label={copy.language}>
+				{
+					locales.map((code) => {
+						const href = swapBlogLocalePath(Astro.url.pathname, code);
+						return (
+							<a
+								href={href}
+								hreflang={code}
+								class:list={[
+									'inline-flex h-8 items-center text-sm font-bold text-primary-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+									code === locale ? 'underline underline-offset-4' : 'opacity-80 hover:opacity-100',
+								]}
+								aria-current={code === locale ? 'true' : undefined}
+							>
+								{localeLabels[code]}
+							</a>
+						);
+					})
+				}
+			</div>
 			<a
 				href="https://app.kaimanstudio.ai/auth/login"
-				class="hidden min-h-11 items-center gap-2 rounded-lg px-4 font-bold text-black hover:bg-primary-100 sm:inline-flex"
+				class="inline-flex h-10 items-center rounded-lg bg-primary px-4 text-sm font-bold text-white hover:bg-primary-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
 			>
-				<LogIn aria-hidden="true" size={18} /> {copy.login}
-			</a>
-			<a
-				href="https://app.kaimanstudio.ai/auth/register"
-				class="inline-flex min-h-11 items-center gap-2 rounded-lg bg-primary px-4 font-bold text-white hover:bg-primary-700"
-			>
-				<UserPlus aria-hidden="true" size={18} /> {copy.signup}
+				{copy.enter}
 			</a>
 		</div>
 	</nav>
+	<div class="bg-primary-100/50">
+		<nav
+			aria-label={copy.categoriesNav}
+			class="mx-auto flex h-8 max-w-7xl items-center gap-gap-control px-5 lg:px-8"
+		>
+			<a
+				aria-label={copy.search}
+				href={search}
+				class="inline-flex size-8 shrink-0 items-center justify-center rounded-md text-black hover:text-primary-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+			>
+				<Search aria-hidden="true" size={16} />
+			</a>
+			<div class="flex min-w-0 flex-1 items-center gap-4 overflow-x-auto">
+				{
+					categories.map((tag) => (
+						<a
+							href={blogCategoryPath(locale, tag.slug)}
+							class="shrink-0 text-sm font-bold text-primary-800 opacity-80 hover:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+						>
+							{tagDisplayName(tag, locale)}
+						</a>
+					))
+				}
+			</div>
+		</nav>
+	</div>
 </header>
+{/* Spacer: main h-14 (56) + mini h-8 (32) = 88px */}
+<div class="h-[5.5rem]" aria-hidden="true"></div>

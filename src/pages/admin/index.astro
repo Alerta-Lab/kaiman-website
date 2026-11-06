@@ -1,5 +1,6 @@
 ---
 import { FileCheck2, FileClock, FileText, Plus, Tags } from 'lucide-react';
+import Kbd from '../../components/ui/atoms/Kbd.astro';
 import AdminLayout from '../../layouts/AdminLayout.astro';
 import { dashboardCounts } from '../../server/repositories/posts';
 
@@ -13,31 +14,23 @@ const cards = [
 ---
 
 <AdminLayout title="Resumen">
-	<div class="mb-gap-page flex flex-wrap justify-end">
-		<a href="/admin/posts/nuevo" class="inline-flex min-h-11 items-center gap-2 rounded-lg bg-primary px-4 font-bold text-white hover:bg-primary-700">
-			<Plus aria-hidden="true" size={19} /> Nuevo artículo
-		</a>
-	</div>
+	<a
+		slot="actions"
+		href="/admin/posts/nuevo"
+		class="inline-flex min-h-11 items-center gap-2 rounded-lg bg-primary px-4 font-bold text-white hover:bg-primary-700"
+	>
+		<Plus aria-hidden="true" size={19} /> Nuevo artículo
+		<Kbd tone="onPrimary" label="Atajo N">N</Kbd>
+	</a>
 	<section aria-label="Resumen del contenido" class="grid gap-gap-control sm:grid-cols-2 xl:grid-cols-4">
-		{cards.map(({ label, value, icon: Icon }) => (
-			<article class="rounded-xl border border-primary-200 bg-white p-5">
-				<Icon aria-hidden="true" className="text-primary" />
-				<p class="mt-4 text-sm font-bold text-primary-800">{label}</p>
-				<p class="font-headline text-4xl font-bold tracking-tight text-black">{value}</p>
-			</article>
-		))}
+		{
+			cards.map(({ label, value, icon: Icon }) => (
+				<article class="rounded-xl border border-primary-200 bg-white p-5">
+					<Icon aria-hidden="true" className="text-primary" />
+					<p class="mt-4 text-sm font-bold text-primary-800">{label}</p>
+					<p class="font-headline text-4xl font-bold tracking-tight text-black">{value}</p>
+				</article>
+			))
+		}
 	</section>
-	<section class="mt-gap-page rounded-xl border border-primary-200 bg-white p-6">
-		<h2 class="font-headline text-2xl font-bold tracking-tight">Atajos</h2>
-		<ul class="mt-4 grid gap-3 text-sm sm:grid-cols-3">
-			<li><kbd class="rounded bg-primary-100 px-2 py-1 font-bold text-primary-900">N</kbd> Nuevo artículo</li>
-			<li><kbd class="rounded bg-primary-100 px-2 py-1 font-bold text-primary-900">/</kbd> Buscar</li>
-			<li><kbd class="rounded bg-primary-100 px-2 py-1 font-bold text-primary-900">Ctrl/⌘ + S</kbd> Guardar</li>
-		</ul>
-	</section>
-	<script>
-		document.addEventListener('keydown', (event) => {
-			if (event.key.toLowerCase() === 'n' && !['INPUT', 'TEXTAREA'].includes((event.target as HTMLElement).tagName)) location.href = '/admin/posts/nuevo';
-		});
-	</script>
 </AdminLayout>
