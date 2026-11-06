@@ -32,7 +32,7 @@ export function WordPreview() {
 			const data = await response.json();
 			if (!response.ok) throw new Error(data.error ?? 'No se pudo guardar el tema.');
 			setSaved((current) => ({ ...current, [index]: data.created }));
-			setClassified((current) => ({ ...current, [index]: data.classification ?? { error: data.classificationError ?? 'Sin categoría ni etiquetas.' } }));
+			setClassified((current) => ({ ...current, [index]: data.classification ?? { error: data.classificationError ?? 'Sin categoría ni palabras clave.' } }));
 		} catch (e) { setError(e instanceof Error ? e.message : 'No se pudo conectar.'); }
 		finally { setBusy(false); }
 	}
@@ -42,7 +42,7 @@ export function WordPreview() {
 	return <div className="space-y-6">
 		<section className="rounded-2xl border border-primary-200 bg-white p-6">
 			<h2 className="font-headline text-2xl font-bold">Revisar un Word</h2>
-			<p className="mt-2">Detecta temas e idiomas sin usar créditos. Revisa y guarda cada tema como borrador. Al guardar, la IA asigna la categoría y las etiquetas (gpt-4o-mini, consumo mínimo).</p>
+			<p className="mt-2">Detecta temas e idiomas sin usar créditos. Revisa y guarda cada tema como borrador. Al guardar, la IA asigna la categoría y las palabras clave (gpt-4o-mini, consumo mínimo).</p>
 			<label className="mt-4 block font-bold">Documento .docx<input type="file" accept=".docx" className="mt-2 block" onChange={(event) => setFile(event.target.files?.[0])} /></label>
 			<button type="button" onClick={preview} disabled={busy} className="mt-4 min-h-11 rounded-lg bg-primary px-4 font-bold text-white disabled:opacity-50">{busy ? 'Leyendo…' : 'Analizar documento'}</button>
 			{error && <p role="alert" className="mt-4 text-error-700">{error}</p>}
@@ -67,7 +67,7 @@ function ClassifiedNote({ result }: { result: Classified }) {
 	return <p role="status" className="mt-4 rounded-lg bg-primary-100 p-3">
 		<strong>Categoría:</strong> {result.category.name}
 		{result.category.created && <span className="ml-2 rounded-full bg-primary px-2 py-0.5 text-sm font-bold text-white">nueva</span>}
-		<br /><strong>Etiquetas:</strong> {result.tags.map((tag) => tag.name).join(', ') || 'ninguna'}
+		<br /><strong>Palabras clave:</strong> {result.tags.map((tag) => tag.name).join(', ') || 'ninguna'}
 		<span className="mt-1 block text-sm text-black/65">Asignadas por IA a las dos versiones. Puedes cambiarlas en el editor.</span>
 	</p>;
 }

@@ -11,6 +11,6 @@ export const POST: APIRoute = async ({ params, locals }) => {
 		return Response.json(await classifyTranslationGroup(post.translationGroupId));
 	} catch (error) {
 		console.error('[classify-post]', error);
-		return Response.json({ error: 'La IA no pudo asignar categoría y etiquetas. Inténtalo de nuevo.' }, { status: 502 });
+		return Response.json({ error: 'La IA no pudo asignar categoría y palabras clave. Inténtalo de nuevo.' }, { status: 502 });
 	}
 };

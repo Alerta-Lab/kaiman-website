@@ -200,7 +200,7 @@ async function linkTagsByName(database: Tx, postId: string, names: string[], loc
 	const nameColumn = locale === 'en' ? tags.nameEn : tags.name;
 	for (const name of [...new Set(names.map((value) => value.trim()).filter(Boolean))]) {
 		const slug = slugify(name);
-		if (!slug) continue;
+		if (!slug) throw new Error('Una palabra clave no contiene caracteres válidos para su URL.');
 		let [tag] = await database
 			.select()
 			.from(tags)

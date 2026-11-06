@@ -2,6 +2,7 @@ import { ExternalLink, Eye, Languages, Save, Sparkles, Upload } from 'lucide-rea
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Toast, type ToastTone } from '../../components/blog/molecules/Toast';
 import type { ImagePart, ImageProgressEvent } from './image-progress';
+import { keywordsForSave } from './keyword-save';
 
 type ImageStage = { phase: 'waiting' | 'generating' | 'uploading' | 'uploaded' | 'saved' | 'interrupted'; percentage?: number };
 
@@ -34,8 +35,9 @@ const slugify = (value: string) =>
 	value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 type CategoryOption = { id: string; name: string };
+type TagOption = { id: string; name: string; nameEn: string | null };
 
-export function PostEditor({ initial = {}, categories = [] }: { initial?: Initial; categories?: CategoryOption[] }) {
+export function PostEditor({ initial = {}, categories = [], tagOptions = [] }: { initial?: Initial; categories?: CategoryOption[]; tagOptions?: TagOption[] }) {
 	const [data, setData] = useState({
 		title: initial.title ?? '',
 		slug: initial.slug ?? '',
@@ -53,6 +55,7 @@ export function PostEditor({ initial = {}, categories = [] }: { initial?: Initia
 	const [notice, setNotice] = useState<Notice | null>(null);
 	const [busy, setBusy] = useState(false);
 	const [brief, setBrief] = useState('');
+	const [tagSearch, setTagSearch] = useState('');
 	const [approved, setApproved] = useState(Boolean(initial.editorial?.approvedAt));
 	const [dirty, setDirty] = useState(false);
 	const [savedRevision, setSavedRevision] = useState(initial.updatedAt ?? '');
@@ -71,6 +74,19 @@ export function PostEditor({ initial = {}, categories = [] }: { initial?: Initia
 	};
 
 	const update = (field: keyof typeof data, value: string) => { setDirty(true); setApproved(false); setData((current) => ({ ...current, [field]: value })); };
+	const selectedTags = data.tags.split(',').map((tag) => tag.trim()).filter(Boolean);
+	const tagKey = (value: string) => value.trim().toLocaleLowerCase();
+	const availableTags = tagOptions.map((tag) => ({ ...tag, label: data.locale === 'en' && tag.nameEn ? tag.nameEn : tag.name }))
+		.filter((tag) => !selectedTags.some((selected) => tagKey(selected) === tagKey(tag.label)))
+		.filter((tag) => !tagSearch.trim() || tagKey(`${tag.name} ${tag.nameEn ?? ''}`).includes(tagKey(tagSearch)));
+	const addTag = (name: string) => {
+		const value = name.trim();
+		if (value.length < 2 || value.length > 50 || value.includes(',') || selectedTags.length >= 8 || selectedTags.some((tag) => tagKey(tag) === tagKey(value))) return;
+		update('tags', [...selectedTags, value].join(', '));
+		setTagSearch('');
+	};
+	const search = tagSearch.trim();
+	const matchesExistingTag = tagOptions.some((tag) => [tag.name, tag.nameEn].some((name) => name && tagKey(name) === tagKey(search))) || selectedTags.some((tag) => tagKey(tag) === tagKey(search));
 	const derivedSlug = useMemo(() => slugify(data.title), [data.title]);
 	const targetLocale = data.locale === 'es' ? 'en' : 'es';
 	const closeNotice = useCallback(() => setNotice(null), []);
@@ -92,6 +108,13 @@ export function PostEditor({ initial = {}, categories = [] }: { initial?: Initia
 
 	const save = async (event?: { preventDefault: () => void }) => {
 		event?.preventDefault();
+		let keywords: string[];
+		try {
+			keywords = keywordsForSave(selectedTags, tagSearch, tagOptions, data.locale);
+		} catch (error) {
+			showNotice({ tone: 'error', title: error instanceof Error ? error.message : 'Revisa la palabra clave pendiente.' });
+			return;
+		}
 		setBusy(true);
 		setNotice(null);
 		const response = await safeFetch(initial.id ? `/api/admin/posts/${initial.id}` : '/api/admin/posts', {
@@ -102,10 +125,7 @@ export function PostEditor({ initial = {}, categories = [] }: { initial?: Initia
 				...(editorial ? { editorial } : {}),
 				slug: data.slug || derivedSlug,
 				categoryId: data.categoryId || null,
-				tags: data.tags
-					.split(',')
-					.map((tag) => tag.trim())
-					.filter(Boolean),
+				tags: keywords,
 			}),
 		});
 		if (!response.ok) {
@@ -115,6 +135,8 @@ export function PostEditor({ initial = {}, categories = [] }: { initial?: Initia
 		}
 		const result = await response.json();
 		setBusy(false);
+		setData((current) => ({ ...current, tags: keywords.join(', ') }));
+		setTagSearch('');
 		if (result.updatedAt) setSavedRevision(result.updatedAt);
 		setSavedStatus(data.status);
 		setSavedSlug(data.slug || derivedSlug);
@@ -146,12 +168,12 @@ export function PostEditor({ initial = {}, categories = [] }: { initial?: Initia
 
 	const classify = async () => {
 		if (!initial.id || dirty) {
-			showNotice({ tone: 'info', title: 'Guarda los cambios antes de pedir la categoría y las etiquetas.' });
+			showNotice({ tone: 'info', title: 'Guarda los cambios antes de pedir la categoría y las palabras clave.' });
 			return;
 		}
-		if (!confirm('La IA asignará la categoría y las etiquetas a todas las versiones de este artículo y reemplazará las actuales. ¿Continuar?')) return;
+		if (!confirm('La IA asignará la categoría y las palabras clave a todas las versiones de este artículo y reemplazará las actuales. ¿Continuar?')) return;
 		setBusy(true);
-		showNotice({ tone: 'info', title: 'Asignando categoría y etiquetas con gpt-4o-mini…' });
+		showNotice({ tone: 'info', title: 'Asignando categoría y palabras clave con gpt-4o-mini…' });
 		const response = await safeFetch(`/api/admin/posts/${initial.id}/classify`, { method: 'POST' });
 		if (!response.ok) {
 			setBusy(false);
@@ -361,14 +383,23 @@ export function PostEditor({ initial = {}, categories = [] }: { initial?: Initia
 						</select>
 						<span className="mt-1 block text-sm font-normal text-black/60">Sector del negocio. Se comparte entre los dos idiomas.</span>
 					</label>
-					<label className="block font-bold">
-						Etiquetas
-						<input className={`${field} mt-2`} placeholder="Membresías, fidelización" value={data.tags} onChange={(e) => update('tags', e.target.value)} />
-						<span className="mt-1 block text-sm font-normal text-black/60">Temas del artículo, separados por comas.</span>
-					</label>
+					<fieldset className="min-w-0">
+						<legend className="font-bold">Palabras clave</legend>
+						<p id="tag-help" className="mt-1 text-sm text-black/60">Selecciona temas o crea una palabra clave nueva. Al guardar también se agregará el texto escrito aquí. Máximo 8.</p>
+						<div className="mt-3 flex flex-wrap gap-2" aria-label="Palabras clave seleccionadas">
+							{selectedTags.length === 0 && <span className="text-sm text-black/60">Aún no hay palabras clave seleccionadas.</span>}
+							{selectedTags.map((tag, index) => <span key={`${tag}-${index}`} className="inline-flex items-center gap-2 rounded-lg bg-primary-100 px-3 py-1 text-sm font-semibold">{tag}<button type="button" aria-label={`Quitar ${tag}`} onClick={() => update('tags', selectedTags.filter((_, i) => i !== index).join(', '))} className="rounded px-1 text-primary-800 hover:bg-primary-200">×</button></span>)}
+						</div>
+						<label htmlFor="tag-search" className="mt-3 block text-sm font-bold">Buscar o crear palabra clave</label>
+						<input id="tag-search" className={`${field} mt-1`} placeholder="Ej. fidelización" value={tagSearch} onChange={(e) => setTagSearch(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); const exact = availableTags.find((tag) => [tag.name, tag.nameEn].some((name) => name && tagKey(name) === tagKey(search))); if (exact) addTag(exact.label); else if (!matchesExistingTag) addTag(search); } }} maxLength={50} aria-describedby="tag-help" />
+						{selectedTags.length >= 8 && <p className="mt-2 text-sm text-black/60">Ya seleccionaste 8 palabras clave. Quita una para agregar otra.</p>}
+						{availableTags.length > 0 && <ul className="mt-2 max-h-40 overflow-y-auto rounded-lg border border-black/10 bg-white" aria-label="Palabras clave disponibles">{availableTags.map((tag) => <li key={tag.id}><button type="button" disabled={selectedTags.length >= 8} onClick={() => addTag(tag.label)} className="min-h-11 w-full px-3 text-left text-sm hover:bg-primary-100 disabled:opacity-50">+ {tag.label}</button></li>)}</ul>}
+						{search.length >= 2 && !search.includes(',') && !matchesExistingTag && <button type="button" disabled={selectedTags.length >= 8} onClick={() => addTag(search)} className="mt-2 min-h-11 rounded-lg border border-primary-700 px-3 text-sm font-bold text-primary-800 disabled:opacity-50">Crear «{search}»</button>}
+						{search.includes(',') && <p className="mt-2 text-sm text-error-700">Agrega una palabra clave a la vez, sin comas.</p>}
+					</fieldset>
 					{initial.id && (
 						<button type="button" onClick={classify} disabled={busy || dirty} className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-primary-700 bg-white px-4 font-bold text-primary-800 hover:bg-primary-100 disabled:opacity-50">
-							<Sparkles size={18} aria-hidden /> Sugerir categoría y etiquetas con IA
+							<Sparkles size={18} aria-hidden /> Sugerir categoría y palabras clave con IA
 						</button>
 					)}
 					<label className="block font-bold">

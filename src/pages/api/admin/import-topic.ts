@@ -19,6 +19,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
 		return Response.json({ created: saved.created, classification }, { status: 201 });
 	} catch (error) {
 		console.error('[import-topic classify]', error);
-		return Response.json({ created: saved.created, classification: null, classificationError: 'Los borradores se guardaron, pero la IA no pudo asignar categoría y etiquetas. Usa «Sugerir con IA» en el editor.' }, { status: 201 });
+		return Response.json({ created: saved.created, classification: null, classificationError: 'Los borradores se guardaron, pero la IA no pudo asignar categoría y palabras clave. Usa «Sugerir con IA» en el editor.' }, { status: 201 });
 	}
 };
