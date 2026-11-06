@@ -57,7 +57,7 @@ export const landing = {
 			{
 				label: 'Plan',
 				eyebrow: 'Desde 49 USD',
-				title: 'Mejor marketing debe estar al alcance de tu negocio.',
+				title: 'Un mejor marketing debe estar al alcance de tu negocio.',
 				body: 'Elige el plan que mejor se adapte a las necesidades de tu empresa.',
 			},
 		],
@@ -384,7 +384,7 @@ export const landing = {
 		cta: 'Obtener plan',
 	},
 	plans: {
-		title: 'Mejor marketing debe estar al alcance de tu negocio.',
+		title: 'Un mejor marketing debe estar al alcance de tu negocio.',
 		intro:
 			'Elige el plan que mejor se adapte a las necesidades de tu empresa. Todos los planes de Kaiman parten del mismo Brand Understanding y te dan acceso a capacidades de marketing diseñadas para ayudarte a trabajar mejor y más eficientemente.',
 		perMonth: 'USD',
