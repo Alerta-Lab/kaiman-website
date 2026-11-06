@@ -12,6 +12,10 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-06 — FAQ acordeón animado
+
+- `#preguntas`: un ítem abierto a la vez; altura animada ~300ms al expandir/colapsar.
+
 ### 2026-11-05 — Tools: section-13-*
 
 - Cards: 1→`13-1` … 8→`13-8` (todas las cards tools).
@@ -46,6 +50,7 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 ### 2026-11-05 — Tools chips: borde blanco
 
 - Categorías de `#tools` con `border-white` (antes `border-feature-*`).
+- Responsive: grid `2 / sm:3 / md:4 / lg:7` (antes una sola fila `flex-1` que se solapaba en mobile).
 
 ### 2026-11-05 — Finder defaults
 

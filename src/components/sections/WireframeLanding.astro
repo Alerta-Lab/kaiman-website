@@ -80,9 +80,9 @@ const glowMist =
 	'pointer-events-none absolute inset-0 bg-[radial-gradient(900px_520px_at_100%_0%,rgba(0,207,255,0.06),transparent_58%),radial-gradient(900px_480px_at_0%_100%,rgba(113,73,251,0.16),transparent_62%)]';
 const hairline = 'border-b border-white/[0.06]';
 const h2 =
-	'font-display text-[clamp(1.65rem,3.4vw,2.75rem)] leading-[1.08] font-semibold tracking-tight text-white';
+	'font-display text-[clamp(1.65rem,3.4vw,2.75rem)] leading-[1.08] font-semibold tracking-tight text-balance text-white';
 const h3 =
-	'mt-2 font-display text-[clamp(1.5rem,2.8vw,2.15rem)] leading-[1.1] font-semibold tracking-tight text-white';
+	'mt-2 font-display text-[clamp(1.5rem,2.8vw,2.15rem)] leading-[1.1] font-semibold tracking-tight text-balance text-white';
 const lead = 'mt-4 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base';
 const body = 'mt-3 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base';
 const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-tight text-white sm:text-xl';
@@ -106,7 +106,7 @@ const audienceEyebrow = 'font-display text-sm font-semibold tracking-tight text-
 					{wf.hero.titleBefore}
 					<br />
 					{wf.hero.titleAfter}{' '}
-					<span class="bg-[linear-gradient(90deg,#00cfff_0%,#7149fb_100%)] bg-clip-text text-transparent">
+					<span class="whitespace-nowrap bg-[linear-gradient(90deg,#00cfff_0%,#7149fb_100%)] bg-clip-text text-transparent">
 						{wf.hero.titleAccent}
 					</span>
 				</h1>
@@ -529,10 +529,10 @@ const audienceEyebrow = 'font-display text-sm font-semibold tracking-tight text-
 					))
 				}
 			</div>
-			<div class="mt-8 flex w-full gap-2">
+			<div class="mt-8 grid w-full grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
 				{
 					wf.tools.categories.map((cat) => (
-						<span class="flex min-w-0 flex-1 items-center justify-center rounded-lg border border-white px-2 py-2.5 text-center font-display text-xs font-semibold tracking-tight text-white sm:text-sm">
+						<span class="flex items-center justify-center rounded-lg border border-white px-3 py-2.5 text-center font-display text-xs font-semibold tracking-tight text-balance text-white last:col-span-2 sm:text-sm sm:last:col-span-3 md:last:col-span-1">
 							{cat.label}
 						</span>
 					))
@@ -742,7 +742,7 @@ const audienceEyebrow = 'font-display text-sm font-semibold tracking-tight text-
 	<section id="preguntas" class:list={[sectionY, 'scroll-mt-28', hairline]}>
 		<div class="mx-auto w-full max-w-3xl px-5 sm:px-6 lg:px-8">
 			<h2 class={h2}>{wf.faq.title}</h2>
-			<div class="mt-8">
+			<div class="mt-8" data-faq-list>
 				{
 					wf.faq.items.map((item, index) => (
 						<details class="group border-b border-white/15 open:border-transparent open:bg-white">
@@ -756,14 +756,71 @@ const audienceEyebrow = 'font-display text-sm font-semibold tracking-tight text-
 									</span>
 								</span>
 							</summary>
-							<p class="px-5 pb-6 pl-[3.75rem] text-base text-pretty text-neutral-300 group-open:text-ink/80 sm:px-6 sm:pl-16">
-								{item.a}
-							</p>
+							<div
+								data-faq-panel
+								class="overflow-hidden transition-[height] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+								style="height: 0px"
+							>
+								<p class="px-5 pb-6 pl-[3.75rem] text-base text-pretty text-neutral-300 group-open:text-ink/80 sm:px-6 sm:pl-16">
+									{item.a}
+								</p>
+							</div>
 						</details>
 					))
 				}
 			</div>
 		</div>
+		<script>
+			const list = document.querySelector<HTMLElement>('#preguntas [data-faq-list]');
+			if (list) {
+				const items = [...list.querySelectorAll<HTMLDetailsElement>('details')];
+				const panelOf = (details: HTMLDetailsElement) =>
+					details.querySelector<HTMLElement>('[data-faq-panel]');
+
+				const closeItem = (details: HTMLDetailsElement) => {
+					const panel = panelOf(details);
+					if (!panel || !details.open) return;
+					// From `auto` → px → 0 needs a reflow or the collapse skips the transition.
+					panel.style.height = `${panel.scrollHeight}px`;
+					void panel.offsetHeight;
+					panel.style.height = '0px';
+					const onEnd = (event: TransitionEvent) => {
+						if (event.propertyName !== 'height') return;
+						panel.removeEventListener('transitionend', onEnd);
+						details.open = false;
+					};
+					panel.addEventListener('transitionend', onEnd);
+				};
+
+				const openItem = (details: HTMLDetailsElement) => {
+					items.forEach((other) => {
+						if (other !== details) closeItem(other);
+					});
+					const panel = panelOf(details);
+					if (!panel || details.open) return;
+					details.open = true;
+					panel.style.height = '0px';
+					void panel.offsetHeight;
+					panel.style.height = `${panel.scrollHeight}px`;
+					const onEnd = (event: TransitionEvent) => {
+						if (event.propertyName !== 'height') return;
+						panel.removeEventListener('transitionend', onEnd);
+						panel.style.height = 'auto';
+					};
+					panel.addEventListener('transitionend', onEnd);
+				};
+
+				items.forEach((details) => {
+					const summary = details.querySelector('summary');
+					if (!summary) return;
+					summary.addEventListener('click', (event) => {
+						event.preventDefault();
+						if (details.open) closeItem(details);
+						else openItem(details);
+					});
+				});
+			}
+		</script>
 	</section>
 
 	{/* Close CTA */}
