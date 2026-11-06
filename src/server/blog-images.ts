@@ -38,6 +38,7 @@ export function imagePrompts(post: Post, bodyAspect: BodyAspect = '9:16') {
 		const concept = [
 			`Article title: ${post.title}`,
 			post.excerpt?.trim() && `Article summary: ${post.excerpt.trim()}`,
+			post.markdown?.trim() && `Article context (excerpt): ${post.markdown.trim().slice(0, 6000)}`,
 			description.trim() && `Image description: ${description.trim()}`,
 			brief.trim() && `Image brief: ${brief.trim()}`,
 		].filter(Boolean).join('\n');
@@ -56,8 +57,9 @@ export function imagePrompts(post: Post, bodyAspect: BodyAspect = '9:16') {
 	] as const;
 }
 
-export async function generateBlogImages(post: Post, bodyAspect: BodyAspect = '9:16', onProgress: (event: ImageProgressEvent) => void = () => {}) {
-	const prompts = imagePrompts(post, bodyAspect);
+export async function generateBlogImages(post: Post, bodyAspect: BodyAspect = '9:16', onProgress: (event: ImageProgressEvent) => void = () => {}, reviewedPrompts?: readonly [string, string]) {
+	const defaults = imagePrompts(post, bodyAspect);
+	const prompts = reviewedPrompts ?? defaults;
 	const apiKey = getEnv('OPENAI_API_KEY');
 	if (!apiKey) throw new Error('OpenAI no está configurado.');
 	const blobToken = getEnv('BLOB_READ_WRITE_TOKEN');

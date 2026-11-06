@@ -46,6 +46,10 @@ describe('imágenes con Blob', () => {
 		expect(mock.generate).not.toHaveBeenCalled();
 		expect(mock.put).not.toHaveBeenCalled();
 	});
+	it('envía al modelo las instrucciones que revisó el usuario', async () => {
+		await generateBlogImages(post, '9:16', () => {}, ['Portada revisada', 'Interior revisado']);
+		expect(mock.generate.mock.calls.map(([args]) => args.prompt)).toEqual(['Portada revisada', 'Interior revisado']);
+	});
 	it('sube las imágenes locales existentes sin llamar al generador', async () => {
 		const local = { ...post, coverUrl: '/blog-generated/aaaaaaaa.webp', editorial: { ...post.editorial!, bodyImageUrl: '/blog-generated/bbbbbbbb.webp' } };
 		mock.select.mockReturnValue({ from: () => ({ where: () => ({ for: async () => [local] }) }) });

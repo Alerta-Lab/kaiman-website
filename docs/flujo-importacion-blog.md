@@ -7,7 +7,7 @@ El panel incluye vista previa de Word, guardado de cada tema como borradores vin
 1. Subir un Word y detectar temas y versiones de idioma. La vista previa permite guardar cada tema por separado.
 2. Extraer y mapear contenido por tema e idioma. La IA identifica las versiones y sus campos con solicitudes de texto; el contenido se copia de los bloques extraídos del Word. El análisis consume créditos, y el número de solicitudes aumenta con las versiones. Hay que comparar el resultado con el original y revisar los bloques omitidos: no se garantiza una detección perfecta de todos los formatos.
 3. Revisar y editar los campos en la vista previa. El servidor valida los datos y evita sobrescribir slugs existentes; no genera automáticamente sugerencias para corregir conflictos. Se guardan borradores, nunca se publica automáticamente.
-4. Si solo existe español, ofrecer «Crear versión en inglés»; ejecutar la traducción únicamente cuando el usuario la solicite. Si solo existe inglés, ofrecer español del mismo modo. Si existen ambas versiones, conservarlas y vincularlas sin mostrar la oferta de traducción ni llamar a IA para traducir.
+4. Si solo existe un idioma, ofrecer traducir el otro en la revisión; ejecutar la traducción únicamente cuando el usuario la solicite. Revisar los textos alternativos y pies de imagen de la versión traducida. Si existen ambas versiones, conservarlas y vincularlas sin ofrecer traducción en la revisión.
 5. El usuario revisa y acepta cada borrador individualmente. La aceptación indica que el texto está listo para el paso visual: no cambia el estado a publicado.
 6. Después de aceptar el contenido, se pueden generar portada e imagen interior de ese tema. La generación no se repite automáticamente y las imágenes requieren revisión antes de publicar.
 
@@ -40,7 +40,7 @@ El panel incluye vista previa de Word, guardado de cada tema como borradores vin
 ## Validaciones y protección del contenido
 
 - Cada versión se guarda como borrador con su propio slug; se vinculan mediante un grupo de traducción.
-- El título visible actualmente admite hasta 120 caracteres; si se supera debe avisarse sin recortar el original. El título SEO y la descripción SEO se conservan completos: Google puede mostrar solo una parte en los resultados, pero 60 y 160 caracteres no son límites de Google.
+- El título visible, la entradilla, el título SEO y la descripción SEO se conservan completos: Google puede mostrar solo una parte en los resultados, pero 60 y 160 caracteres no son límites de Google.
 - Si un slug ya existe para el mismo idioma, el guardado falla sin reemplazar el artículo. El mensaje actual es general; se puede corregir el slug en la vista previa y volver a intentar.
 - Las versiones incompletas o de idioma dudoso requieren revisión; no asumir que son una traducción equivalente.
 - Las señales `hreflang` de artículos solo enlazan versiones equivalentes publicadas; falta mapear redirecciones de URLs anteriores antes de una migración.
@@ -49,7 +49,7 @@ El panel incluye vista previa de Word, guardado de cada tema como borradores vin
 ## Imágenes
 
 - Portada horizontal 16:9; interior vertical 9:16 por defecto, con 3:2 como opción. La generación puede necesitar resolución compatible y recorte o adaptación revisable.
-- La instrucción de generación incluye el título, el alt y el prompt del documento si existe, además de una dirección visual común. No se propone un prompt adicional editable automáticamente ni se detectan contradicciones. Se pide evitar letras y texto en la imagen; el resultado debe revisarse.
+- Tras aceptar el contenido, el sistema prepara indicaciones editables con título, entradilla, un fragmento del artículo, alt y prompt del Word, más la dirección visual común. Prepararlas no consume créditos. Las instrucciones revisadas se envían al generar; su edición aplica a esa generación y no queda guardada como plantilla. No se detectan contradicciones automáticamente. Se pide evitar letras y texto en la imagen; el resultado debe revisarse.
 - Compartir las imágenes entre idiomas si son apropiadas para ambos; mantener sus descripciones alternativas y pies localizados.
 - Las nuevas imágenes se almacenan en un Blob público persistente: cualquiera con la URL puede verlas, incluso antes de publicar. Las imágenes locales previas se pueden subir sin regenerar. Si se requiere confidencialidad para borradores, se debe implementar almacenamiento privado separado.
 

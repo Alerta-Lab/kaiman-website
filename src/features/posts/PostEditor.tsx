@@ -15,7 +15,6 @@ import {
 	Sparkles,
 	Strikethrough,
 	Trash2,
-	Upload,
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { Toast, type ToastTone } from '../../components/blog/molecules/Toast';
@@ -166,10 +165,12 @@ export function PostEditor({
 	const [translationGroupId, setTranslationGroupId] = useState(initialGroupId);
 	const [notice, setNotice] = useState<Notice | null>(null);
 	const [busy, setBusy] = useState(false);
+	const [idea, setIdea] = useState('');
+	const [generatedDraft, setGeneratedDraft] = useState('');
 	const [tagSearches, setTagSearches] = useState<Record<ContentLocale, string>>({ es: '', en: '' });
-	const [dirty, setDirty] = useState(false);
-	const [fileName, setFileName] = useState('');
-	const fileRef = useRef<HTMLInputElement>(null);
+	const [dirtyLocales, setDirtyLocales] = useState<Record<ContentLocale, boolean>>({ es: false, en: false });
+	const [categoryDirty, setCategoryDirty] = useState(false);
+	const dirty = dirtyLocales.es || dirtyLocales.en || categoryDirty || Boolean(tagSearches.es.trim() || tagSearches.en.trim());
 	const markdownRef = useRef<HTMLTextAreaElement>(null);
 
 	const draft = versions[activeLocale];
@@ -190,7 +191,7 @@ export function PostEditor({
 	const closeNotice = useCallback(() => setNotice(null), []);
 
 	const updateActive = (patch: Partial<LocaleDraft>) => {
-		setDirty(true);
+		setDirtyLocales((current) => ({ ...current, [activeLocale]: true }));
 		setVersions((current) => ({
 			...current,
 			[activeLocale]: { ...current[activeLocale], ...patch },
@@ -264,7 +265,8 @@ export function PostEditor({
 		};
 		setBusy(false);
 		setTagSearches((current) => ({ ...current, [activeLocale]: '' }));
-		setDirty(false);
+		setDirtyLocales((current) => ({ ...current, [activeLocale]: false }));
+		setCategoryDirty(false);
 		setTranslationGroupId((current) => current ?? result.translationGroupId);
 		setVersions((current) => ({
 			...current,
@@ -328,7 +330,7 @@ export function PostEditor({
 			};
 		};
 		setBusy(false);
-		setDirty(true);
+		setDirtyLocales((current) => ({ ...current, [activeLocale]: true }));
 		setVersions((current) => ({
 			...current,
 			[activeLocale]: {
@@ -362,42 +364,15 @@ export function PostEditor({
 		}
 		location.reload();
 	};
-
-	const importWord = async () => {
-		const file = fileRef.current?.files?.[0];
-		if (!file) {
-			showNotice({ tone: 'info', title: copy.selectWord });
-			return;
-		}
-		if ((draft.title || draft.markdown || draft.excerpt) && !confirm(copy.confirmImport)) return;
-		setBusy(true);
-		showNotice({ tone: 'info', title: copy.analyzingDoc });
-		const form = new FormData();
-		form.set('document', file);
-		form.set('locale', activeLocale);
-		const response = await safeFetch('/api/admin/import-word', { method: 'POST', body: form });
-		if (!response.ok) {
-			setBusy(false);
-			showNotice(await readError(response));
-			return;
-		}
+	const generateFromIdea = async () => {
+		if (idea.trim().length < 10 || busy) return;
+		setBusy(true); setNotice(null); setGeneratedDraft('');
+		const response = await safeFetch('/api/admin/posts/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ brief: idea, locale: activeLocale }) });
+		if (!response.ok) { setBusy(false); showNotice(await readError(response)); return; }
 		const result = await response.json();
 		setBusy(false);
-		setDirty(true);
-		setVersions((current) => ({
-			...current,
-			[activeLocale]: {
-				...current[activeLocale],
-				title: result.title ?? current[activeLocale].title,
-				slug: result.slug ?? current[activeLocale].slug,
-				excerpt: result.excerpt ?? current[activeLocale].excerpt,
-				markdown: result.markdown ?? current[activeLocale].markdown,
-				seoTitle: result.seoTitle ?? current[activeLocale].seoTitle,
-				seoDescription: result.seoDescription ?? current[activeLocale].seoDescription,
-				tags: Array.isArray(result.tags) ? result.tags.join(', ') : current[activeLocale].tags,
-			},
-		}));
-		showNotice({ tone: 'success', title: copy.imported });
+		if (typeof result.id !== 'string' || !result.id) { showNotice({ tone: 'error', title: copy.actionFailed }); return; }
+		setGeneratedDraft(result.id); showNotice({ tone: 'success', title: copy.ideaReady });
 	};
 
 	const remove = async () => {
@@ -421,6 +396,11 @@ export function PostEditor({
 		document.addEventListener('keydown', handler);
 		return () => document.removeEventListener('keydown', handler);
 	});
+	useEffect(() => {
+		const warn = (event: BeforeUnloadEvent) => { if (dirty) { event.preventDefault(); event.returnValue = ''; } };
+		window.addEventListener('beforeunload', warn);
+		return () => window.removeEventListener('beforeunload', warn);
+	}, [dirty]);
 
 	const md = (before: string, after = '', fallback = '') =>
 		insertMarkdown(markdownRef, before, after, fallback, (value) => updateActive({ markdown: value }));
@@ -443,37 +423,9 @@ export function PostEditor({
 			<section className="rounded-2xl border border-white bg-white p-5 sm:p-6">
 				<h2 className="font-headline text-xl font-bold tracking-tight text-black">{copy.aiImportTitle}</h2>
 				<p className="mt-1 max-w-2xl font-body text-sm font-normal text-black">{copy.aiImportDesc}</p>
-				<div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
-					<input
-						ref={fileRef}
-						id="post-word-upload"
-						aria-label={copy.wordDocumentAria}
-						type="file"
-						accept=".doc,.docx"
-						className="sr-only"
-						onChange={(event) => setFileName(event.target.files?.[0]?.name ?? '')}
-					/>
-					<label
-						htmlFor="post-word-upload"
-						className="flex min-h-11 w-full flex-1 cursor-pointer items-center gap-3 rounded-lg border border-black-stroke/30 bg-primary-100/50 px-2 py-1.5"
-					>
-						<span className="inline-flex min-h-9 shrink-0 items-center rounded-md bg-primary px-3 font-body text-sm font-medium text-white">
-							{copy.chooseFile}
-						</span>
-						<span className="truncate font-body text-sm font-normal text-black/70">
-							{fileName || copy.noFileChosen}
-						</span>
-					</label>
-					<button
-						type="button"
-						onClick={importWord}
-						disabled={busy}
-						className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-lg bg-primary px-5 font-body font-medium text-white hover:bg-primary-700 disabled:opacity-50"
-					>
-						<Upload size={18} aria-hidden /> {copy.import}
-					</button>
-				</div>
+				<a href="/admin/importar" className="mt-5 inline-flex min-h-11 items-center rounded-lg bg-primary px-5 font-body font-medium text-white hover:bg-primary-700">{copy.reviewWord}</a>
 			</section>
+			{mode === 'create' && <details className="rounded-2xl border border-white bg-white p-5 sm:p-6"><summary className="cursor-pointer font-headline text-xl font-bold text-black">{copy.ideaTitle}</summary><p className="mt-2 text-sm text-black/70">{copy.ideaHint}</p><label className="mt-3 block font-bold">{copy.ideaLabel}<textarea className={`${fieldClass} mt-1 min-h-24`} maxLength={4000} value={idea} onChange={(event) => setIdea(event.target.value)} /></label><button type="button" disabled={busy || idea.trim().length < 10} onClick={generateFromIdea} className="mt-3 min-h-11 rounded-lg bg-primary px-4 font-bold text-white disabled:opacity-50">{busy ? copy.ideaWorking : copy.ideaGenerate}</button>{generatedDraft && <a href={`/admin/posts/${generatedDraft}`} className="ml-3 inline-flex min-h-11 items-center font-bold text-primary underline">{copy.ideaOpen}</a>}</details>}
 
 			<div className="flex flex-wrap items-center justify-between gap-3">
 				<div
@@ -495,11 +447,11 @@ export function PostEditor({
 							onClick={() => setActiveLocale(code)}
 							className="min-w-28 rounded-lg px-4 font-body text-sm font-medium text-black aria-selected:bg-primary aria-selected:text-white"
 						>
-							{label}
+							{label}{(dirtyLocales[code] || tagSearches[code].trim() || (categoryDirty && activeLocale === code)) ? ` · ${copy.unsaved}` : ''}
 						</button>
 					))}
 				</div>
-				<button
+				{!draft.id && !draft.title.trim() && !draft.markdown.trim() && Boolean(other.title.trim() && other.markdown.trim()) && <button
 					type="button"
 					onClick={translate}
 					disabled={busy}
@@ -507,7 +459,7 @@ export function PostEditor({
 					className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-primary-700 bg-white px-4 font-body font-medium text-primary-800 hover:bg-primary-100 disabled:opacity-50"
 				>
 					<Languages size={18} aria-hidden /> {busy ? copy.translating : copy.translate}
-				</button>
+				</button>}
 			</div>
 
 			<form onSubmit={save} className="space-y-5">
@@ -608,7 +560,7 @@ export function PostEditor({
 									className={selectClass}
 									value={categoryId}
 									onChange={(e) => {
-										setDirty(true);
+										setCategoryDirty(true);
 										setCategoryId(e.target.value);
 									}}
 								>

@@ -1,5 +1,5 @@
-import { ExternalLink, Eye, Languages, Save, Sparkles, Upload } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ExternalLink, Eye, Languages, Save, Sparkles } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Toast, type ToastTone } from '../../components/blog/molecules/Toast';
 import type { AdminCopy } from '../../i18n/locales/es/admin-editorial';
 import { fillAdmin } from '../../i18n/ui';
@@ -96,6 +96,9 @@ export function PostEditor({
 		bodyImageUrl: initial.editorial?.bodyImageUrl ?? '',
 	});
 	const [bodyAspect, setBodyAspect] = useState<'9:16' | '3:2'>('9:16');
+	const [imagePrompts, setImagePrompts] = useState<{ cover: string; body: string; updatedAt: string } | null>(null);
+	const [promptLoading, setPromptLoading] = useState(false);
+	const [promptError, setPromptError] = useState(false);
 	const [imageProgress, setImageProgress] = useState<Record<ImagePart, ImageStage> | null>(null);
 	const [savingImages, setSavingImages] = useState(false);
 	const [editorial, setEditorial] = useState(
@@ -109,7 +112,6 @@ export function PostEditor({
 				}
 			: null,
 	);
-	const fileRef = useRef<HTMLInputElement>(null);
 	const safeFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
 		try {
 			return await fetch(input, init);
@@ -117,6 +119,21 @@ export function PostEditor({
 			return Response.json({ error: copy.networkError }, { status: 503 });
 		}
 	};
+	useEffect(() => {
+		let cancelled = false;
+		setImagePrompts(null); setPromptError(false);
+		if (!approved || dirty || !initial.id) { setPromptLoading(false); return; }
+		setPromptLoading(true);
+		void fetch(`/api/admin/posts/${initial.id}/image-prompts`, {
+			method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ bodyAspect }),
+		}).then(async (response) => {
+			if (!response.ok) throw new Error('Prompt preview failed');
+			return response.json() as Promise<{ cover: string; body: string; updatedAt: string }>;
+		}).then((result) => { if (!cancelled) setImagePrompts(result); })
+			.catch(() => { if (!cancelled) setPromptError(true); })
+			.finally(() => { if (!cancelled) setPromptLoading(false); });
+		return () => { cancelled = true; };
+	}, [approved, bodyAspect, dirty, initial.id]);
 
 	const update = (field: keyof typeof data, value: string) => { setDirty(true); setApproved(false); setData((current) => ({ ...current, [field]: value })); };
 	const selectedTags = data.tags.split(',').map((tag) => tag.trim()).filter(Boolean);
@@ -230,36 +247,6 @@ export function PostEditor({
 		location.reload();
 	};
 
-	const importWord = async () => {
-		const file = fileRef.current?.files?.[0];
-		if (!file) {
-			showNotice({ tone: 'info', title: copy.selectWord });
-			return;
-		}
-		if ((data.title || data.markdown || data.excerpt) && !confirm(copy.confirmImport)) return;
-		setBusy(true);
-		showNotice({ tone: 'info', title: copy.analyzingDoc });
-		const form = new FormData();
-		form.set('document', file);
-		form.set('locale', data.locale);
-		const response = await safeFetch('/api/admin/import-word', { method: 'POST', body: form });
-		if (!response.ok) {
-			setBusy(false);
-			showNotice(await readError(response));
-			return;
-		}
-		const result = await response.json();
-		setBusy(false);
-		setData((current) => ({
-			...current,
-			...result,
-			tags: Array.isArray(result.tags) ? result.tags.join(', ') : current.tags,
-		}));
-		setDirty(true);
-		setApproved(false);
-		showNotice({ tone: 'success', title: copy.imported });
-	};
-
 	const generate = async () => {
 		if (brief.trim().length < 10) {
 			showNotice({ tone: 'info', title: copy.briefTooShort });
@@ -300,7 +287,7 @@ export function PostEditor({
 	};
 
 	const generateImages = async () => {
-		if (!initial.id) return;
+		if (!initial.id || !imagePrompts?.cover.trim() || !imagePrompts.body.trim()) return;
 		setBusy(true);
 		setSavingImages(false);
 		setImageProgress({ cover: { phase: 'waiting' }, body: { phase: 'waiting' } });
@@ -309,7 +296,7 @@ export function PostEditor({
 			const response = await safeFetch(`/api/admin/posts/${initial.id}/images`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ bodyAspect }),
+				body: JSON.stringify({ bodyAspect, updatedAt: imagePrompts.updatedAt, prompts: { cover: imagePrompts.cover, body: imagePrompts.body } }),
 			});
 			if (!response.ok) {
 				setImageProgress(null);
@@ -453,29 +440,6 @@ export function PostEditor({
 					</button>
 				</section>
 			)}
-			<section className="rounded-2xl border border-primary-200 bg-primary-100 p-5">
-				<div className="flex items-center gap-2 font-headline text-xl font-bold">
-					<Sparkles className="text-primary" aria-hidden /> {copy.aiImportTitle}
-				</div>
-				<p className="mt-1 text-sm text-black/65">{copy.aiImportDesc}</p>
-				<div className="mt-4 flex flex-wrap gap-3">
-					<input
-						ref={fileRef}
-						aria-label={copy.wordDocumentAria}
-						type="file"
-						accept=".doc,.docx"
-						className="min-h-11 rounded-lg bg-white p-2"
-					/>
-					<button
-						type="button"
-						onClick={importWord}
-						disabled={busy}
-						className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-black px-4 font-bold text-white disabled:opacity-50"
-					>
-						<Upload size={18} aria-hidden /> {copy.import}
-					</button>
-				</div>
-			</section>
 			<form onSubmit={save} className="grid gap-6 xl:grid-cols-[1fr_22rem]">
 				<div className="space-y-5 rounded-2xl border border-black/10 bg-white p-6">
 					<label className="block font-bold">
@@ -724,16 +688,22 @@ export function PostEditor({
 								{copy.bodyAspect}{' '}
 								<select
 									value={bodyAspect}
-									onChange={(event) => setBodyAspect(event.target.value as '9:16' | '3:2')}
+									onChange={(event) => { setImagePrompts(null); setBodyAspect(event.target.value as '9:16' | '3:2'); }}
 									className="ml-2 rounded-lg border border-black/30 p-2"
 								>
 									<option value="9:16">{copy.aspectVertical}</option>
 									<option value="3:2">{copy.aspectHorizontal}</option>
 								</select>
 							</label>
+							<section className="space-y-3 rounded-lg border border-primary-200 bg-white p-4">
+								<h3 className="font-bold">{copy.promptHeading}</h3><p className="text-sm text-black/70">{copy.promptHelp}</p>
+								{promptLoading && <p role="status">{copy.promptLoading}</p>}
+								{promptError && <p role="alert" className="text-error-700">{copy.promptFailed}</p>}
+								{imagePrompts && (['cover', 'body'] as const).map((part) => <label key={part} className="block font-bold">{part === 'cover' ? copy.promptCover : copy.promptBody}<textarea className="mt-1 min-h-36 w-full rounded-lg border border-black/30 p-2 font-normal" maxLength={30000} value={imagePrompts[part]} onChange={(event) => setImagePrompts((current) => current && ({ ...current, [part]: event.target.value }))} /></label>)}
+							</section>
 							<button
 								type="button"
-								disabled={busy || dirty}
+								disabled={busy || dirty || !imagePrompts?.cover.trim() || !imagePrompts?.body.trim()}
 								onClick={generateImages}
 								className="min-h-11 rounded-lg border border-primary-700 px-4 font-bold text-primary-800 disabled:opacity-50"
 							>

@@ -33,4 +33,17 @@ describe('protección de generación de imágenes', () => {
 			expect(event.message).not.toContain('detalle interno');
 		} finally { log.mockRestore(); }
 	});
+	it('usa exactamente las indicaciones revisadas cuando la versión coincide', async () => {
+		const updatedAt = new Date('2026-01-01T00:00:00.000Z');
+		mocks.getPostById.mockResolvedValue({ status: 'draft', updatedAt, editorial: { approvedAt: '2026-01-01' } });
+		mocks.generateBlogImages.mockResolvedValue({ coverUrl: '/cover', bodyImageUrl: '/body' });
+		const response = await POST({ params: { id: 'test' }, locals: { admin: { id: 'admin' } }, request: new Request('http://localhost', { method: 'POST', body: JSON.stringify({ bodyAspect: '9:16', updatedAt: updatedAt.toISOString(), prompts: { cover: 'Portada revisada', body: 'Interior revisado' } }) }) } as never);
+		await response.text();
+		expect(mocks.generateBlogImages).toHaveBeenCalledWith(expect.anything(), '9:16', expect.any(Function), ['Portada revisada', 'Interior revisado']);
+	});
+	it('rechaza indicaciones de una versión anterior antes de llamar al generador', async () => {
+		mocks.getPostById.mockResolvedValue({ status: 'draft', updatedAt: new Date('2026-01-02'), editorial: { approvedAt: '2026-01-01' } });
+		const response = await POST({ params: { id: 'test' }, locals: { admin: { id: 'admin' } }, request: new Request('http://localhost', { method: 'POST', body: JSON.stringify({ bodyAspect: '9:16', updatedAt: '2026-01-01T00:00:00.000Z', prompts: { cover: 'Portada', body: 'Interior' } }) }) } as never);
+		expect(response.status).toBe(409); expect(mocks.generateBlogImages).not.toHaveBeenCalled();
+	});
 });

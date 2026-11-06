@@ -12,7 +12,6 @@ const tags = await listTags();
 ---
 
 <AdminLayout title={t.editor.newTitle}>
-	<a href="/admin/importar" class="mb-6 inline-flex min-h-11 items-center rounded-lg border border-primary-700 px-4 font-bold text-primary-800">{locale === 'en' ? 'Review Word articles' : 'Revisar artículos de un Word'}</a>
 	<PostEditor
 		client:load
 		mode="create"
