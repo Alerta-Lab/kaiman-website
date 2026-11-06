@@ -12,6 +12,10 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-06 — Footer sin bloque Legal
+
+- Quitada la columna Legal del `SiteFooter` (términos/privacidad) hasta definir contenido legal.
+
 ### 2026-11-06 — Editor: file picker i18n + tabs contraste
 
 - Selector de archivo custom: botón primary + textos `chooseFile` / `noFileChosen` (ES/EN).

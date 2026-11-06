@@ -27,11 +27,6 @@ const resourceLinks = [
 	{ href: `${home}#playbooks`, label: copy.footer.playbooks, blank: false },
 	{ href: blogIndexPath(locale), label: copy.footer.help, blank: true },
 ];
-
-const legalLinks = [
-	{ href: localeUrl(locale, 'terminos'), label: copy.footer.terms },
-	{ href: localeUrl(locale, 'privacidad'), label: copy.footer.privacy },
-];
 ---
 
 <footer data-site-footer class="relative border-t border-white/[0.06] bg-[#060612]">
@@ -63,8 +58,8 @@ const legalLinks = [
 			</div>
 		</div>
 
-		<div class="grid grid-cols-2 gap-x-6 gap-y-10 border-t border-white/10 pt-12 sm:grid-cols-3 lg:grid-cols-4 lg:gap-12">
-			<div class="col-span-2 flex flex-col gap-3 sm:col-span-3 lg:col-span-1">
+		<div class="grid grid-cols-2 gap-x-6 gap-y-10 border-t border-white/10 pt-12 sm:grid-cols-3 lg:gap-12">
+			<div class="col-span-2 flex flex-col gap-3 sm:col-span-1">
 				<p class="inline-flex items-start gap-2 text-sm text-pretty text-neutral-300">
 					<MapPin size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
 					{copy.footer.address}
@@ -124,15 +119,6 @@ const legalLinks = [
 				>
 					{copy.footer.alerta}
 				</a>
-			</nav>
-
-			<nav class="flex flex-col gap-2" aria-label={copy.footer.legal}>
-				<p class="text-sm font-semibold text-white">{copy.footer.legal}</p>
-				{legalLinks.map((link) => (
-					<a class="w-fit text-sm text-neutral-300 hover:underline hover:underline-offset-4" href={link.href}>
-						{link.label}
-					</a>
-				))}
 			</nav>
 		</div>
 
