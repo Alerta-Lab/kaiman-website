@@ -94,11 +94,16 @@ export function ChatOrb({ locale, copy }: Props) {
 	useEffect(() => {
 		if (!open) return;
 		inputRef.current?.focus();
+		const previousOverflow = document.body.style.overflow;
+		document.body.style.overflow = 'hidden';
 		const onKey = (event: KeyboardEvent) => {
 			if (event.key === 'Escape') setOpenSynced(false);
 		};
 		document.addEventListener('keydown', onKey);
-		return () => document.removeEventListener('keydown', onKey);
+		return () => {
+			document.body.style.overflow = previousOverflow;
+			document.removeEventListener('keydown', onKey);
+		};
 	}, [open, setOpenSynced]);
 
 	useEffect(() => {
@@ -146,14 +151,14 @@ export function ChatOrb({ locale, copy }: Props) {
 	};
 
 	return (
-		<div className="pointer-events-auto fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3 sm:bottom-6 sm:right-6">
+		<div className="pointer-events-auto fixed bottom-5 right-5 z-[90] flex flex-col items-end gap-3 sm:bottom-6 sm:right-6">
 			{open && (
 				<section
 					id={panelId}
 					role="dialog"
-					aria-modal="false"
+					aria-modal="true"
 					aria-label={copy.title}
-					className="flex h-[min(36rem,78vh)] w-[min(26rem,calc(100vw-2.5rem))] flex-col overflow-hidden rounded-2xl border border-primary/35 bg-[#0b141a] shadow-[0_0_0_1px_rgba(107,72,233,0.25),0_24px_64px_rgba(0,0,0,0.5),0_0_40px_rgba(107,72,233,0.22)]"
+					className="fixed inset-0 z-[90] flex h-dvh w-full flex-col overflow-hidden rounded-none border-0 bg-[#0b141a] pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] sm:static sm:inset-auto sm:z-auto sm:h-[min(36rem,78vh)] sm:w-[min(26rem,calc(100vw-2.5rem))] sm:rounded-2xl sm:border sm:border-primary/35 sm:pt-0 sm:pb-0 sm:shadow-[0_0_0_1px_rgba(107,72,233,0.25),0_24px_64px_rgba(0,0,0,0.5),0_0_40px_rgba(107,72,233,0.22)]"
 				>
 					<header className="flex items-start justify-between gap-3 border-b border-white/10 bg-[#111b21] px-4 py-3">
 						<div className="min-w-0">
@@ -260,7 +265,7 @@ export function ChatOrb({ locale, copy }: Props) {
 				</section>
 			)}
 
-			<span className="relative inline-flex size-14 items-center justify-center">
+			<span className={`relative inline-flex size-14 items-center justify-center ${open ? 'max-sm:hidden' : ''}`}>
 				<span className="chat-orb-spin absolute inset-0 rounded-full" aria-hidden="true" />
 				<button
 					type="button"
