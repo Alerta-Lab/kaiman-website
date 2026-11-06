@@ -11,18 +11,11 @@ import {
 import { getLanding, getWireframe, type Locale } from '../../i18n';
 import { blogIndexPath, blogPostPath } from '../../lib/blog-paths';
 import { signupUrlForPlan } from '../../lib/plan-handoff';
-import {
-	alertaUrl,
-	creditUnitUsd,
-	formatUsd,
-	plans,
-	signupUrl,
-} from '../../lib/plans';
+import { creditUnitUsd, formatUsd, plans, signupUrl } from '../../lib/plans';
 import { asset } from '../../lib/asset';
 import { listPublishedPosts } from '../../server/repositories/posts';
 import { PlanFinder } from '../plan/PlanFinder';
 import Button from '../ui/Button.astro';
-import Card from '../ui/Card.astro';
 
 interface Props {
 	locale: Locale;
@@ -37,16 +30,16 @@ const demoVideo = asset(locale === 'en' ? '/video/demo-en.mp4' : '/video/demo-es
 const demoPoster = asset(locale === 'en' ? '/video/demo-en-poster.jpg' : '/video/demo-es-poster.jpg');
 
 const audiencePhotos: Record<string, string> = {
-	professionals: asset('/martinez.png'),
-	products: asset('/ana.png'),
-	sellers: asset('/carlos.png'),
-	creators: asset('/sofia.png'),
+	martinez: asset('/martinez.png'),
+	ana: asset('/ana.png'),
+	carlos: asset('/carlos.png'),
+	sofia: asset('/sofia.png'),
 };
 
 const heroOutputs = [
-	asset('/demos/salsana/pieza-2.webp'),
-	asset('/brand/showcase-martinez.webp'),
-	asset('/demos/salsana/pieza-dulce.webp'),
+	asset('/section-1.jpg'),
+	asset('/section-1-1.jpg'),
+	asset('/section-1-2.jpg'),
 ];
 
 const heroModes = [
@@ -59,32 +52,53 @@ const heroModes = [
 	{ id: 'website', label: wf.hero.modes.website, Icon: Globe, active: false },
 ] as const;
 
-/** S3 problem facets — drop public/section-3.1.png … section-3.4.png */
-const problemFacets = wf.problem.facets.map((facet) => ({
-	...facet,
-	src: asset(`/${facet.image}.png`),
-}));
+/** S3 compare — section-4.png (sin) · section-4-2.png (con) */
+const problemCompare = [
+	{ src: asset('/section-4.png'), label: wf.problem.withoutLabel, alt: wf.problem.withoutAlt },
+	{ src: asset('/section-4-2.png'), label: wf.problem.withLabel, alt: wf.problem.withAlt },
+] as const;
 
-/** S11 tools blitz — drop public/section-11-1.png … section-11-8.png */
+/** Tools blitz — public/{image}.png (p.ej. section-13-1, section-11-2…) */
 const toolItems = wf.tools.items.map((item) => ({
 	...item,
 	src: asset(`/${item.image}.png`),
 }));
 
-const shell = 'mx-auto w-full max-w-[75rem] px-5 sm:px-6 lg:px-8';
-const sectionY = 'py-14 sm:py-16 lg:py-20';
+const shell = 'mx-auto w-full max-w-[1600px] px-8 sm:px-12 lg:px-20';
+const sectionY = 'relative py-14 sm:py-16 lg:py-20';
+const night = 'bg-[#060612]';
+/** Solid band — flat navy on selected sections only */
+const band = 'bg-[#01001E]';
+/** Soft brand glows — bleed across sections (no overflow clip on section). */
+const glowTop =
+	'pointer-events-none absolute inset-0 bg-[radial-gradient(1100px_520px_at_50%_-8%,rgba(113,73,251,0.22),transparent_72%)]';
+const glowBottom =
+	'pointer-events-none absolute inset-0 bg-[radial-gradient(900px_420px_at_50%_110%,rgba(113,73,251,0.22),transparent_74%)]';
+const glowCenter =
+	'pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(67,56,202,0.18),transparent_70%)]';
+const glowMist =
+	'pointer-events-none absolute inset-0 bg-[radial-gradient(900px_520px_at_100%_0%,rgba(0,207,255,0.06),transparent_58%),radial-gradient(900px_480px_at_0%_100%,rgba(113,73,251,0.16),transparent_62%)]';
+const hairline = 'border-b border-white/[0.06]';
 const h2 =
 	'font-display text-[clamp(1.65rem,3.4vw,2.75rem)] leading-[1.08] font-semibold tracking-tight text-balance text-white';
 const h3 =
 	'mt-2 font-display text-[clamp(1.5rem,2.8vw,2.15rem)] leading-[1.1] font-semibold tracking-tight text-balance text-white';
-const lead = 'mt-4 max-w-2xl text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base';
+const lead = 'mt-4 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base';
+const body = 'mt-3 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base';
 const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-tight text-white sm:text-xl';
+const audienceEyebrow = 'font-display text-sm font-semibold tracking-tight text-primary-300 sm:text-base';
 ---
 
-<main id="contenido" class="bg-ink text-white">
+<main id="contenido" class:list={[night, 'relative text-white']}>
+	{/* Continuous page atmosphere — avoids hard seams between sections */}
+	<div
+		class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_35%_at_50%_0%,rgba(113,73,251,0.2),transparent),radial-gradient(ellipse_70%_30%_at_90%_18%,rgba(0,207,255,0.05),transparent),radial-gradient(ellipse_80%_35%_at_10%_38%,rgba(113,73,251,0.14),transparent),radial-gradient(ellipse_85%_40%_at_50%_62%,rgba(67,56,202,0.16),transparent),radial-gradient(ellipse_90%_35%_at_50%_100%,rgba(113,73,251,0.2),transparent)]"
+		aria-hidden="true"
+	></div>
 	{/* S1 · Hero */}
-	<section id="top" class="relative overflow-hidden border-b border-white/10">
-		<div class="pointer-events-none absolute inset-0 bg-[radial-gradient(1200px_520px_at_80%_0%,rgba(107,72,233,0.28),transparent_70%)]" aria-hidden="true"></div>
+	<section id="hero" class:list={['relative scroll-mt-28', hairline]}>
+		<div class={glowMist} aria-hidden="true"></div>
+		<div class={glowTop} aria-hidden="true"></div>
 		<div class:list={[shell, 'relative grid items-center gap-10 pt-28 pb-14 lg:grid-cols-2 lg:gap-12 lg:pt-32 lg:pb-16']}>
 			<div>
 				<p class="font-display text-base font-medium text-primary-300 sm:text-lg">{wf.hero.eyebrow}</p>
@@ -92,13 +106,15 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 					{wf.hero.titleBefore}
 					<br />
 					{wf.hero.titleAfter}{' '}
-					<span class="text-primary-300">{wf.hero.titleAccent}</span>
+					<span class="whitespace-nowrap bg-[linear-gradient(90deg,#00cfff_0%,#7149fb_100%)] bg-clip-text text-transparent">
+						{wf.hero.titleAccent}
+					</span>
 				</h1>
 				<p class="mt-5 max-w-xl text-base leading-relaxed text-pretty text-neutral-300 sm:text-lg">{wf.hero.body1}</p>
 				<p class="mt-3 max-w-xl text-base leading-relaxed text-pretty text-neutral-300 sm:text-lg">{wf.hero.body2}</p>
 				<div class="mt-7 flex flex-wrap gap-3">
 					<Button href={signupUrl}>{wf.hero.cta}</Button>
-					<Button href="#brand-knowledge" variant="secondary">{wf.hero.secondaryCta}</Button>
+					<Button href="#brand-understanding" variant="secondary">{wf.hero.secondaryCta}</Button>
 				</div>
 				<p class="mt-3 text-sm text-neutral-400">{wf.hero.note}</p>
 			</div>
@@ -164,9 +180,26 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 		</div>
 	</section>
 
-	{/* S2 · Origin */}
-	<section id="origen" class:list={[sectionY, 'border-b border-white/10']}>
-		<div class:list={[shell, 'grid items-center gap-8 lg:grid-cols-2 lg:gap-12']}>
+	{/* S2 · Demo */}
+	<section id="demo" class:list={[sectionY, 'scroll-mt-28', band, hairline]}>
+		<div class:list={[shell, 'relative']}>
+			<div class="overflow-hidden rounded-2xl border border-white/10 bg-ink">
+				<video
+					class="aspect-video w-full object-cover"
+					poster={demoPoster}
+					controls
+					playsinline
+					preload="metadata"
+				>
+					<source src={demoVideo} type="video/mp4" />
+				</video>
+			</div>
+		</div>
+	</section>
+
+	{/* S3 · Origin */}
+	<section id="origen" class:list={[sectionY, 'scroll-mt-28', hairline]}>
+		<div class:list={[shell, 'relative grid items-center gap-8 lg:grid-cols-2 lg:gap-12']}>
 			<div>
 				<h2 class={h2}>{wf.origin.title}</h2>
 				<p class={lead}>{wf.origin.body1}</p>
@@ -187,72 +220,88 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 						decoding="async"
 					/>
 				</div>
-				<p class="text-sm text-neutral-400">
-					{wf.origin.clientsLabel}{' '}
-					<a href={alertaUrl} class="font-semibold text-primary-300 underline-offset-2 hover:underline">{wf.origin.clientsCta}</a>
-				</p>
+				<p class="text-sm text-pretty text-neutral-400">{wf.origin.imageCaption}</p>
 			</div>
 		</div>
 	</section>
 
 	{/* S3 · Problem */}
-	<section id="problem" class:list={[sectionY, 'border-b border-white/10 bg-ink-100']}>
-		<div class={shell}>
-			<div class="grid items-end gap-8 lg:grid-cols-2 lg:gap-16">
-				<h2 class={h2}>
-					{wf.problem.titleBefore}{' '}
-					<span class="text-primary-300">{wf.problem.titleAccent}</span>
-				</h2>
+	<section id="problem" class:list={[sectionY, band, hairline]}>
+		<div class:list={[shell, 'relative']}>
+			<div class="grid items-start gap-10 lg:grid-cols-2 lg:gap-14">
+				<div>
+					<h2 class={h2}>
+						{wf.problem.titleBefore}{' '}
+						<span class="text-primary-300">{wf.problem.titleAccent}</span>
+					</h2>
+					<div class="mt-8 grid grid-cols-2 gap-3">
+						{
+							problemCompare.map((item) => (
+								<figure class="min-w-0">
+									<p class="mb-2 text-sm font-semibold text-primary-300">{item.label}</p>
+									<div class="overflow-hidden rounded-2xl border border-white/10 bg-ink-200">
+										<img
+											src={item.src}
+											alt={item.alt}
+											class="aspect-[4/5] h-auto w-full object-cover"
+											loading="lazy"
+											decoding="async"
+										/>
+									</div>
+								</figure>
+							))
+						}
+					</div>
+				</div>
 				<div>
 					<p class="text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.problem.body1}</p>
 					<p class="mt-3 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.problem.body2}</p>
-				</div>
-			</div>
-			<ul class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-				{
-					problemFacets.map((facet) => (
-						<li>
-							<Card as="div" class="overflow-hidden border border-white/10 p-0 hover:translate-y-0">
-								<div class="aspect-video overflow-hidden bg-ink">
-									<img
-										src={facet.src}
-										alt={wf.problem.imageAlt}
-										class="h-full w-full object-cover"
-										loading="lazy"
-										decoding="async"
-									/>
-								</div>
-								<div class="border-t border-white/10 px-4 py-4">
-									<p class="font-display text-sm font-semibold tracking-tight text-white sm:text-base">{facet.label}</p>
-								</div>
-							</Card>
-						</li>
-					))
-				}
-			</ul>
-			<div class="mt-14 grid items-center gap-8 lg:grid-cols-2 lg:gap-16">
-				<p class="font-display text-lg leading-snug font-medium tracking-tight text-pretty text-white sm:text-xl">
-					{wf.problem.after}
-				</p>
-				<div class="rounded-2xl border border-white/10 bg-ink-200 p-8 sm:p-9">
-					<p class="font-display text-2xl leading-snug font-semibold tracking-tight text-balance text-white sm:text-3xl">
-						{wf.problem.secretBefore}{' '}
-						<span class="text-feature-image">{wf.problem.secretAccent}</span>
-					</p>
-					<p class="mt-4 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.problem.secretBody1}</p>
-					<p class="mt-3 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.problem.secretBody2}</p>
+					<ul class="mt-4 list-disc space-y-1.5 pl-5 text-[0.95rem] leading-relaxed text-neutral-300 sm:text-base">
+						{wf.problem.bullets.map((item) => (
+							<li>{item}</li>
+						))}
+					</ul>
+					<p class="mt-4 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.problem.after}</p>
 				</div>
 			</div>
 		</div>
 	</section>
 
+	{/* S3b · Brand secret */}
+	<section id="secreto" class:list={['relative py-20 sm:py-28 lg:py-32', hairline]}>
+		<div class={glowCenter} aria-hidden="true"></div>
+		<div class:list={[shell, 'relative']}>
+			<div class="mx-auto max-w-3xl text-center">
+				<p class={h2}>
+					{wf.problem.secretBefore}{' '}
+					<span class="text-primary-300">{wf.problem.secretAccent}</span>
+				</p>
+				<p class="mt-4 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.problem.secretBody1}</p>
+				<p class="mt-3 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.problem.secretBody2}</p>
+			</div>
+		</div>
+	</section>
+
 	{/* S4 · Brand Understanding */}
-	<section id="brand-knowledge" class:list={[sectionY, 'border-b border-white/10']}>
-		<div class={shell}>
-			<p class="font-display font-medium text-primary-300">{wf.brandKnowledge.eyebrow}</p>
-			<h2 class:list={[h2, 'mt-2 max-w-4xl']}>{wf.brandKnowledge.title}</h2>
-			<p class={lead}>{wf.brandKnowledge.body1}</p>
-			<p class="mt-3 max-w-2xl text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.brandKnowledge.body2}</p>
+	<section id="brand-understanding" class:list={[sectionY, 'scroll-mt-28', band, hairline]}>
+		<div class:list={[shell, 'relative']}>
+			<div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
+				<div>
+					<p class="font-display font-medium text-primary-300">{wf.brandKnowledge.eyebrow}</p>
+					<h2 class:list={[h2, 'mt-2']}>{wf.brandKnowledge.title}</h2>
+					<p class={lead}>{wf.brandKnowledge.body1}</p>
+					<p class={body}>{wf.brandKnowledge.body2}</p>
+				</div>
+				<div class="overflow-hidden rounded-2xl border border-white/10 bg-ink-200">
+					<img
+						src={asset('/section-5.png')}
+						alt={wf.brandKnowledge.resultAlt}
+						class="h-auto w-full object-contain object-center"
+						loading="lazy"
+						decoding="async"
+					/>
+				</div>
+			</div>
 			<div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 				{
 					wf.brandKnowledge.steps.map((step) => (
@@ -264,34 +313,23 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 					))
 				}
 			</div>
-			<div class="mt-14 grid items-center gap-10 lg:grid-cols-2">
-				<div>
-					<p class="mb-4 text-sm text-neutral-400">{wf.brandKnowledge.learnsLabel}</p>
-					<div class="flex flex-wrap gap-2.5">
-						{
-							wf.brandKnowledge.tags.map((tag) => (
-								<span class="rounded-full border border-white/15 bg-ink-200 px-4 py-2.5 text-sm text-neutral-200">{tag}</span>
-							))
-						}
-					</div>
-				</div>
-				<div class="overflow-hidden rounded-2xl border border-white/10 bg-ink-200">
-					<img
-						src={asset('/section-4.png')}
-						alt={wf.brandKnowledge.resultAlt}
-						class="h-auto w-full object-contain object-center"
-						loading="lazy"
-						decoding="async"
-					/>
+			<div class="mt-14 flex flex-col items-center text-center">
+				<p class="mb-5 font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">{wf.brandKnowledge.learnsLabel}</p>
+				<div class="flex max-w-3xl flex-wrap justify-center gap-2.5">
+					{
+						wf.brandKnowledge.tags.map((tag) => (
+							<span class="rounded-full border border-white/15 bg-ink-200 px-4 py-2.5 text-sm text-neutral-200">{tag}</span>
+						))
+					}
 				</div>
 			</div>
 		</div>
 	</section>
 
 	{/* S5 · Stories intro */}
-	<section id="stories" class:list={[sectionY, 'border-b border-white/10 bg-ink-100 pb-10']}>
-		<div class={shell}>
-			<h2 class:list={[h2, 'max-w-4xl']}>{wf.stories.title}</h2>
+	<section id="stories" class:list={[sectionY, hairline, 'pb-10']}>
+		<div class:list={[shell, 'relative']}>
+			<h2 class={h2}>{wf.stories.title}</h2>
 			<p class={lead}>{wf.stories.body}</p>
 			<div class="mt-11 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 				{
@@ -310,9 +348,12 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 								/>
 							</div>
 							<div class="p-5">
-								<p class="text-sm text-primary-300">{persona.who}</p>
-								<p class="mt-1 font-display text-lg leading-snug font-semibold tracking-tight text-white sm:text-xl">{persona.job}</p>
-								<p class="mt-2 text-sm text-feature-image">{persona.line}</p>
+								<p class="font-display text-lg leading-snug font-semibold tracking-tight text-white sm:text-xl">{persona.who}</p>
+								<p class="mt-2 text-sm leading-relaxed text-white">{persona.job}</p>
+								<p class="mt-1 inline-flex items-center gap-2 text-sm leading-relaxed text-white">
+									<span aria-hidden="true">•</span>
+									{persona.line}
+								</p>
 							</div>
 						</a>
 					))
@@ -321,19 +362,19 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 		</div>
 	</section>
 
-	{/* S6 · Independent professionals */}
-	<section id="ana" class:list={[sectionY, 'border-b border-white/10 bg-ink-100 pt-10']}>
-		<div class={shell}>
+	{/* S6 · Martinez · Independent professionals */}
+	<section id="martinez" class:list={[sectionY, band, hairline, 'pt-10']}>
+		<div class:list={[shell, 'relative']}>
 			<div class="rounded-3xl border border-white/10 bg-ink-200 p-6 sm:p-10 lg:p-12">
 				<div class="grid items-start gap-10 lg:grid-cols-2">
 					<div>
-						<p class="text-primary-300">{wf.professionals.eyebrow}</p>
+						<p class={audienceEyebrow}>{wf.professionals.eyebrow}</p>
 						<h3 class={h3}>{wf.professionals.title}</h3>
 						<p class="mt-4 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.professionals.body}</p>
 					</div>
 					<div class="overflow-hidden rounded-2xl border border-white/10 bg-ink">
 						<img
-							src={audiencePhotos.professionals}
+							src={audiencePhotos.martinez}
 							alt={wf.professionals.imageAlt}
 							class="aspect-video h-auto w-full object-cover object-top"
 							loading="lazy"
@@ -356,21 +397,22 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 		</div>
 	</section>
 
-	{/* S7 · Product creators */}
-	<section id="carlos" class:list={[sectionY, 'border-b border-white/10']}>
-		<div class={shell}>
+	{/* S7 · Ana · Product creators */}
+	<section id="ana" class:list={[sectionY, hairline]}>
+		<div class={glowMist} aria-hidden="true"></div>
+		<div class:list={[shell, 'relative']}>
 			<div class="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
 				<div class="overflow-hidden rounded-2xl border border-white/10 bg-ink-200">
 					<img
-						src={audiencePhotos.products}
+						src={asset('/section-9.png')}
 						alt={wf.products.imageAlt}
-						class="aspect-video h-auto w-full object-cover object-top"
+						class="aspect-video h-auto w-full object-cover"
 						loading="lazy"
 						decoding="async"
 					/>
 				</div>
 				<div>
-					<p class="text-primary-300">{wf.products.eyebrow}</p>
+					<p class={audienceEyebrow}>{wf.products.eyebrow}</p>
 					<h3 class={h3}>{wf.products.title}</h3>
 					<p class="mt-4 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.products.body}</p>
 				</div>
@@ -389,18 +431,18 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 		</div>
 	</section>
 
-	{/* S8 · Sellers */}
-	<section id="sofia" class:list={[sectionY, 'border-b border-white/10 bg-ink-100']}>
-		<div class={shell}>
+	{/* S8 · Carlos · Sellers */}
+	<section id="carlos" class:list={[sectionY, band, hairline]}>
+		<div class:list={[shell, 'relative']}>
 			<div class="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
 				<div>
-					<p class="text-primary-300">{wf.sellers.eyebrow}</p>
+					<p class={audienceEyebrow}>{wf.sellers.eyebrow}</p>
 					<h3 class={h3}>{wf.sellers.title}</h3>
 					<p class="mt-4 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.sellers.body}</p>
 				</div>
 				<div class="overflow-hidden rounded-2xl border border-white/10 bg-ink-200">
 					<img
-						src={audiencePhotos.sellers}
+						src={audiencePhotos.carlos}
 						alt={wf.sellers.imageAlt}
 						class="aspect-video h-auto w-full object-cover object-top"
 						loading="lazy"
@@ -422,19 +464,19 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 		</div>
 	</section>
 
-	{/* S8b · Coaches */}
-	<section id="coaches" class:list={[sectionY, 'border-b border-white/10 bg-ink-100 pt-4']}>
-		<div class={shell}>
+	{/* S8b · Sofia · Coaches */}
+	<section id="sofia" class:list={[sectionY, hairline, 'pt-4']}>
+		<div class:list={[shell, 'relative']}>
 			<div class="rounded-3xl border border-white/10 bg-ink-200 p-6 sm:p-10 lg:p-12">
 				<div class="grid items-start gap-10 lg:grid-cols-2">
 					<div>
-						<p class="text-primary-300">{wf.coaches.eyebrow}</p>
+						<p class={audienceEyebrow}>{wf.coaches.eyebrow}</p>
 						<h3 class={h3}>{wf.coaches.title}</h3>
 						<p class="mt-4 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.coaches.body}</p>
 					</div>
 					<div class="overflow-hidden rounded-2xl border border-white/10 bg-ink">
 						<img
-							src={audiencePhotos.creators}
+							src={asset('/section-10.png')}
 							alt={wf.coaches.imageAlt}
 							class="aspect-video h-auto w-full object-cover object-top"
 							loading="lazy"
@@ -458,12 +500,14 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 	</section>
 
 	{/* S9 · Tools / blitz */}
-	<section id="tools" class:list={[sectionY, 'border-b border-white/10']}>
-		<div class={shell}>
-			<h2 class:list={[h2, 'max-w-4xl']}>{wf.tools.title}</h2>
-			<p class={lead}>{wf.tools.body1}</p>
-			<p class="mt-3 max-w-2xl text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.tools.body2}</p>
-			<p class="mt-3 max-w-2xl text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.tools.body3}</p>
+	<section id="tools" class:list={[sectionY, band, hairline]}>
+		<div class:list={[shell, 'relative']}>
+			<div class="mx-auto max-w-5xl text-center">
+				<h2 class={h2}>{wf.tools.title}</h2>
+				<p class={lead}>{wf.tools.body1}</p>
+				<p class={body}>{wf.tools.body2}</p>
+				<p class={body}>{wf.tools.body3}</p>
+			</div>
 			<div class="mt-11 grid grid-cols-[repeat(auto-fit,minmax(16.25rem,1fr))] gap-4">
 				{
 					toolItems.map((item) => (
@@ -485,10 +529,12 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 					))
 				}
 			</div>
-			<div class="mt-8 flex flex-wrap gap-2.5">
+			<div class="mt-8 grid w-full grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
 				{
 					wf.tools.categories.map((cat) => (
-						<span class="rounded-lg border border-white/15 px-3.5 py-2 text-sm text-neutral-300">{cat}</span>
+						<span class="flex items-center justify-center rounded-lg border border-white px-3 py-2.5 text-center font-display text-xs font-semibold tracking-tight text-balance text-white last:col-span-2 sm:text-sm sm:last:col-span-3 md:last:col-span-1">
+							{cat.label}
+						</span>
 					))
 				}
 			</div>
@@ -496,8 +542,9 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 	</section>
 
 	{/* S9b · Menos / Más */}
-	<section id="menos" class:list={[sectionY, 'border-b border-white/10']}>
-		<div class={shell}>
+	<section id="menos" class:list={[sectionY, hairline]}>
+		<div class={glowBottom} aria-hidden="true"></div>
+		<div class:list={[shell, 'relative']}>
 			<div class="grid items-end gap-8 lg:grid-cols-2 lg:gap-14">
 				<h2 class={h2}>{wf.menos.title}</h2>
 				<div>
@@ -505,7 +552,12 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 					<p class="mt-3 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.menos.body2}</p>
 				</div>
 			</div>
-			<div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+			<div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+				<article class="rounded-2xl bg-primary p-7 text-white">
+					<p class="font-display text-xs font-semibold tracking-[0.14em] text-primary-100 uppercase">{wf.menos.moreEyebrow}</p>
+					<h3 class="mt-2 font-display text-xl font-semibold sm:text-2xl">{wf.menos.moreTitle}</h3>
+					<p class="mt-3 text-sm text-pretty text-primary-100 sm:text-base">{wf.menos.moreBody}</p>
+				</article>
 				{
 					wf.menos.cards.map((card) => (
 						<article class="rounded-2xl border border-white/10 bg-ink-200 p-7">
@@ -516,74 +568,51 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 					))
 				}
 			</div>
-			<div class="mt-4 flex flex-wrap items-center gap-4 rounded-2xl bg-primary px-8 py-9 sm:gap-12">
-				<div>
-					<p class="font-display text-xs font-semibold tracking-[0.14em] text-primary-100 uppercase">{wf.menos.moreEyebrow}</p>
-					<p class="mt-1 font-display text-3xl font-semibold text-white sm:text-4xl">{wf.menos.moreTitle}</p>
-				</div>
-				<p class="max-w-xl text-base text-pretty text-white sm:text-lg">{wf.menos.moreBody}</p>
-			</div>
-		</div>
-	</section>
-
-	{/* Demo anchor */}
-	<section id="demo" class:list={[sectionY, 'border-b border-white/10 bg-ink-100']}>
-		<div class={shell}>
-			<div class="overflow-hidden rounded-2xl border border-white/10 bg-ink">
-				<video
-					class="aspect-video w-full object-cover"
-					poster={demoPoster}
-					controls
-					playsinline
-					preload="metadata"
-				>
-					<source src={demoVideo} type="video/mp4" />
-				</video>
-			</div>
 		</div>
 	</section>
 
 	{/* S10 · Value */}
-	<section id="value" class:list={[sectionY, 'border-b border-white/10']}>
-		<div class={shell}>
-			<h2 class:list={[h2, 'mb-10 max-w-4xl']}>{wf.value.title}</h2>
+	<section id="value" class:list={[sectionY, band, hairline]}>
+		<div class:list={[shell, 'relative']}>
 			<div class="grid gap-4 lg:grid-cols-2">
-				<div class="rounded-2xl border border-white/15 p-8 sm:p-9">
-					<p class="text-sm text-neutral-400">{wf.value.leftLabel}</p>
+				<div class="flex h-full flex-col rounded-2xl border border-white/15 p-8 sm:p-9">
+					<p class="font-display text-base font-semibold tracking-tight text-white sm:text-lg">{wf.value.leftLabel}</p>
 					<ul class="mt-5 flex list-disc flex-col gap-2 pl-5 text-neutral-300">
 						{wf.value.leftItems.map((item) => <li>{item}</li>)}
 					</ul>
-					<p class="mt-8 font-display text-4xl font-semibold text-white">
-						{wf.value.leftPrice}
-						<span class="text-lg font-medium text-neutral-400"> {wf.value.leftPer}</span>
-					</p>
-					<p class="mt-2 text-sm text-neutral-400">{wf.value.leftNote}</p>
+					<div class="mt-auto pt-8">
+						<p class="font-display text-4xl font-semibold text-white">
+							{wf.value.leftPrice}
+							<span class="text-lg font-medium text-neutral-400"> {wf.value.leftPer}</span>
+						</p>
+						<p class="mt-2 text-sm text-neutral-400">{wf.value.leftNote}</p>
+					</div>
 				</div>
-				<div class="rounded-2xl bg-primary p-8 text-white sm:p-9">
-					<p class="text-sm text-primary-100">{wf.value.rightLabel}</p>
-					<p class="mt-4 font-display text-xl leading-snug font-semibold tracking-tight sm:text-2xl">{wf.value.rightTitle}</p>
-					<p class="mt-8 font-display text-4xl font-semibold">
-						{wf.value.rightPrice}
-						<span class="text-lg font-medium text-primary-100"> {wf.value.rightPer}</span>
-					</p>
-					<p class="mt-2 text-sm text-primary-100">{wf.value.rightNote}</p>
+				<div class="flex h-full flex-col rounded-2xl bg-primary p-8 text-white sm:p-9">
+					<p class="font-display text-base font-semibold tracking-tight text-white sm:text-lg">{wf.value.rightLabel}</p>
+					<ul class="mt-5 flex list-disc flex-col gap-2 pl-5 text-white/95">
+						{wf.value.rightItems.map((item) => <li>{item}</li>)}
+						<li class="mt-1 font-display text-lg font-semibold tracking-tight text-white sm:text-xl">
+							{wf.value.rightHighlight}
+						</li>
+					</ul>
+					<div class="mt-auto pt-8">
+						<p class="font-display text-4xl font-semibold">
+							{wf.value.rightPrice}
+							<span class="text-lg font-medium text-primary-100">{wf.value.rightPer}</span>
+						</p>
+						<p class="mt-2 text-sm text-primary-100">{wf.value.rightNote}</p>
+					</div>
 				</div>
-			</div>
-			<div
-				id="impact"
-				class="mt-4 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/15 px-6 py-5"
-			>
-				<p class="font-display text-lg leading-snug font-semibold text-white sm:text-xl">{wf.value.impactTitle}</p>
-				<Button href="#piezas" variant="secondary">{wf.value.impactCta}</Button>
 			</div>
 		</div>
 	</section>
 
 	{/* S11 · Pricing */}
-	<section id="pricing" class:list={[sectionY, 'border-b border-white/10 bg-ink-100']}>
-		<div class={shell}>
-			<h2 class={h2}>{copy.plans.title}</h2>
-			<p class={lead}>{copy.plans.intro}</p>
+	<section id="planes" class:list={[sectionY, 'scroll-mt-28', hairline]}>
+		<div class:list={[shell, 'relative']}>
+			<h2 class:list={[h2, 'text-center text-balance']}>{copy.plans.title}</h2>
+			<p class:list={[lead, 'text-center']}>{copy.plans.intro}</p>
 			<ul class="mt-11 grid gap-4 md:grid-cols-3">
 				{
 					plans.map((plan) => (
@@ -607,24 +636,31 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 					))
 				}
 			</ul>
-			<div class="mt-4 flex flex-col gap-4 rounded-2xl border border-white/10 bg-ink-200 p-7 sm:flex-row sm:items-center sm:justify-between">
-				<div>
-					<h3 class="font-display text-2xl font-semibold text-white">{copy.plans.names.enterprise}</h3>
-					<p class="mt-2 max-w-2xl text-neutral-300">{copy.plans.blurbs.enterprise}</p>
+			<div class="mt-4 rounded-2xl border border-white/10 bg-ink-200 p-7">
+				<h3 class="font-display text-2xl font-semibold text-white">{copy.plans.names.enterprise}</h3>
+				<div class="mt-4 flex flex-col sm:flex-row sm:items-center">
+					<p class="max-w-2xl text-pretty text-neutral-300">{copy.plans.blurbs.enterprise}</p>
+					<div class="flex w-full items-center justify-center">
+						<Button
+							href={`mailto:${copy.footer.email}`}
+							variant="secondary"
+							plan="enterprise"
+							class="[&_.k-btn-l]:!px-12"
+						>
+							{copy.plans.enterpriseCta}
+						</Button>
+					</div>
 				</div>
-				<Button href={`mailto:${copy.footer.email}`} variant="secondary" plan="enterprise">
-					{copy.plans.enterpriseCta}
-				</Button>
 			</div>
 		</div>
 	</section>
 
 	{/* Piezas al mes */}
-	<section id="piezas" class:list={[sectionY, 'border-b border-white/10']}>
-		<div class={shell}>
+	<section id="piezas" class:list={[sectionY, 'scroll-mt-28', band, hairline]}>
+		<div class:list={[shell, 'relative']}>
 			<h2 class={h2}>{copy.finder.title}</h2>
 			<p class={lead}>{copy.finder.intro}</p>
-			<p class="mt-4 max-w-2xl rounded-xl border border-primary/30 bg-primary-900/20 px-4 py-3 text-sm font-semibold text-pretty text-primary-200">
+			<p class="mt-4 w-full rounded-xl border border-primary/30 bg-primary-900/20 px-4 py-3 text-sm font-semibold text-pretty text-primary-200">
 				{copy.finder.disclaimer}
 			</p>
 			<div class="mt-8">
@@ -634,8 +670,9 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 	</section>
 
 	{/* Playbooks */}
-	<section id="playbooks" class:list={[sectionY, 'border-b border-white/10 bg-ink-100']}>
-		<div class={shell}>
+	<section id="playbooks" class:list={[sectionY, 'scroll-mt-28', hairline]}>
+		<div class={glowMist} aria-hidden="true"></div>
+		<div class:list={[shell, 'relative']}>
 			<h2 class={h2}>{wf.playbooks.title}</h2>
 			<p class={lead}>{wf.playbooks.body}</p>
 			<ul class="mt-10 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
@@ -657,8 +694,8 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 	</section>
 
 	{/* Blog */}
-	<section id="blog" class:list={[sectionY, 'border-b border-white/10']}>
-		<div class={shell}>
+	<section id="blog" class:list={[sectionY, 'scroll-mt-28', band, hairline]}>
+		<div class:list={[shell, 'relative']}>
 			<p class="font-display text-sm font-semibold tracking-[0.14em] text-primary-300 uppercase">{copy.blog.eyebrow}</p>
 			<h2 class:list={[h2, 'mt-3']}>{copy.blog.title}</h2>
 			<p class={lead}>{copy.blog.body}</p>
@@ -673,20 +710,28 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 									href={blogPostPath(locale, post.slug)}
 									class="flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-ink-200 transition-colors hover:border-primary/40"
 								>
-									{post.coverUrl ? (
-										<div class="aspect-[16/10] overflow-hidden bg-ink">
-											<img
-												src={post.coverUrl}
-												alt={post.coverAlt ?? ''}
-												class="h-full w-full object-cover"
-												loading="lazy"
-												decoding="async"
-											/>
-										</div>
-									) : null}
+									<div class="aspect-video overflow-hidden bg-ink">
+										{
+											post.coverUrl ? (
+												<img
+													src={post.coverUrl}
+													alt={post.coverAlt ?? ''}
+													class="h-full w-full object-cover"
+													loading="lazy"
+													decoding="async"
+												/>
+											) : null
+										}
+									</div>
 									<div class="flex flex-1 flex-col gap-2 p-5">
-										<h3 class="font-display text-lg font-semibold tracking-tight text-white">{post.title}</h3>
-										{post.excerpt ? <p class="text-sm text-pretty text-neutral-400">{post.excerpt}</p> : null}
+										<h3 class="font-display text-base font-semibold tracking-tight text-balance text-white sm:text-[1.05rem]">
+											{post.title}
+										</h3>
+										{
+											post.excerpt ? (
+												<p class="line-clamp-3 text-sm text-pretty text-neutral-400">{post.excerpt}</p>
+											) : null
+										}
 										<span class="mt-auto pt-3 text-sm font-semibold text-primary-300">{copy.blog.read}</span>
 									</div>
 								</a>
@@ -696,22 +741,22 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 				)
 			}
 			<div class="mt-8">
-				<Button href={blogHref} variant="secondary">{copy.blog.cta}</Button>
+				<Button href={blogHref} variant="secondary" target="_blank" rel="noopener noreferrer">{copy.blog.cta}</Button>
 			</div>
 		</div>
 	</section>
 
 	{/* FAQ */}
-	<section id="faq" class:list={[sectionY, 'border-b border-white/10']}>
+	<section id="preguntas" class:list={[sectionY, 'scroll-mt-28', hairline]}>
 		<div class="mx-auto w-full max-w-3xl px-5 sm:px-6 lg:px-8">
 			<h2 class={h2}>{wf.faq.title}</h2>
-			<div class="mt-8">
+			<div class="mt-8" data-faq-list>
 				{
 					wf.faq.items.map((item, index) => (
 						<details class="group border-b border-white/15 open:border-transparent open:bg-white">
-							<summary class="cursor-pointer list-none px-1 py-6 marker:content-none [&::-webkit-details-marker]:hidden">
+							<summary class="cursor-pointer list-none px-5 py-6 marker:content-none sm:px-6 [&::-webkit-details-marker]:hidden">
 								<span class="flex items-start gap-4">
-									<span class="font-display text-sm font-semibold text-primary-300 tabular-nums">
+									<span class="font-display text-sm font-semibold text-primary-300 tabular-nums transition-colors group-open:text-primary">
 										{String(index + 1).padStart(2, '0')}
 									</span>
 									<span class="font-display text-lg font-semibold text-balance text-white transition-colors group-open:text-ink sm:text-xl">
@@ -719,19 +764,77 @@ const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-t
 									</span>
 								</span>
 							</summary>
-							<p class="px-1 pb-6 pl-12 text-base text-pretty text-neutral-300 group-open:text-ink/80">{item.a}</p>
+							<div
+								data-faq-panel
+								class="overflow-hidden transition-[height] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+								style="height: 0px"
+							>
+								<p class="px-5 pb-6 pl-[3.75rem] text-base text-pretty text-neutral-300 group-open:text-ink/80 sm:px-6 sm:pl-16">
+									{item.a}
+								</p>
+							</div>
 						</details>
 					))
 				}
 			</div>
 		</div>
+		<script>
+			const list = document.querySelector<HTMLElement>('#preguntas [data-faq-list]');
+			if (list) {
+				const items = [...list.querySelectorAll<HTMLDetailsElement>('details')];
+				const panelOf = (details: HTMLDetailsElement) =>
+					details.querySelector<HTMLElement>('[data-faq-panel]');
+
+				const closeItem = (details: HTMLDetailsElement) => {
+					const panel = panelOf(details);
+					if (!panel || !details.open) return;
+					// From `auto` → px → 0 needs a reflow or the collapse skips the transition.
+					panel.style.height = `${panel.scrollHeight}px`;
+					void panel.offsetHeight;
+					panel.style.height = '0px';
+					const onEnd = (event: TransitionEvent) => {
+						if (event.propertyName !== 'height') return;
+						panel.removeEventListener('transitionend', onEnd);
+						details.open = false;
+					};
+					panel.addEventListener('transitionend', onEnd);
+				};
+
+				const openItem = (details: HTMLDetailsElement) => {
+					items.forEach((other) => {
+						if (other !== details) closeItem(other);
+					});
+					const panel = panelOf(details);
+					if (!panel || details.open) return;
+					details.open = true;
+					panel.style.height = '0px';
+					void panel.offsetHeight;
+					panel.style.height = `${panel.scrollHeight}px`;
+					const onEnd = (event: TransitionEvent) => {
+						if (event.propertyName !== 'height') return;
+						panel.removeEventListener('transitionend', onEnd);
+						panel.style.height = 'auto';
+					};
+					panel.addEventListener('transitionend', onEnd);
+				};
+
+				items.forEach((details) => {
+					const summary = details.querySelector('summary');
+					if (!summary) return;
+					summary.addEventListener('click', (event) => {
+						event.preventDefault();
+						if (details.open) closeItem(details);
+						else openItem(details);
+					});
+				});
+			}
+		</script>
 	</section>
 
 	{/* Close CTA */}
-	<section class="relative overflow-hidden py-16 sm:py-20">
-		<div class="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_420px_at_50%_100%,rgba(107,72,233,0.28),transparent_72%)]" aria-hidden="true"></div>
-		<div class="relative mx-auto max-w-3xl px-5 text-center sm:px-6">
-			<h2 class={h2}>{wf.close.title}</h2>
+	<section class:list={['relative py-16 sm:py-20', band]}>
+		<div class="relative mx-auto max-w-5xl px-5 text-center sm:px-6">
+			<h2 class:list={[h2, 'text-balance']}>{wf.close.title}</h2>
 			<p class="mt-4 text-base text-pretty text-neutral-300 sm:text-lg">{wf.close.body}</p>
 			<div class="mt-7 flex flex-wrap justify-center gap-3">
 				<Button href={signupUrl}>{wf.close.cta}</Button>

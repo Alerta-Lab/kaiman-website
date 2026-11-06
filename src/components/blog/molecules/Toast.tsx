@@ -29,6 +29,7 @@ export function Toast({ tone = 'info', title, detail, open, onClose, autoHideMs 
 	const titleId = useId();
 	const detailId = useId();
 	const Icon = icons[tone];
+	const hasDetail = Boolean(detail);
 
 	useEffect(() => {
 		if (!open) setExpanded(false);
@@ -48,15 +49,15 @@ export function Toast({ tone = 'info', title, detail, open, onClose, autoHideMs 
 				role={tone === 'error' ? 'alert' : 'status'}
 				aria-labelledby={titleId}
 				aria-describedby={expanded && detail ? detailId : undefined}
-				className={`pointer-events-auto w-full max-w-md rounded-xl border p-4 shadow-[0_12px_32px_rgba(0,0,0,0.18)] ${toneStyles[tone]}`}
+				className={`pointer-events-auto w-auto max-w-md rounded-xl border shadow-[0_12px_32px_rgba(0,0,0,0.18)] ${hasDetail ? 'p-4' : 'px-3 py-2'} ${toneStyles[tone]}`}
 			>
-				<div className="flex items-start gap-3">
-					<Icon aria-hidden="true" size={20} className="mt-0.5 shrink-0" />
+				<div className={`flex gap-3 ${hasDetail ? 'items-start' : 'items-center'}`}>
+					<Icon aria-hidden="true" size={18} className={`shrink-0 ${hasDetail ? 'mt-0.5' : ''}`} />
 					<div className="min-w-0 flex-1">
-						<p id={titleId} className="font-headline text-sm font-bold text-pretty">
+						<p id={titleId} className="font-headline text-sm font-bold leading-none text-pretty">
 							{title}
 						</p>
-						{detail ? (
+						{hasDetail ? (
 							<div className="mt-2">
 								<button
 									type="button"
@@ -87,9 +88,9 @@ export function Toast({ tone = 'info', title, detail, open, onClose, autoHideMs 
 						type="button"
 						aria-label="Cerrar aviso"
 						onClick={onClose}
-						className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg hover:bg-black/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+						className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg hover:bg-black/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
 					>
-						<X aria-hidden="true" size={18} />
+						<X aria-hidden="true" size={16} />
 					</button>
 				</div>
 			</div>

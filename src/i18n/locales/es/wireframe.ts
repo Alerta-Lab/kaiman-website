@@ -4,8 +4,8 @@ export const wireframe = {
 	hero: {
 		eyebrow: 'Negocios pequeños. Marketing en grande.',
 		titleBefore: 'Mejor que aprender IA,',
-		titleAfter: 'deja que la IA aprenda de',
-		titleAccent: 'ti.',
+		titleAfter: 'deja que la IA',
+		titleAccent: 'aprenda de ti.',
 		body1:
 			'Kaiman es una plataforma de inteligencia artificial que aprende sobre tu negocio, entiende tu marca y utiliza ese conocimiento para ayudarte a crear estrategias, campañas, imágenes, videos, sitios web y mucho más.',
 		body2: 'Todo con la personalidad de tu marca y el conocimiento de tu negocio.',
@@ -13,7 +13,7 @@ export const wireframe = {
 		secondaryCta: 'Descubre cómo funciona',
 		note: 'Planes desde $49.99 al mes · Creado por Alerta, una agencia creativa multicultural',
 		promptTitle: 'Empecemos a crear.',
-		promptText: 'Promocionar blanqueamiento dental para Navidad',
+		promptText: 'Promocionar blanqueamiento y cuidado',
 		chipBrand: 'Marca: Dr. Martínez Family Dentistry',
 		chipFormat: 'Post de Instagram + Story',
 		outputAlt: 'Ejemplo de pieza con marca',
@@ -29,16 +29,16 @@ export const wireframe = {
 		},
 	},
 	origin: {
-		title: 'El poder del marketing al emprendedor.',
+		title: 'El poder del marketing para el emprendedor.',
 		body1:
-			'Durante años trabajamos haciendo marketing para grandes compañías, con acceso a investigación, estrategia, creatividad, producción, tecnología y especialistas.',
+			'Kaiman fue desarrollado por Alerta, una agencia de marketing y publicidad multicultural. Durante años hemos trabajado para grandes compañías, usando recursos como investigación, estrategia, creatividad, producción y tecnología para desarrollar sus marcas.',
 		body2:
-			'Pero empezamos a conocer emprendedores, pequeños negocios y profesionales independientes que necesitaban las mismas capacidades, pero de una manera diseñada para la realidad de sus negocios.',
+			'Pero empezamos a conocer emprendedores, pequeños negocios y profesionales independientes que hoy necesitan las mismas capacidades de marketing, pero de una manera diseñada para la realidad de sus negocios.',
 		body3: 'Kaiman nació para poner ese poder en sus manos.',
 		closing: 'Marketing más inteligente, más accesible y',
 		closingAccent: 'construido alrededor de tu negocio.',
-		clientsLabel: 'Del equipo de Alerta, una agencia creativa y de producción multicultural.',
-		clientsCta: 'Visitar Alerta',
+		imageCaption:
+			'Si eres emprendedor no tienes tiempo extra para aprender marketing. Kaiman llegó para apoyarte.',
 		imageAlt: 'Producción creativa de Alerta',
 	},
 	problem: {
@@ -48,12 +48,7 @@ export const wireframe = {
 			'Todo negocio necesita generar marketing constantemente. Y hoy, más que nunca, las empresas pequeñas y medianas, especialmente, deben hacerlo para conseguir clientes.',
 		body2:
 			'La mayoría utiliza Inteligencia Artificial para crear sus publicaciones. Pero con cada nueva generación, su marca puede perder consistencia porque la IA no tiene presentes detalles esenciales como:',
-		facets: [
-			{ label: 'Colores', image: 'section-3.1' },
-			{ label: 'Tipografías', image: 'section-3.2' },
-			{ label: 'Tono de comunicación', image: 'section-3.3' },
-			{ label: 'Estilo visual', image: 'section-3.4' },
-		],
+		bullets: ['sus colores', 'sus tipografías', 'su tono de comunicación', 'su estilo visual'],
 		after:
 			'Sin esos detalles, su contenido empieza a parecerse al de todos los demás y pierde algo fundamental: lo que hace única a su marca.',
 		secretBefore: 'El gran secreto del marketing:',
@@ -61,10 +56,13 @@ export const wireframe = {
 		secretBody1: 'Una marca se construye cuando las personas pueden reconocerla una y otra vez.',
 		secretBody2:
 			'Kaiman mantiene la personalidad de tu marca en cada generación para que tu negocio construya una imagen consistente, reconocible y propia, sin que tengas que explicarla cada vez.',
-		imageAlt: 'Ejemplo de anuncios inconsistentes hechos con IA',
+		withoutLabel: 'Sin Kaiman',
+		withLabel: 'Con Kaiman',
+		withoutAlt: 'Ejemplo de anuncios inconsistentes hechos con IA',
+		withAlt: 'Ejemplo de anuncios con marca hechos con Kaiman',
 	},
 	brandKnowledge: {
-		eyebrow: 'Brand Understanding · El pilar central de Kaiman',
+		eyebrow: 'Brand Understanding',
 		title: 'Kaiman entiende tu negocio para trabajar contigo, como un socio.',
 		body1:
 			'Kaiman va más allá de recordar tu logo, tus colores o tus tipografías. Entiende el negocio detrás de la marca: qué haces, qué ofreces, a quién le hablas, cómo te comunicas y qué hace diferente a tu negocio.',
@@ -107,37 +105,37 @@ export const wireframe = {
 		body: 'No todos los negocios venden de la misma manera. Kaiman entiende sus diferencias y les da las herramientas para enfrentar sus propios retos de marketing.',
 		personas: [
 			{
-				id: 'professionals',
+				id: 'martinez',
 				who: 'Profesionales independientes',
 				job: 'Servicios especializados',
 				line: 'Confianza y reputación',
-				href: '#ana',
+				href: '#martinez',
 			},
 			{
-				id: 'products',
+				id: 'ana',
 				who: 'Creadores de productos propios',
 				job: 'Productos y lanzamientos',
 				line: 'Construcción de demanda',
-				href: '#carlos',
+				href: '#ana',
 			},
 			{
-				id: 'sellers',
+				id: 'carlos',
 				who: 'Vendedores y representantes',
 				job: 'Oferta cambiante',
 				line: 'Audiencias de oportunidad',
-				href: '#sofia',
+				href: '#carlos',
 			},
 			{
-				id: 'creators',
+				id: 'sofia',
 				who: 'Creadores, coaches y educadores',
 				job: 'Conocimiento como producto',
 				line: 'Desarrollo de audiencia',
-				href: '#coaches',
+				href: '#sofia',
 			},
 		],
 	},
 	professionals: {
-		eyebrow: 'Profesionales independientes · Servicios especializados · Confianza y reputación',
+		eyebrow: 'Profesionales independientes',
 		title: 'Tu experiencia es tu producto. La confianza es lo que lo vende.',
 		body: 'Kaiman entiende los servicios que ofreces, qué los hace diferentes y las audiencias que tienen mayor necesidad de ellos. Ese conocimiento le permite ayudarte a comunicar tu experiencia con claridad, construir autoridad y convertir visibilidad en nuevas oportunidades de negocio.',
 		imageAlt: 'Ejemplo de profesional independiente',
@@ -198,7 +196,7 @@ export const wireframe = {
 		],
 	},
 	sellers: {
-		eyebrow: 'Vendedores y representantes · Oferta cambiante · Audiencias de oportunidad',
+		eyebrow: 'Vendedores y representantes',
 		title: 'La próxima oportunidad puede aparecer en cualquier momento. Tu marketing también debe estar ahí.',
 		body: 'Cuando lo que vendes cambia constantemente, tu marketing necesita responder con la misma velocidad. Kaiman entiende tu oferta, tus audiencias y tu negocio para ayudarte a mantener una presencia constante y convertir cada nueva oportunidad en comunicación relevante.',
 		imageAlt: 'Ejemplo de vendedor o representante',
@@ -226,7 +224,7 @@ export const wireframe = {
 		],
 	},
 	coaches: {
-		eyebrow: 'Creadores, coaches y educadores · Conocimiento como producto · Desarrollo de audiencia',
+		eyebrow: 'Creadores, coaches y educadores',
 		title: 'Tu audiencia puede estar en cualquier lugar. Tu mensaje debe llegarles.',
 		body: 'Cuando tu conocimiento, experiencia o punto de vista son parte de lo que vendes, necesitas convertirlos en una marca capaz de crecer. Kaiman entiende tu voz, tus temas, tu audiencia y lo que quieres construir para ayudarte a transformar tus ideas en contenido, productos y oportunidades de negocio.',
 		imageAlt: 'Ejemplo de coach o creador',
@@ -261,16 +259,24 @@ export const wireframe = {
 		body3:
 			'Y como todo parte del mismo entendimiento de tu negocio, puedes pasar de una necesidad a una estrategia, de una estrategia a una pieza y de una pieza a una campaña sin empezar de cero cada vez.',
 		items: [
-			{ title: 'Generar imagen, video y música de calidad.', body: '', image: 'section-11-1' },
-			{ title: 'Crear anuncios específicos para tu marca.', body: '', image: 'section-11-2' },
-			{ title: 'Programar campañas en tus redes con calendario.', body: '', image: 'section-11-3' },
-			{ title: 'Analizar tus resultados y mejorar tu desempeño.', body: '', image: 'section-11-4' },
-			{ title: 'Crear tus propios avatares y hablar en cualquier idioma.', body: '', image: 'section-11-5' },
-			{ title: 'Desarrollar websites listos para publicar.', body: '', image: 'section-11-6' },
-			{ title: 'Editar fotos, video y audio.', body: '', image: 'section-11-7' },
-			{ title: 'Analizar tu mercado y encontrar oportunidades de negocio.', body: '', image: 'section-11-8' },
+			{ title: 'Generar imagen, video y música de calidad.', body: '', image: 'section-13-1' },
+			{ title: 'Crear anuncios específicos para tu marca.', body: '', image: 'section-13-2' },
+			{ title: 'Programar campañas en tus redes con calendario.', body: '', image: 'section-13-3' },
+			{ title: 'Analizar tus resultados y mejorar tu desempeño.', body: '', image: 'section-13-4' },
+			{ title: 'Crear tus propios avatares y hablar en cualquier idioma.', body: '', image: 'section-13-5' },
+			{ title: 'Desarrollar websites listos para publicar.', body: '', image: 'section-13-6' },
+			{ title: 'Editar fotos, video y audio.', body: '', image: 'section-13-7' },
+			{ title: 'Analizar tu mercado y encontrar oportunidades de negocio.', body: '', image: 'section-13-8' },
 		],
-		categories: ['Image', 'Video', 'Audio', 'Script', 'Presentation', 'Website', 'Analysis'],
+		categories: [
+			{ id: 'image', label: 'Imagen' },
+			{ id: 'video', label: 'Video' },
+			{ id: 'audio', label: 'Audio' },
+			{ id: 'script', label: 'Guión' },
+			{ id: 'presentation', label: 'Presentación' },
+			{ id: 'website', label: 'Sitio web' },
+			{ id: 'analysis', label: 'Análisis' },
+		],
 	},
 	menos: {
 		title: 'Más capacidad de marketing con menos complejidad, tiempo y esfuerzo.',
@@ -305,7 +311,7 @@ export const wireframe = {
 			'Haz más del marketing que tu empresa necesita con una plataforma diseñada para trabajar alrededor de tu negocio.',
 	},
 	value: {
-		title: 'Mejor marketing debe estar al alcance de tu negocio.',
+		title: 'Un mejor marketing debe estar al alcance de tu negocio.',
 		leftLabel: 'Tu marketing con otras herramientas por separado:',
 		leftItems: [
 			'Generación de imágenes y textos (ChatGPT)',
@@ -322,12 +328,20 @@ export const wireframe = {
 		leftNote:
 			'Ocho cuentas, ocho facturas y tu marca explicada desde cero cada vez. Y sin Brand Understanding guiando tu marketing.',
 		rightLabel: 'Tu marketing con Kaiman',
-		rightTitle: 'Todas las herramientas. Una suscripción. Brand Understanding integrado.',
+		rightItems: [
+			'Generación de imágenes y textos',
+			'Generación de videos',
+			'Presentaciones',
+			'Análisis de mercado',
+			'Voz, traducción, música',
+			'Edición de imagen, audio y video',
+			'Planeación de contenido',
+			'Búsqueda de creadores e influencers',
+		],
+		rightHighlight: 'Brand Understanding integrado',
 		rightPrice: 'Desde $49.99',
 		rightPer: '/mes',
-		rightNote: 'Por una fracción del costo y además entiende tu marca.',
-		impactTitle: 'Mira cuánto puede ahorrarle Kaiman a tu negocio.',
-		impactCta: 'Estima tus piezas al mes',
+		rightNote: 'Una sola suscripción por una fracción del costo. Y además entiende tu negocio.',
 	},
 	playbooks: {
 		title: 'Estrategias para tu industria.',

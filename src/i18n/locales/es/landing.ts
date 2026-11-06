@@ -57,7 +57,7 @@ export const landing = {
 			{
 				label: 'Plan',
 				eyebrow: 'Desde 49 USD',
-				title: 'Mejor marketing debe estar al alcance de tu negocio.',
+				title: 'Un mejor marketing debe estar al alcance de tu negocio.',
 				body: 'Elige el plan que mejor se adapte a las necesidades de tu empresa.',
 			},
 		],
@@ -379,14 +379,12 @@ export const landing = {
 		planLabel: 'Plan de referencia para este volumen',
 		unitLabel: 'Costo de referencia por crédito en ese plan',
 		enterprise:
-			'Este volumen supera los 2.500 créditos del plan Empresarial. Corporativo se arma a medida.',
-		assumption:
-			'Referencia aproximada (tarifas de plataforma, 2026-11-03): 4 créditos por imagen (1K/2K), 25 créditos por clip de video de 8 s, 1 crédito por guion, 6 créditos por minuto iniciado de audio (texto a voz), 9 créditos por slide (sin imágenes de IA) y 26 créditos por website tipo landing. Cada paso del slider es una unidad de esa tarifa. Herramientas, resolución, duración y opciones pueden cambiar el total real.',
+			'Este volumen supera los 2.500 créditos del plan Business. Enterprise se arma a medida.',
 		perMonth: 'al mes',
 		cta: 'Obtener plan',
 	},
 	plans: {
-		title: 'Mejor marketing debe estar al alcance de tu negocio.',
+		title: 'Un mejor marketing debe estar al alcance de tu negocio.',
 		intro:
 			'Elige el plan que mejor se adapte a las necesidades de tu empresa. Todos los planes de Kaiman parten del mismo Brand Understanding y te dan acceso a capacidades de marketing diseñadas para ayudarte a trabajar mejor y más eficientemente.',
 		perMonth: 'USD',
@@ -402,10 +400,10 @@ export const landing = {
 		custom: 'A medida',
 		enterpriseCta: 'Agenda una llamada',
 		names: {
-			start: 'Esencial',
-			pro: 'Profesional',
-			scale: 'Empresarial',
-			enterprise: 'Corporativo',
+			start: 'Starter',
+			pro: 'Pro',
+			scale: 'Business',
+			enterprise: 'Enterprise',
 		},
 		taglines: {
 			start: 'Para personas que empiezan con marketing impulsado por IA.',
@@ -483,7 +481,7 @@ export const landing = {
 			},
 			{
 				q: '¿Puedo manejar más de una marca o negocio desde mi cuenta?',
-				a: 'Sí, según el plan. Esencial incluye 1 marca. Profesional incluye hasta 3 marcas. Empresarial incluye hasta 5 marcas. Corporativo se define a medida.',
+				a: 'Sí, según el plan. Starter incluye 1 marca. Pro incluye hasta 3 marcas. Business incluye hasta 5 marcas. Enterprise se define a medida.',
 			},
 			{
 				q: '¿Qué incluye la prueba gratis?',

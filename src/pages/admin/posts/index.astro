@@ -1,203 +1,47 @@
 ---
-import { Eye, EyeOff, Pencil, Plus, Send, Trash2 } from 'lucide-react';
+import { Plus } from 'lucide-react';
+import Kbd from '../../../components/ui/atoms/Kbd.astro';
+import { PostsAdmin, type AdminPostsPayload } from '../../../features/posts/PostsAdmin';
+import { getAdmin } from '../../../i18n';
 import AdminLayout from '../../../layouts/AdminLayout.astro';
-import { blogPostPath } from '../../../lib/blog-paths';
+import { getAdminLocale } from '../../../server/admin-locale';
 import { listAllPosts } from '../../../server/repositories/posts';
 
-const posts = await listAllPosts();
+const locale = getAdminLocale(Astro.cookies);
+const t = getAdmin(locale);
+const result = await listAllPosts({ page: 1, pageSize: 10 });
+const initial: AdminPostsPayload = {
+	total: result.total,
+	page: result.page,
+	pageSize: result.pageSize,
+	totalPages: result.totalPages,
+	items: result.items.map((post) => ({
+		id: post.id,
+		title: post.title,
+		slug: post.slug,
+		locale: post.locale,
+		status: post.status,
+		updatedAt: post.updatedAt.toISOString(),
+		category: post.category
+			? {
+					id: post.category.id,
+					name: post.category.name,
+					nameEn: post.category.nameEn,
+					slug: post.category.slug,
+				}
+			: null,
+	})),
+};
 ---
 
-<AdminLayout title="Artículos">
-	<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
-		<div role="toolbar" aria-label="Acciones sobre los artículos seleccionados" class="flex flex-wrap items-center gap-2">
-			<p class="mr-1 font-bold"><span id="selected-count">0</span> seleccionados</p>
-			<button type="button" id="publish-selected" disabled class="bulk-action inline-flex min-h-11 items-center gap-2 rounded-lg bg-success-700 px-4 font-bold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40">
-				<Send aria-hidden="true" size={18} /> Publicar
-			</button>
-			<button type="button" id="draft-selected" disabled class="bulk-action inline-flex min-h-11 items-center gap-2 rounded-lg border border-black/40 px-4 font-bold hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-40">
-				<EyeOff aria-hidden="true" size={18} /> Pasar a borrador
-			</button>
-			<button type="button" id="delete-selected" disabled class="bulk-action inline-flex min-h-11 items-center gap-2 rounded-lg border border-error-700 px-4 font-bold text-error-700 hover:bg-error-100 disabled:cursor-not-allowed disabled:opacity-40">
-				<Trash2 aria-hidden="true" size={18} /> Eliminar
-			</button>
-		</div>
-		<a href="/admin/posts/nuevo" class="inline-flex min-h-11 items-center gap-2 rounded-lg bg-primary px-4 font-bold text-white"><Plus aria-hidden="true" size={18} /> Nuevo artículo</a>
-	</div>
-	<p id="bulk-status" role="status" aria-live="polite" class="mb-4 rounded-lg bg-primary-100 p-3 font-bold empty:hidden"></p>
-	<div class="overflow-x-auto rounded-2xl border border-black/10 bg-white">
-		<table class="w-full min-w-[68rem] text-left">
-			<thead class="bg-primary-100 text-sm">
-				<tr>
-					<th class="w-12 p-4"><input type="checkbox" id="select-all" class="size-5 accent-primary" aria-label="Seleccionar todos los artículos" /></th>
-					<th class="p-4">Título</th><th class="p-4">Categoría</th><th class="p-4">Idioma</th><th class="p-4">Estado</th><th class="p-4">Actualizado</th><th class="p-4"><span class="sr-only">Acciones</span></th>
-				</tr>
-			</thead>
-			<tbody>
-				{posts.map((post) => (
-					<tr class="border-t border-black/10">
-						<td class="p-4">
-							<input
-								type="checkbox"
-								class="post-select size-5 accent-primary"
-								value={post.id}
-								data-title={post.title}
-								data-published={post.status === 'published' ? 'true' : 'false'}
-								aria-label={`Seleccionar «${post.title}» (${post.locale.toUpperCase()})`}
-							/>
-						</td>
-						<td class="p-4 font-bold">
-							<a
-								href={post.status === 'published' ? blogPostPath(post.locale, post.slug) : `/admin/posts/${post.id}/preview`}
-								target="_blank"
-								rel="noopener"
-								class="text-black underline-offset-4 hover:text-primary hover:underline"
-								title={post.status === 'published' ? 'Abrir la página publicada' : 'Abrir la vista previa del borrador'}
-							>
-								{post.title}<span class="sr-only"> ({post.status === 'published' ? 'abre la página publicada' : 'abre la vista previa'} en una pestaña nueva)</span>
-							</a>
-						</td>
-						<td class="p-4">{post.category ? post.category.name : <span class="text-black/50">Sin categoría</span>}</td>
-						<td class="p-4 font-bold uppercase text-primary-800">{post.locale}</td>
-						<td class="p-4"><span class:list={['rounded-full px-3 py-1 text-sm font-bold', post.status === 'published' ? 'bg-success-100 text-success-700' : 'bg-warning/30']}>{post.status === 'published' ? 'Publicado' : 'Borrador'}</span></td>
-						<td class="p-4">{new Intl.DateTimeFormat('es', { dateStyle: 'medium' }).format(post.updatedAt)}</td>
-						<td class="p-4">
-							<div class="flex justify-end gap-1">
-								<a href={`/admin/posts/${post.id}/preview`} target="_blank" rel="noopener" class="inline-flex min-h-11 items-center gap-2 rounded-lg px-3 font-bold text-primary hover:bg-primary-100"><Eye aria-hidden="true" size={17} /> Vista previa</a>
-								<a href={`/admin/posts/${post.id}`} class="inline-flex min-h-11 items-center gap-2 rounded-lg px-3 font-bold text-primary hover:bg-primary-100"><Pencil aria-hidden="true" size={17} /> Editar</a>
-								<button
-									type="button"
-									class="post-delete inline-flex min-h-11 items-center gap-2 rounded-lg px-3 font-bold text-error-700 hover:bg-error-100"
-									data-id={post.id}
-									data-title={post.title}
-									data-published={post.status === 'published' ? 'true' : 'false'}
-								>
-									<Trash2 aria-hidden="true" size={17} /> Eliminar
-								</button>
-							</div>
-						</td>
-					</tr>
-				))}
-			</tbody>
-		</table>
-	</div>
+<AdminLayout title={t.posts.title}>
+	<a
+		slot="actions"
+		href="/admin/posts/nuevo"
+		class="inline-flex min-h-11 items-center gap-2 rounded-lg bg-primary px-4 font-bold text-white hover:bg-primary-700"
+	>
+		<Plus aria-hidden="true" size={18} /> {t.posts.newPost}
+		<Kbd tone="onPrimary" label={`${t.shell.shortcut} N`}>N</Kbd>
+	</a>
+	<PostsAdmin client:load initial={initial} copy={t.posts} locale={locale} />
 </AdminLayout>
-
-<script>
-	type Target = { id: string; title: string; published: boolean };
-	type StatusResult = { updated: number; skipped: { title: string; reason: string }[]; unchanged: number; error?: string };
-
-	const FLASH = 'admin-posts-flash';
-	const boxes = () => [...document.querySelectorAll<HTMLInputElement>('.post-select')];
-	const selectAll = document.querySelector<HTMLInputElement>('#select-all');
-	const count = document.querySelector('#selected-count');
-	const status = document.querySelector('#bulk-status');
-	const actions = [...document.querySelectorAll<HTMLButtonElement>('.bulk-action')];
-	const say = (text: string) => {
-		if (status) status.textContent = text;
-	};
-
-	// Result message carried over the reload that follows a bulk action.
-	try {
-		const flash = sessionStorage.getItem(FLASH);
-		if (flash) {
-			say(flash);
-			sessionStorage.removeItem(FLASH);
-		}
-	} catch {
-		/* storage unavailable: no message */
-	}
-	const reloadWith = (message: string) => {
-		try {
-			sessionStorage.setItem(FLASH, message);
-		} catch {
-			/* ignore */
-		}
-		location.reload();
-	};
-
-	const selected = (): Target[] =>
-		boxes()
-			.filter((box) => box.checked)
-			.map((box) => ({ id: box.value, title: box.dataset.title ?? '', published: box.dataset.published === 'true' }));
-	const listOf = (targets: Target[]) =>
-		targets.slice(0, 8).map((target) => `• ${target.title}`).join('\n') + (targets.length > 8 ? `\n… y ${targets.length - 8} más` : '');
-	const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
-
-	const refresh = () => {
-		const checked = selected().length;
-		if (count) count.textContent = String(checked);
-		for (const button of actions) button.disabled = checked === 0;
-		if (selectAll) {
-			selectAll.checked = checked > 0 && checked === boxes().length;
-			selectAll.indeterminate = checked > 0 && checked < boxes().length;
-		}
-	};
-
-	async function changeStatus(targets: Target[], next: 'published' | 'draft') {
-		const toChange = targets.filter((target) => target.published !== (next === 'published'));
-		if (!toChange.length) {
-			say(next === 'published' ? 'Los artículos seleccionados ya están publicados.' : 'Los artículos seleccionados ya son borradores.');
-			return;
-		}
-		const question =
-			next === 'published'
-				? `¿Publicar ${plural(toChange.length, 'artículo', 'artículos')}? Se verán en el blog público.`
-				: `¿Pasar ${plural(toChange.length, 'artículo', 'artículos')} a borrador? Dejarán de verse en el blog.`;
-		if (!confirm(`${question}\n\n${listOf(toChange)}`)) return;
-		for (const button of actions) button.disabled = true;
-		say(next === 'published' ? 'Publicando…' : 'Pasando a borrador…');
-		try {
-			const response = await fetch('/api/admin/posts/status', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ ids: toChange.map((target) => target.id), status: next }),
-			});
-			const result = (await response.json()) as StatusResult;
-			if (!response.ok) throw new Error(result.error ?? 'No se pudo cambiar el estado.');
-			const done =
-				next === 'published'
-					? plural(result.updated, 'artículo publicado', 'artículos publicados')
-					: plural(result.updated, 'artículo pasado a borrador', 'artículos pasados a borrador');
-			const skipped = result.skipped.map((item) => `«${item.title}»: ${item.reason}`).join(' · ');
-			reloadWith(skipped ? `${done}. No se publicaron ${result.skipped.length}: ${skipped}.` : `${done}.`);
-		} catch (error) {
-			say(error instanceof Error ? error.message : 'No hay conexión. Inténtalo de nuevo.');
-			refresh();
-		}
-	}
-
-	async function remove(targets: Target[]) {
-		const published = targets.filter((target) => target.published).length;
-		const warning = published ? `\n\n${published} ${published === 1 ? 'está publicado y dejará' : 'están publicados y dejarán'} de verse en el blog.` : '';
-		if (!confirm(`¿Eliminar ${targets.length === 1 ? 'este artículo' : `estos ${targets.length} artículos`} de forma permanente? No se puede deshacer.\n\n${listOf(targets)}${warning}`)) return;
-		for (const button of actions) button.disabled = true;
-		let failed = 0;
-		for (const [index, target] of targets.entries()) {
-			say(`Eliminando ${index + 1} de ${targets.length}…`);
-			try {
-				const response = await fetch(`/api/admin/posts/${target.id}`, { method: 'DELETE' });
-				if (!response.ok) failed++;
-			} catch {
-				failed++;
-			}
-		}
-		if (failed) {
-			say(`No se pudieron eliminar ${failed} de ${targets.length}. Recarga la página y revisa la lista.`);
-			refresh();
-			return;
-		}
-		reloadWith(`${plural(targets.length, 'artículo eliminado', 'artículos eliminados')}.`);
-	}
-
-	selectAll?.addEventListener('change', () => {
-		for (const box of boxes()) box.checked = selectAll.checked;
-		refresh();
-	});
-	for (const box of boxes()) box.addEventListener('change', refresh);
-	document.querySelector('#publish-selected')?.addEventListener('click', () => changeStatus(selected(), 'published'));
-	document.querySelector('#draft-selected')?.addEventListener('click', () => changeStatus(selected(), 'draft'));
-	document.querySelector('#delete-selected')?.addEventListener('click', () => remove(selected()));
-	for (const button of document.querySelectorAll<HTMLButtonElement>('.post-delete')) {
-		button.addEventListener('click', () => remove([{ id: button.dataset.id ?? '', title: button.dataset.title ?? '', published: button.dataset.published === 'true' }]));
-	}
-</script>

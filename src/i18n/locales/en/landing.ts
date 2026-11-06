@@ -380,9 +380,7 @@ export const landing = {
 		planLabel: 'Reference plan for this volume',
 		unitLabel: 'Reference cost per credit on that plan',
 		enterprise:
-			'This volume exceeds the 2,500 credits of the Business plan. Corporate is built to fit.',
-		assumption:
-			'Approximate reference (platform rates, 2026-11-03): 4 credits per image (1K/2K), 25 credits per 8 s video clip, 1 credit per script, 6 credits per started minute of audio (text to speech), 9 credits per slide (without AI images), and 26 credits per landing-style website. Each slider step is one unit of that rate. Tool, resolution, length, and options can change the real total.',
+			'This volume exceeds the 2,500 credits of the Business plan. Enterprise is built to fit.',
 		perMonth: 'per month',
 		cta: 'Get this plan',
 	},
@@ -403,10 +401,10 @@ export const landing = {
 		custom: 'Custom',
 		enterpriseCta: 'Book a call',
 		names: {
-			start: 'Essential',
-			pro: 'Professional',
+			start: 'Starter',
+			pro: 'Pro',
 			scale: 'Business',
-			enterprise: 'Corporate',
+			enterprise: 'Enterprise',
 		},
 		taglines: {
 			start: 'For individuals getting started with AI-powered marketing.',
@@ -458,14 +456,6 @@ export const landing = {
 		read: 'Read',
 		empty: 'No published articles yet.',
 	},
-	blog: {
-		eyebrow: 'Blog',
-		title: 'Latest published articles',
-		body: 'Short reads on product, brand, and artificial intelligence applied to your business marketing.',
-		cta: 'Browse all articles',
-		read: 'Read',
-		empty: 'No published articles yet.',
-	},
 	faq: {
 		title: 'Frequently asked questions',
 		lead: 'Answers about the product, plans, and how Kaiman works with your business.',
@@ -492,7 +482,7 @@ export const landing = {
 			},
 			{
 				q: 'Can I manage more than one brand or business from my account?',
-				a: 'Yes, depending on the plan. Essential includes 1 brand. Professional includes up to 3 brands. Business includes up to 5 brands. Corporate is defined to fit.',
+				a: 'Yes, depending on the plan. Starter includes 1 brand. Pro includes up to 3 brands. Business includes up to 5 brands. Enterprise is defined to fit.',
 			},
 			{
 				q: 'What does the free trial include?',

@@ -2,6 +2,7 @@
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import SiteHeader from '../../components/layout/SiteHeader.astro';
 import { getLanding, isLocale, locales, type Locale } from '../../i18n';
+import { localeUrl } from '../../lib/locale-url';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 export const prerender = true;
@@ -11,7 +12,7 @@ export function getStaticPaths() {
 }
 
 const param = Astro.params.locale;
-if (!param || !isLocale(param)) return Astro.redirect('/es/');
+if (!param || !isLocale(param)) return Astro.redirect(localeUrl('es'));
 const locale = param as Locale;
 const copy = getLanding(locale);
 ---

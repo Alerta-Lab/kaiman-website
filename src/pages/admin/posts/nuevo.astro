@@ -1,13 +1,30 @@
 ---
 import { PostEditor } from '../../../features/posts/PostEditor';
+import { getAdmin } from '../../../i18n';
 import AdminLayout from '../../../layouts/AdminLayout.astro';
-import { listCategories, listTags } from '../../../server/repositories/posts';
+import { getAdminLocale } from '../../../server/admin-locale';
+import { categoryDisplayName, listCategories, listTags } from '../../../server/repositories/posts';
 
+const locale = getAdminLocale(Astro.cookies);
+const t = getAdmin(locale);
 const categories = await listCategories();
 const tags = await listTags();
 ---
 
-<AdminLayout title="Nuevo artículo">
-	<a href="/admin/importar" class="mb-6 inline-flex min-h-11 items-center rounded-lg border border-primary-700 px-4 font-bold text-primary-800">Revisar Word con varios artículos</a>
-	<PostEditor client:load categories={categories.map(({ id, name }) => ({ id, name }))} tagOptions={tags.map(({ id, name, nameEn }) => ({ id, name, nameEn }))} />
+<AdminLayout title={t.editor.newTitle}>
+	<a
+		href="/admin/importar"
+		class="mb-6 inline-flex min-h-11 items-center rounded-lg border border-primary-700 px-4 font-bold text-primary-800"
+	>
+		{t.editor.reviewMultiWord}
+	</a>
+	<PostEditor
+		client:load
+		copy={t.editor}
+		tagOptions={tags.map(({ id, name, nameEn }) => ({ id, name, nameEn }))}
+		categories={categories.map((category) => ({
+			id: category.id,
+			name: categoryDisplayName(category, locale),
+		}))}
+	/>
 </AdminLayout>

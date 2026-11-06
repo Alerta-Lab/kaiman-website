@@ -12,6 +12,222 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-06 — Admin i18n ES/EN
+
+- Diccionarios `src/i18n/locales/{es,en}/admin.ts` + `getAdmin(locale)`.
+- Selector ES/EN del sidebar traduce shell, resumen, posts, tags, categorías, media, editor, analítica, login y vista previa (nombres de contenido vía `name`/`nameEn`).
+
+### 2026-11-06 — Admin categorías tipo etiquetas + borde tabla
+
+- Categorías: cards con preview/edición (lápiz, check, X); pie space-between slug + conteo; sin párrafo intro.
+- Tabla artículos: contorno blanco con ring suave.
+
+### 2026-11-06 — Admin artículos: toolbar, search y paginación
+
+- Tabla en `text-sm` (14px, `font-body`). Toolbar full-width: selección izq. / acciones der.; eliminar solo icono.
+- Buscador con debounce + skeleton; paginación vía `GET /api/admin/posts`.
+
+### 2026-11-06 — Admin toast compacto + nav hamburguesa
+
+- Toast sin detalle: card horizontal compacta (`items-center`, padding reducido).
+- Admin &lt; lg: sidebar drawer + overlay; hamburguesa en el header.
+
+### 2026-11-06 — Admin media: upload preview, grid/lista, búsqueda y paginación
+
+- Cuadro de subida con preview, quitar/cambiar archivo y alt a la derecha.
+- Biblioteca: contador + search con debounce, vista grid/lista, copiar URL, eliminar, paginación.
+
+### 2026-11-06 — Admin etiquetas bilingües + selector de idioma
+
+- Etiquetas: `name` (ES) + `nameEn` (EN) al crear y editar; preview muestra solo el idioma del admin.
+- Sidebar admin: selector ES/EN arriba de Resumen (`kaiman_admin_locale`).
+
+### 2026-11-06 — Admin etiquetas: crear full-width + edición inline
+
+- Formulario «Nueva etiqueta» a ancho completo del main.
+- Cards: nombre como texto; lápiz → editar (input + check guardar); papelera → X cancelar en modo edición.
+
+### 2026-11-06 — Atomo Kbd
+
+- `components/ui/atoms/Kbd.astro`: tecla de atajo reutilizable (`border-b` tipo keycap). Tones `default` | `onPrimary`.
+- Admin nav: R Resumen, A Artículos, E Etiquetas, I Imágenes, L Analítica; N → nuevo artículo (global).
+
+### 2026-11-06 — Nombres de planes unificados
+
+- ES/EN: Starter, Pro, Business, Enterprise (mismo texto en ambos idiomas).
+
+### 2026-11-06 — Blog footer tipo directorio
+
+- Footer multi-columna (Explorar / Categorías / Legal / Cuenta+Contacto), barra legal abajo.
+- Responsive: 2 cols → 3 → 4; bloque cuenta con borde en desktop.
+
+### 2026-11-06 — Blog index: hero + card flotante
+
+- Atmósfera `night` en `body` (gradiente fixed, sin corte). Hero con más `py`.
+- Card blanca `overflow-visible`; PostCard sin `overflow-hidden` (hover no se recorta).
+
+### 2026-11-06 — Blog header en dos franjas
+
+- Arriba: logo + idiomas + «Ingresa a Kaiman». Abajo (mini): lupa + categorías del blog.
+
+### 2026-11-06 — Blog cards: portada 16:9
+
+- `PostCard` + cards `#blog`: portada `aspect-video`, título más chico, excerpt `line-clamp-3`.
+- `PostCard`: `<a>` envuelve `article` (click a la nota); sin «Leer»; tags como `span`.
+
+### 2026-11-06 — FAQ acordeón animado
+
+- `#preguntas`: un ítem abierto a la vez; altura animada ~300ms al expandir/colapsar.
+
+### 2026-11-05 — Tools: section-13-*
+
+- Cards: 1→`13-1` … 8→`13-8` (todas las cards tools).
+
+### 2026-11-05 — Hero prompt
+
+- Prompt: «Promocionar blanqueamiento y cuidado» / «Promote whitening and care».
+- `section-1-2.jpg` renovada/optimizada (~175 KB) en el grid del prompt.
+
+### 2026-11-05 — Bandas sólidas selectivas
+
+- Color plano `#01001E` solo en: demo, problem, brand-understanding, martinez, carlos, tools, value, piezas, blog, cierre.
+
+### 2026-11-05 — Problem: section-4 Sin Kaiman
+
+- Comparación `4/5`. «Sin Kaiman»: `section-4.png`. «Con Kaiman»: `section-4-2.png` (~900px, optimizado).
+
+### 2026-11-05 — Hero: aprenda + section-1
+
+- Acento ES: «aprenda de ti.» (alineado con «deja que»); EN: «learn from you.»
+- Tres outputs del prompt: `section-1.jpg`, `section-1-1.jpg`, `section-1-2.jpg` (optimizados ~800px / ~110–150 KB).
+
+### 2026-11-05 — Shell 1600px
+
+- Contenedor de sección (`shell`) de `max-w-[75rem]` a `max-w-[1600px]`.
+- Padding-x ampliado: `px-8 sm:px-12 lg:px-20`.
+
+### 2026-11-05 — FAQ abierto: contraste + padding
+
+- Número en `group-open:text-primary`; summary/respuesta con más `px` (`px-5` / `sm:px-6`).
+
+### 2026-11-05 — Tools chips: borde blanco
+
+- Categorías de `#tools` con `border-white` (antes `border-feature-*`).
+- Responsive: grid `2 / sm:3 / md:4 / lg:7` (antes una sola fila `flex-1` que se solapaba en mobile).
+
+### 2026-11-05 — Finder defaults
+
+- Sliders por defecto: imagen 10, video 10, guion 5, audio 20 min, presentación 10, website 4.
+
+### 2026-11-05 — Planes: título centrado
+
+- `#planes` h2 + intro en `text-center`.
+
+### 2026-11-05 — Value: sin barra impact
+
+- Eliminado el bloque `#impact` (CTA a estimador) bajo las cards de comparación en `#value`.
+
+### 2026-11-05 — Menos: Más arriba
+
+- Grid de 5: primera card «Más / Capacidad» (primary); luego las 4 «Menos».
+
+### 2026-11-05 — Origin copy
+
+- ES/EN: título «para el emprendedor»; body abre con Alerta; cierre «construido alrededor de tu negocio».
+- Caption bajo foto: emprendedor / tiempo / Kaiman apoya. `section-2.png` optimizada (~2 MB).
+
+### 2026-11-05 — Atmósfera azul noche + glows
+
+- Base continua `#060612` en `main` + capa de atmósfera a página completa (sin paneles alternos).
+- Sin `overflow-hidden` en secciones (evita cortes del glow). Separadores `border-white/[0.06]`.
+- Glows locales suaves que pueden fundirse entre bloques.
+
+### 2026-11-05 — Audiencias: ids por nombre
+
+- Cards/secciones: `#martinez` `#ana` `#carlos` `#sofia` (antes ana/carlos/sofia/coaches desalineados).
+
+### 2026-11-05 — Demo como 2ª sección
+
+- `#demo` (video) pasa a ir justo después del hero.
+
+### 2026-11-05 — Tools categories full-width
+
+- Chips de modo a ancho completo (`flex-1`) con `bg-feature-*` (website → `feature-creators`). Labels ES localizados.
+
+### 2026-11-05 — Carlos: una imagen section-9
+
+- `#carlos`: grid 2×2 reemplazado por `section-9.png` (optimizada ~1.8 MB).
+
+### 2026-11-05 — Brand Understanding layout
+
+- Arriba 2 cols: copy izquierda + imagen derecha. Abajo «Kaiman entiende» + tags centrados (sin imagen).
+
+### 2026-11-05 — Value card Kaiman
+
+- Quitado el título «Todas las herramientas…». Bullets espejo sin marcas + highlight «Brand Understanding integrado». Nota: una sola suscripción / entiende tu negocio.
+
+### 2026-11-05 — Secreto en sección propia
+
+- Caja «consistencia de marca» sale de `#problem` a sección `#secreto` debajo.
+
+### 2026-11-05 — Footer: logo + Volver arriba
+
+- Quitados eyebrow «Kaiman Studio», lead y CTA de prueba.
+- Logo del header; back-top con flecha + «Volver arriba» / «Back to top». Sin `min-h-svh`.
+
+### 2026-11-05 — Stories cards hierarchy
+
+- Cards de audiencia: `who` como título; `job` y `line` en texto normal blanco.
+
+### 2026-11-05 — Problem: 2 cols + bullets
+
+- Columna 1: título + 2 imágenes (Sin/Con Kaiman; placeholders `section-3.1` / `3.2`).
+- Columna 2: copy completo, bullets (`sus colores`…), cierre y caja del secreto.
+- Ya no hay grid de 4 facets/cards.
+
+### 2026-11-05 — Eyebrows Brand + audiencias
+
+- Brand Understanding: sin «El pilar central…».
+- Audiencias: solo el primer tramo (profesionales / vendedores / coaches) con bullet; productos ya era corto.
+
+### 2026-11-05 — Hero title accent gradient
+
+- Acento del H1: «aprenda de ti.» / «learn from you.» con `bg-clip-text` + degradado `#00cfff` → `#7149fb` (izq → der).
+
+### 2026-11-05 — Sofia: sin clips 9:16
+
+- Sección `#sofia`: se quitó la fila de 3 clips (`section-8.1`…`8.3`); queda la foto principal.
+
+### 2026-11-05 — Anclas alineadas con nav
+
+- Wireframe usaba `top` / `brand-knowledge` / `pricing` / `faq`; header/footer apuntaban a `hero` / `brand-understanding` / `planes` / `preguntas` (IDs del LandingPage viejo) → 404 de ancla en Pages.
+- IDs unificados a los del nav; `scroll-mt-28` en secciones ancladas por el header fijo.
+
+### 2026-11-05 — Footer blanks, leads, close width
+
+- Instagram, blog (footer + CTA sección) y Alerta: `target="_blank"` + `rel="noopener noreferrer"`.
+- Leads de sección: sin `max-w-2xl` (usan el ancho del shell).
+- Close CTA: contenedor `max-w-5xl` para que «más eficiente» no parta de línea.
+
+### 2026-11-05 — Finder rates copy + locale URLs
+
+- Quitado el párrafo de tarifas del PlanFinder (`assumption` ES/EN).
+- Links de locale: `localeUrl` / `blog*Path` siempre incluyen `/es|en/` + `base`. `getRelativeLocaleUrl` omitía `es` (`prefixDefaultLocale: false`) y en Pages salían `/kaiman-website/blogs/...` → 404.
+
+### 2026-11-05 — Origin link, secreto, galleries S7/S8
+
+- Visitar Alerta: `target="_blank"` + `whitespace-nowrap`.
+- Secreto: acento en `text-primary-300` (no feature-image).
+- Productos: grid 2×2 `section-7.1`…`7.4.png`.
+- Vendedores: foto arriba + 3 clips 9:16 `section-8.1`…`8.3.png`.
+
+### 2026-11-05 — GitHub Pages: redirect sin `base`
+
+- Síntoma: `/kaiman-website/` redirigía a `/es/` (raíz del org) → 404; `/kaiman-website/es/` sí respondía 200.
+- Causa: `Astro.redirect('/es/')` ignora `base: '/kaiman-website/'`.
+- Fix: `localeUrl()` vía `getRelativeLocaleUrl` en `index` y redirects de locale/blog.
+- Language switch: `pathWithoutLocale` no quitaba el base → URLs tipo `/en/kaiman-website/es/`. Ahora `stripBase` + `getRelativeLocaleUrl`.
+
 ### 2026-11-04 — Problem facets + secreto
 
 - Facets con `Card`: imagen + footer label (Colores / Tipografías / Tono… / Estilo) + índice; sin «su/sus».

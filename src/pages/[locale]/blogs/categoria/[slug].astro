@@ -7,14 +7,26 @@ import PublicHeader from '../../../../components/blog/organisms/PublicHeader.ast
 import { isLocale, locales, type Locale } from '../../../../i18n';
 import BlogLayout from '../../../../layouts/BlogLayout.astro';
 import { blogCategoryPath, blogTagPath } from '../../../../lib/blog-paths';
-import { categoryDisplayName, getCategoryBySlug, listPublishedPosts } from '../../../../server/repositories/posts';
+import { localeUrl } from '../../../../lib/locale-url';
+import {
+	categoryDisplayName,
+	getCategoryBySlug,
+	listPublishedCategories,
+	listPublishedPosts,
+} from '../../../../server/repositories/posts';
 
 export async function getStaticPaths() {
 	const paths: { params: { locale: Locale; slug: string } }[] = [];
 	for (const locale of locales) {
-		const posts = await listPublishedPosts({ locale });
-		const tagSlugs = new Set(posts.flatMap((post) => post.tags.map((tag) => tag.slug)));
-		for (const slug of tagSlugs) {
+		const [posts, categories] = await Promise.all([
+			listPublishedPosts({ locale }),
+			listPublishedCategories(locale),
+		]);
+		const slugs = new Set([
+			...categories.map((category) => category.slug),
+			...posts.flatMap((post) => post.tags.map((tag) => tag.slug)),
+		]);
+		for (const slug of slugs) {
 			paths.push({ params: { locale, slug } });
 		}
 	}
@@ -22,7 +34,7 @@ export async function getStaticPaths() {
 }
 
 const param = Astro.params.locale;
-if (!param || !isLocale(param)) return Astro.redirect('/es/blogs');
+if (!param || !isLocale(param)) return Astro.redirect(localeUrl('es', 'blogs'));
 const locale = param as Locale;
 const slug = Astro.params.slug ?? '';
 
@@ -53,20 +65,31 @@ const copy =
 			};
 ---
 
-<BlogLayout title={copy.title} description={copy.description} locale={locale} canonical={canonical} alternateEs={alternateEs} alternateEn={alternateEn}>
+<BlogLayout
+	title={copy.title}
+	description={copy.description}
+	locale={locale}
+	canonical={canonical}
+	alternateEs={alternateEs}
+	alternateEn={alternateEn}
+>
 	<PublicHeader locale={locale} />
 	<main id="contenido" class="mx-auto min-h-[70vh] max-w-7xl px-5 py-16 lg:px-8">
 		<header class="max-w-2xl border-b border-primary-200 pb-gap-page">
 			<Headline as="h1" size="6xl">{name}</Headline>
 			<Text class="mt-gap-control text-black/75">{copy.support}</Text>
 		</header>
-		{posts.length === 0 ? (
-			<p class="mt-gap-page rounded-xl bg-primary-100 p-gap-block font-bold text-primary-900">{copy.empty}</p>
-		) : (
-			<div class="mt-gap-page grid gap-gap-block md:grid-cols-2 lg:grid-cols-3 lg:gap-gap-page">
-				{posts.map((post) => <PostCard post={post} locale={locale} />)}
-			</div>
-		)}
+		{
+			posts.length === 0 ? (
+				<p class="mt-gap-page rounded-xl bg-primary-100 p-gap-block font-bold text-primary-900">{copy.empty}</p>
+			) : (
+				<div class="mt-gap-page grid gap-gap-block md:grid-cols-2 lg:grid-cols-3 lg:gap-gap-page">
+					{posts.map((post) => (
+						<PostCard post={post} locale={locale} />
+					))}
+				</div>
+			)
+		}
 	</main>
 	<PublicFooter locale={locale} />
 </BlogLayout>

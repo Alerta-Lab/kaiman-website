@@ -1,11 +1,11 @@
 ---
-import { getRelativeLocaleUrl } from 'astro:i18n';
 import { ArrowUp, Mail, MapPin, Phone } from 'lucide-react';
 import { SocialIcon } from 'react-social-icons';
 import { getLanding, type Locale } from '../../i18n';
+import { asset } from '../../lib/asset';
 import { blogIndexPath } from '../../lib/blog-paths';
-import { alertaUrl, instagramUrl, signupUrl } from '../../lib/plans';
-import Button from '../ui/Button.astro';
+import { localeUrl } from '../../lib/locale-url';
+import { alertaUrl, instagramUrl } from '../../lib/plans';
 
 interface Props {
 	locale: Locale;
@@ -13,7 +13,7 @@ interface Props {
 
 const { locale } = Astro.props;
 const copy = getLanding(locale);
-const home = getRelativeLocaleUrl(locale, '/');
+const home = localeUrl(locale);
 const year = new Date().getFullYear();
 
 const productLinks = [
@@ -24,38 +24,42 @@ const productLinks = [
 ];
 
 const resourceLinks = [
-	{ href: `${home}#playbooks`, label: copy.footer.playbooks },
-	{ href: blogIndexPath(locale), label: copy.footer.help },
+	{ href: `${home}#playbooks`, label: copy.footer.playbooks, blank: false },
+	{ href: blogIndexPath(locale), label: copy.footer.help, blank: true },
 ];
 
 const legalLinks = [
-	{ href: getRelativeLocaleUrl(locale, '/terminos'), label: copy.footer.terms },
-	{ href: getRelativeLocaleUrl(locale, '/privacidad'), label: copy.footer.privacy },
+	{ href: localeUrl(locale, 'terminos'), label: copy.footer.terms },
+	{ href: localeUrl(locale, 'privacidad'), label: copy.footer.privacy },
 ];
 ---
 
-<footer data-site-footer class="relative min-h-svh border-t border-white/10 bg-ink-100">
-	<div class="mx-auto flex min-h-svh w-full max-w-content flex-col justify-between gap-16 px-4 py-16 sm:px-6 sm:py-24">
-		<div class="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-			<div class="max-w-3xl flex flex-col gap-6">
-				<p class="text-sm font-semibold tracking-[0.14em] text-primary-300 uppercase">{copy.footer.studio}</p>
-				<h2 class="font-display text-4xl font-semibold tracking-tight text-balance text-white sm:text-5xl lg:text-6xl">
-					{copy.footer.lead}
-				</h2>
-			</div>
-			<div class="flex flex-wrap items-center gap-3">
-				<Button href={signupUrl}>{copy.footer.cta}</Button>
-				<div data-back-top-dock class="relative size-11 shrink-0">
-					<a
-						href="#hero"
-						data-back-top
-						data-docked="false"
-						class="inline-flex size-11 items-center justify-center rounded-full bg-primary text-white shadow-[0_12px_32px_rgba(107,72,233,0.35)] transition-[opacity,background-color] duration-300 hover:bg-primary-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary data-[docked=false]:fixed data-[docked=false]:right-5 data-[docked=false]:bottom-5 data-[docked=false]:z-50 data-[docked=false]:opacity-0 data-[docked=false]:pointer-events-none data-[docked=false]:data-[ready=true]:opacity-100 data-[docked=false]:data-[ready=true]:pointer-events-auto data-[docked=true]:absolute data-[docked=true]:inset-0 sm:data-[docked=false]:right-6 sm:data-[docked=false]:bottom-6"
-						aria-label={copy.footer.backTop}
-					>
-						<ArrowUp size={18} aria-hidden="true" />
-					</a>
-				</div>
+<footer data-site-footer class="relative border-t border-white/[0.06] bg-[#060612]">
+	<div
+		class="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_420px_at_50%_0%,rgba(113,73,251,0.16),transparent_72%)]"
+		aria-hidden="true"
+	></div>
+	<div class="relative mx-auto flex w-full max-w-content flex-col gap-16 px-4 py-16 sm:px-6 sm:py-24">
+		<div class="flex flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
+			<a href={home} class="flex shrink-0 items-center">
+				<img
+					src={asset('/kaiman-logo.png')}
+					alt={copy.meta.title}
+					width="175"
+					height="40"
+					class="h-30 w-auto"
+				/>
+			</a>
+			<div data-back-top-dock class="relative">
+				<a
+					href="#hero"
+					data-back-top
+					data-docked="false"
+					class="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(107,72,233,0.35)] transition-[opacity,background-color] duration-300 hover:bg-primary-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary data-[docked=false]:fixed data-[docked=false]:right-5 data-[docked=false]:bottom-5 data-[docked=false]:z-50 data-[docked=false]:opacity-0 data-[docked=false]:pointer-events-none data-[docked=false]:data-[ready=true]:opacity-100 data-[docked=false]:data-[ready=true]:pointer-events-auto data-[docked=true]:relative data-[docked=true]:shadow-none sm:data-[docked=false]:right-6 sm:data-[docked=false]:bottom-6"
+				>
+					<ArrowUp size={18} aria-hidden="true" />
+					{copy.footer.backTop}
+				</a>
 			</div>
 		</div>
 
@@ -73,7 +77,12 @@ const legalLinks = [
 					<Phone size={16} aria-hidden="true" />
 					{copy.footer.phone}
 				</a>
-				<a class="mt-2 inline-flex items-center gap-3 text-sm font-semibold text-neutral-300 hover:underline hover:underline-offset-4" href={instagramUrl}>
+				<a
+					class="mt-2 inline-flex items-center gap-3 text-sm font-semibold text-neutral-300 hover:underline hover:underline-offset-4"
+					href={instagramUrl}
+					target="_blank"
+					rel="noopener noreferrer"
+				>
 					<SocialIcon
 						url={instagramUrl}
 						as="span"
@@ -98,11 +107,23 @@ const legalLinks = [
 			<nav class="flex flex-col gap-2" aria-label={copy.footer.resources}>
 				<p class="text-sm font-semibold text-white">{copy.footer.resources}</p>
 				{resourceLinks.map((link) => (
-					<a class="w-fit text-sm text-neutral-300 hover:underline hover:underline-offset-4" href={link.href}>
+					<a
+						class="w-fit text-sm text-neutral-300 hover:underline hover:underline-offset-4"
+						href={link.href}
+						target={link.blank ? '_blank' : undefined}
+						rel={link.blank ? 'noopener noreferrer' : undefined}
+					>
 						{link.label}
 					</a>
 				))}
-				<a class="w-fit text-sm text-neutral-300 hover:underline hover:underline-offset-4" href={alertaUrl}>{copy.footer.alerta}</a>
+				<a
+					class="w-fit whitespace-nowrap text-sm text-neutral-300 hover:underline hover:underline-offset-4"
+					href={alertaUrl}
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					{copy.footer.alerta}
+				</a>
 			</nav>
 
 			<nav class="flex flex-col gap-2" aria-label={copy.footer.legal}>

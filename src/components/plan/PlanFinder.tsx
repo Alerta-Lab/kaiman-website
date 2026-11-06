@@ -70,12 +70,12 @@ function Slider({
 }
 
 export function PlanFinder({ copy, planNames }: PlanFinderProps) {
-	const [image, setImage] = useState(12);
-	const [video, setVideo] = useState(6);
-	const [script, setScript] = useState(8);
-	const [audioMinutes, setAudioMinutes] = useState(10);
+	const [image, setImage] = useState(10);
+	const [video, setVideo] = useState(10);
+	const [script, setScript] = useState(5);
+	const [audioMinutes, setAudioMinutes] = useState(20);
 	const [presentation, setPresentation] = useState(10);
-	const [website, setWebsite] = useState(0);
+	const [website, setWebsite] = useState(4);
 
 	const credits =
 		image * pieceCredits.image +
@@ -186,7 +186,6 @@ export function PlanFinder({ copy, planNames }: PlanFinderProps) {
 					{copy.cta}
 				</a>
 			</div>
-			<p className="text-sm text-pretty text-neutral-400 lg:col-span-2">{copy.assumption}</p>
 		</div>
 	);
 }

@@ -144,10 +144,50 @@ export async function getPostById(id: string) {
 	return post ? (await attachTags([post]))[0] : null;
 }
 
-export async function listAllPosts() {
+export type AdminPostListResult = {
+	items: PostWithTags[];
+	total: number;
+	page: number;
+	pageSize: number;
+	totalPages: number;
+};
+
+export async function listAllPosts(
+	options: { query?: string; page?: number; pageSize?: number } = {},
+): Promise<AdminPostListResult> {
+	const page = Math.max(1, options.page ?? 1);
+	const pageSize = Math.min(50, Math.max(1, options.pageSize ?? 10));
+	const query = options.query?.trim();
 	const db = getDb();
-	if (!db) return [demoPost, demoPostEn];
-	return attachTags(await db.select().from(posts).orderBy(desc(posts.updatedAt)));
+
+	if (!db) {
+		const demo = [demoPost, demoPostEn].filter((post) => {
+			if (!query) return true;
+			const haystack = `${post.title} ${post.excerpt} ${post.slug}`.toLowerCase();
+			return haystack.includes(query.toLowerCase());
+		});
+		const total = demo.length;
+		const totalPages = total === 0 ? 0 : Math.ceil(total / pageSize);
+		const start = (page - 1) * pageSize;
+		return { items: demo.slice(start, start + pageSize), total, page, pageSize, totalPages };
+	}
+
+	const where = query
+		? or(ilike(posts.title, `%${query}%`), ilike(posts.slug, `%${query}%`), ilike(posts.excerpt, `%${query}%`))
+		: undefined;
+
+	const [totalRow] = await db.select({ count: sql<number>`count(*)::int` }).from(posts).where(where);
+	const total = totalRow?.count ?? 0;
+	const totalPages = total === 0 ? 0 : Math.ceil(total / pageSize);
+	const rows = await db
+		.select()
+		.from(posts)
+		.where(where)
+		.orderBy(desc(posts.updatedAt))
+		.limit(pageSize)
+		.offset((page - 1) * pageSize);
+
+	return { items: await attachTags(rows), total, page, pageSize, totalPages };
 }
 
 export async function listTags() {
@@ -306,12 +346,16 @@ export async function deletePost(id: string) {
 	await requireDb().delete(posts).where(eq(posts.id, id));
 }
 
-export async function saveTag(name: string, id?: string) {
-	const value = name.trim();
-	if (value.length < 2) throw new Error('La etiqueta debe tener al menos 2 caracteres.');
+export async function saveTag(input: { name: string; nameEn?: string | null }, id?: string) {
+	const name = input.name.trim();
+	const nameEnRaw = input.nameEn?.trim() ?? '';
+	const nameEn = nameEnRaw.length > 0 ? nameEnRaw : null;
+	if (name.length < 2) throw new Error('La etiqueta en español debe tener al menos 2 caracteres.');
+	if (nameEn && nameEn.length < 2) throw new Error('La etiqueta en inglés debe tener al menos 2 caracteres.');
 	const database = requireDb();
-	if (id) return database.update(tags).set({ name: value, slug: slugify(value) }).where(eq(tags.id, id)).returning();
-	return database.insert(tags).values({ name: value, slug: slugify(value) }).returning();
+	const values = { name, nameEn, slug: slugify(name) };
+	if (id) return database.update(tags).set(values).where(eq(tags.id, id)).returning();
+	return database.insert(tags).values(values).returning();
 }
 
 export async function deleteTag(id: string) {

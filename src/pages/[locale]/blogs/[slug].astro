@@ -4,7 +4,8 @@ import PublicFooter from '../../../components/blog/organisms/PublicFooter.astro'
 import PublicHeader from '../../../components/blog/organisms/PublicHeader.astro';
 import { isLocale, locales, type Locale } from '../../../i18n';
 import BlogLayout from '../../../layouts/BlogLayout.astro';
-import { blogPostPath } from '../../../lib/blog-paths';
+import { blogIndexPath, blogPostPath } from '../../../lib/blog-paths';
+import { localeUrl } from '../../../lib/locale-url';
 import { getPublishedPost, getSiblingPost, listPublishedPosts } from '../../../server/repositories/posts';
 
 export async function getStaticPaths() {
@@ -19,12 +20,12 @@ export async function getStaticPaths() {
 }
 
 const param = Astro.params.locale;
-if (!param || !isLocale(param)) return Astro.redirect('/es/blogs');
+if (!param || !isLocale(param)) return Astro.redirect(localeUrl('es', 'blogs'));
 const locale = param as Locale;
 const slug = Astro.params.slug ?? '';
 
 const post = await getPublishedPost(slug, locale);
-if (!post) return Astro.redirect(`/${locale}/blogs`);
+if (!post) return Astro.redirect(localeUrl(locale, 'blogs'));
 
 const otherLocale: Locale = locale === 'es' ? 'en' : 'es';
 const sibling = await getSiblingPost(post.translationGroupId, otherLocale);
@@ -36,13 +37,13 @@ const alternateEs =
 		? canonical
 		: siblingPublished
 			? new URL(blogPostPath('es', siblingPublished.slug), Astro.site).toString()
-			: null;
+			: new URL(blogIndexPath('es'), Astro.site).toString();
 const alternateEn =
 	locale === 'en'
 		? canonical
 		: siblingPublished
 			? new URL(blogPostPath('en', siblingPublished.slug), Astro.site).toString()
-			: null;
+			: new URL(blogIndexPath('en'), Astro.site).toString();
 
 const jsonLd = {
 	'@context': 'https://schema.org',
@@ -54,8 +55,14 @@ const jsonLd = {
 	dateModified: post.updatedAt.toISOString(),
 	mainEntityOfPage: canonical,
 	image: post.coverUrl || undefined,
-	articleSection: post.category ? (locale === 'en' && post.category.nameEn ? post.category.nameEn : post.category.name) : undefined,
-	keywords: post.tags.length ? post.tags.map((tag) => (locale === 'en' && tag.nameEn ? tag.nameEn : tag.name)).join(', ') : undefined,
+	articleSection: post.category
+		? locale === 'en' && post.category.nameEn
+			? post.category.nameEn
+			: post.category.name
+		: undefined,
+	keywords: post.tags.length
+		? post.tags.map((tag) => (locale === 'en' && tag.nameEn ? tag.nameEn : tag.name)).join(', ')
+		: undefined,
 	author: { '@type': 'Organization', name: 'Kaiman Studio' },
 };
 Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=86400');

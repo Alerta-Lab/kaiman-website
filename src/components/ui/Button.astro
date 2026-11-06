@@ -7,6 +7,8 @@ interface Props {
 	class?: string;
 	ariaLabel?: string;
 	plan?: string;
+	target?: string;
+	rel?: string;
 	/** Arrow cell like Webdrift primary. Defaults on for primary md. */
 	arrow?: boolean;
 }
@@ -19,6 +21,8 @@ const {
 	class: className,
 	ariaLabel,
 	plan,
+	target,
+	rel,
 	arrow,
 } = Astro.props;
 
@@ -45,7 +49,7 @@ const arrowSvg = `<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="t
 
 {
 	href ? (
-		<a href={href} class:list={classes} aria-label={accessibleLabel} data-plan={plan} data-cursor-go>
+		<a href={href} class:list={classes} aria-label={accessibleLabel} data-plan={plan} target={target} rel={rel} data-cursor-go>
 			<span class="k-btn-l">
 				{hasLeading ? <span class="k-btn-leading"><slot name="leading" /></span> : null}
 				<span class="k-btn-rl">

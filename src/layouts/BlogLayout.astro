@@ -12,6 +12,8 @@ interface Props {
 	type?: 'website' | 'article';
 	alternateEs?: string | null;
 	alternateEn?: string | null;
+	/** Dark page atmosphere with brand gradient (blog index). */
+	atmosphere?: 'light' | 'night';
 }
 
 const {
@@ -24,7 +26,9 @@ const {
 	type = 'website',
 	alternateEs = null,
 	alternateEn = null,
+	atmosphere = 'light',
 } = Astro.props;
+const night = atmosphere === 'night';
 const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
 const defaultImage = new URL('/og-default.png', Astro.site).toString();
 const socialImage = image ? new URL(image, Astro.site).toString() : defaultImage;
@@ -72,8 +76,21 @@ const socialImage = image ? new URL(image, Astro.site).toString() : defaultImage
 			</>
 		)}
 	</head>
-	<body class="blog-surface min-h-screen bg-white font-body font-semibold text-black antialiased">
-		<a class="sr-only z-50 bg-white p-3 focus:not-sr-only focus:fixed focus:left-4 focus:top-4" href="#contenido">
+	<body
+		class:list={[
+			'blog-surface relative min-h-screen font-body font-semibold antialiased',
+			night ? 'bg-[#01001E] text-white' : 'bg-white text-black',
+		]}
+	>
+		{
+			night ? (
+				<div
+					class="pointer-events-none fixed inset-0 -z-10 bg-[linear-gradient(105deg,#01001E_0%,#01001E_36%,rgba(107,72,233,0.55)_66%,rgba(0,207,255,0.28)_100%)]"
+					aria-hidden="true"
+				></div>
+			) : null
+		}
+		<a class="sr-only z-50 bg-white p-3 text-black focus:not-sr-only focus:fixed focus:left-4 focus:top-4" href="#contenido">
 			{locale === 'en' ? 'Skip to content' : 'Saltar al contenido'}
 		</a>
 		<slot />
