@@ -201,7 +201,8 @@ export async function savePost(input: unknown, authorId: string, id?: string) {
 	const database = requireDb();
 	const existing = id ? await getPostById(id) : null;
 	if (data.status === 'published' && (data.coverUrl?.startsWith('/blog-generated/') || existing?.editorial?.bodyImageUrl?.startsWith('/blog-generated/'))) throw new Error('Las imágenes locales deben subirse a almacenamiento persistente antes de publicar.');
-	const translationGroupId = existing?.translationGroupId ?? randomUUID();
+	const translationGroupId =
+		existing?.translationGroupId ?? data.translationGroupId ?? randomUUID();
 	const values = {
 		title: data.title,
 		slug: data.slug,

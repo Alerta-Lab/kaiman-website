@@ -1,0 +1,53 @@
+---
+import { PostEditor } from '../../../../features/posts/EditorialEditor';
+import { fillAdmin } from '../../../../i18n';
+import { admin as esAdmin } from '../../../../i18n/locales/es/admin-editorial';
+import { admin as enAdmin } from '../../../../i18n/locales/en/admin-editorial';
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+import { getAdminLocale } from '../../../../server/admin-locale';
+import {
+	categoryDisplayName,
+	getPostById,
+	getSiblingPost,
+	listCategories,
+	listTags,
+} from '../../../../server/repositories/posts';
+
+const locale = getAdminLocale(Astro.cookies);
+const t = locale === 'en' ? enAdmin : esAdmin;
+const post = await getPostById(Astro.params.id ?? '');
+if (!post) return Astro.redirect('/admin/posts');
+const sibling = await getSiblingPost(post.translationGroupId, post.locale === 'es' ? 'en' : 'es');
+const categories = await listCategories();
+const tags = await listTags();
+---
+
+<AdminLayout title={fillAdmin(t.editor.editTitle, { locale: post.locale.toUpperCase() })}>
+	<PostEditor
+		client:load
+		copy={t.editor}
+		tagOptions={tags.map(({ id, name, nameEn }) => ({ id, name, nameEn }))}
+		categories={categories.map((category) => ({
+			id: category.id,
+			name: categoryDisplayName(category, locale),
+		}))}
+		initial={{
+			id: post.id,
+			updatedAt: post.updatedAt.toISOString(),
+			title: post.title,
+			slug: post.slug,
+			excerpt: post.excerpt,
+			markdown: post.markdown,
+			status: post.status,
+			locale: post.locale,
+			seoTitle: post.seoTitle,
+			seoDescription: post.seoDescription,
+			coverUrl: post.coverUrl,
+			coverAlt: post.coverAlt,
+			categoryId: post.categoryId,
+			hasSibling: Boolean(sibling),
+			editorial: post.editorial,
+			tags: post.tags.map((tag) => (post.locale === 'en' && tag.nameEn ? tag.nameEn : tag.name)),
+		}}
+	/>
+</AdminLayout>
