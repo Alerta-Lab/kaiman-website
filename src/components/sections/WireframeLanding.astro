@@ -188,8 +188,11 @@ const audienceEyebrow = 'font-display text-sm font-semibold tracking-tight text-
 					class="aspect-video w-full object-cover"
 					poster={demoPoster}
 					controls
+					autoplay
+					muted
+					loop
 					playsinline
-					preload="metadata"
+					preload="auto"
 				>
 					<source src={demoVideo} type="video/mp4" />
 				</video>

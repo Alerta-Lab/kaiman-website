@@ -12,6 +12,10 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-06 — Demo video: autoplay muted loop
+
+- `#demo` en `WireframeLanding`: `autoplay`, `muted`, `loop`, `playsinline`, `preload="auto"` (controles se mantienen).
+
 ### 2026-11-06 — Volver arriba: solo icono, encima del chat
 
 - «Volver arriba» flotante: solo flecha, `size-12` circular (mismo tamaño que el orbe), apilado encima del chat (`right-5`/`bottom` calc sobre el orbe).
