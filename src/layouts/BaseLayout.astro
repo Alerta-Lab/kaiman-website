@@ -10,6 +10,7 @@ interface Props {
 }
 
 const { locale, title, description } = Astro.props;
+const socialImage = 'https://cmylqqaypknpci5z.public.blob.vercel-storage.com/images/5f788c45-c0da-42ca-95b8-7f48eea5172d-kaiman-og.png';
 ---
 
 <!doctype html>
@@ -21,6 +22,10 @@ const { locale, title, description } = Astro.props;
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
 		<meta property="og:type" content="website" />
+		<meta property="og:image" content={socialImage} />
+		<meta property="og:image:alt" content="Kaiman Studio" />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:image" content={socialImage} />
 		<link rel="icon" type="image/png" href={asset('/brand/favicon.png')} />
 		<link rel="icon" href={asset('/favicon.ico')} />
 		<meta name="generator" content={Astro.generator} />
