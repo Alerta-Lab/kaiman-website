@@ -70,7 +70,7 @@ Queda pendiente revisar redirecciones desde las URLs existentes del sitio anteri
 
 ## Chat público
 
-El orbe y su conexión aún no están implementados. El backend suministrado respondió `401 Unauthorized` a una solicitud sin clave y la ruta no aparecía en el Swagger consultado. Hay que confirmar URL, despliegue y autenticación con backend; después ejecutar las preguntas, registrar respuestas y errores, y diseñar el componente. Ver [chat-publico-evaluacion.md](chat-publico-evaluacion.md).
+El intermediario de servidor `POST /api/public/chat` está implementado y probado contra el servicio público; el orbe y la interfaz quedan pendientes. El retest posterior al hotfix conservó el contexto en los ejemplos de anuncios y videos y devolvió títulos de fuentes legibles. Ver [guía para frontend](integracion-chat-publico.md) y [evaluación](chat-publico-evaluacion.md).
 
 ## Siguientes pasos
 
