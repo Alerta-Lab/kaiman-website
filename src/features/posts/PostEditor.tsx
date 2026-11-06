@@ -68,7 +68,9 @@ const slugify = (value: string) =>
 		.replace(/[^a-z0-9]+/g, '-')
 		.replace(/^-|-$/g, '');
 
-const labelClass = 'mb-1.5 block font-body text-sm font-normal text-black/55';
+const labelClass = 'mb-1.5 block font-body text-sm font-normal text-black';
+const hintClass = 'mt-1 block font-body text-xs font-normal text-black/70';
+const helpClass = 'text-sm text-black/70';
 const fieldClass =
 	'min-h-11 w-full rounded-lg border border-black-stroke/30 bg-white px-3 py-2 font-body font-normal text-black outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/30';
 const selectClass = `${fieldClass} appearance-none pr-11`;
@@ -421,9 +423,18 @@ export function PostEditor({
 	return (
 		<div className="space-y-6 pb-28">
 			<section className="rounded-2xl border border-white bg-white p-5 sm:p-6">
-				<h2 className="font-headline text-xl font-bold tracking-tight text-black">{copy.aiImportTitle}</h2>
-				<p className="mt-1 max-w-2xl font-body text-sm font-normal text-black">{copy.aiImportDesc}</p>
-				<a href="/admin/importar" className="mt-5 inline-flex min-h-11 items-center rounded-lg bg-primary px-5 font-body font-medium text-white hover:bg-primary-700">{copy.reviewWord}</a>
+				<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+					<div className="min-w-0">
+						<h2 className="font-headline text-xl font-bold tracking-tight text-black">{copy.aiImportTitle}</h2>
+						<p className="mt-1 max-w-2xl font-body text-sm font-normal text-black">{copy.aiImportDesc}</p>
+					</div>
+					<a
+						href="/admin/importar"
+						className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-lg bg-primary px-5 font-body font-medium text-white hover:bg-primary-700"
+					>
+						{copy.reviewWord}
+					</a>
+				</div>
 			</section>
 			{mode === 'create' && <details className="rounded-2xl border border-white bg-white p-5 sm:p-6"><summary className="cursor-pointer font-headline text-xl font-bold text-black">{copy.ideaTitle}</summary><p className="mt-2 text-sm text-black/70">{copy.ideaHint}</p><label className="mt-3 block font-bold">{copy.ideaLabel}<textarea className={`${fieldClass} mt-1 min-h-24`} maxLength={4000} value={idea} onChange={(event) => setIdea(event.target.value)} /></label><button type="button" disabled={busy || idea.trim().length < 10} onClick={generateFromIdea} className="mt-3 min-h-11 rounded-lg bg-primary px-4 font-bold text-white disabled:opacity-50">{busy ? copy.ideaWorking : copy.ideaGenerate}</button>{generatedDraft && <a href={`/admin/posts/${generatedDraft}`} className="ml-3 inline-flex min-h-11 items-center font-bold text-primary underline">{copy.ideaOpen}</a>}</details>}
 
@@ -494,7 +505,7 @@ export function PostEditor({
 								value={draft.excerpt}
 								onChange={(e) => updateActive({ excerpt: e.target.value })}
 							/>
-							<span className="mt-1 block font-body text-xs font-normal text-black/45">{copy.excerptHint}</span>
+							<span className={hintClass}>{copy.excerptHint}</span>
 						</label>
 					</div>
 				</SectionCard>
@@ -577,18 +588,58 @@ export function PostEditor({
 									className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-black/55"
 								/>
 							</span>
-							<span className="mt-1 block font-body text-xs font-normal text-black/45">{copy.categoryHint}</span>
+							<span className={hintClass}>{copy.categoryHint}</span>
 						</label>
 						<fieldset className="min-w-0 sm:col-span-2">
 							<legend className={labelClass}>{copy.tags}</legend>
-							<p id="tag-help" className="text-sm text-black/60">{copy.tagsHint}</p>
-							<div className="mt-3 flex flex-wrap gap-2" aria-label={copy.keywordsSelected}>
-								{selectedTags.length === 0 && <span className="text-sm text-black/60">{copy.keywordsEmpty}</span>}
-								{selectedTags.map((tag, index) => <span key={`${tag}-${index}`} className="inline-flex items-center gap-2 rounded-lg bg-primary-100 px-3 py-1 text-sm font-semibold">{tag}<button type="button" aria-label={copy.keywordRemove.replace('{name}', tag)} onClick={() => updateActive({ tags: selectedTags.filter((_, i) => i !== index).join(', ') })} className="rounded px-1 text-primary-800 hover:bg-primary-200">×</button></span>)}
-							</div>
-							<label htmlFor="tag-search" className="mt-3 block text-sm font-bold">{copy.keywordSearch}</label>
-							<input id="tag-search" className={`${fieldClass} mt-1`} placeholder={copy.tagsPlaceholder} value={tagSearch} onChange={(e) => setTagSearches((current) => ({ ...current, [activeLocale]: e.target.value }))} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); const exact = availableTags.find((tag) => [tag.name, tag.nameEn].some((name) => name && tagKey(name) === tagKey(search))); if (exact) addTag(exact.label); else if (!matchesExistingTag) addTag(search); } }} maxLength={50} aria-describedby="tag-help" />
-							{selectedTags.length >= 8 && <p className="mt-2 text-sm text-black/60">{copy.keywordsLimit}</p>}
+							{selectedTags.length > 0 && (
+								<div className="mt-3 flex flex-wrap gap-2" aria-label={copy.keywordsSelected}>
+									{selectedTags.map((tag, index) => (
+										<span
+											key={`${tag}-${index}`}
+											className="inline-flex items-center gap-2 rounded-lg bg-primary-100 px-3 py-1 text-sm font-semibold"
+										>
+											{tag}
+											<button
+												type="button"
+												aria-label={copy.keywordRemove.replace('{name}', tag)}
+												onClick={() =>
+													updateActive({
+														tags: selectedTags.filter((_, i) => i !== index).join(', '),
+													})
+												}
+												className="rounded px-1 text-primary-800 hover:bg-primary-200"
+											>
+												×
+											</button>
+										</span>
+									))}
+								</div>
+							)}
+							<label htmlFor="tag-search" className="mt-3 block text-sm font-bold">
+								{copy.keywordSearch}
+							</label>
+							<input
+								id="tag-search"
+								className={`${fieldClass} mt-1`}
+								placeholder={copy.tagsPlaceholder}
+								value={tagSearch}
+								onChange={(e) =>
+									setTagSearches((current) => ({ ...current, [activeLocale]: e.target.value }))
+								}
+								onKeyDown={(e) => {
+									if (e.key === 'Enter') {
+										e.preventDefault();
+										const exact = availableTags.find((tag) =>
+											[tag.name, tag.nameEn].some((name) => name && tagKey(name) === tagKey(search)),
+										);
+										if (exact) addTag(exact.label);
+										else if (!matchesExistingTag) addTag(search);
+									}
+								}}
+								maxLength={50}
+							/>
+							{selectedTags.length >= 8 && <p className={`mt-2 ${helpClass}`}>{copy.keywordsLimit}</p>}
 							{availableTags.length > 0 && <ul className="mt-2 max-h-40 overflow-y-auto rounded-lg border border-black/10 bg-white" aria-label={copy.keywordsAvailable}>{availableTags.map((tag) => <li key={tag.id}><button type="button" disabled={selectedTags.length >= 8} onClick={() => addTag(tag.label)} className="min-h-11 w-full px-3 text-left text-sm hover:bg-primary-100 disabled:opacity-50">+ {tag.label}</button></li>)}</ul>}
 							{search.length >= 2 && !search.includes(',') && !matchesExistingTag && <button type="button" disabled={selectedTags.length >= 8} onClick={() => addTag(search)} className="mt-2 min-h-11 rounded-lg border border-primary-700 px-3 text-sm font-bold text-primary-800 disabled:opacity-50">{copy.keywordCreate.replace('{name}', search)}</button>}
 							{search.includes(',') && <p className="mt-2 text-sm text-error-700">{copy.keywordComma}</p>}

@@ -12,6 +12,13 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-06 — Orbe de chat público
+
+- Orbe fijo inferior derecho (`ChatOrb`) junto a «Volver arriba» (el back-top queda a su izquierda al flotar).
+- Panel flotante ES/EN vía `POST /api/public/chat`; copy en `landing.chat`.
+- Glow giratorio: `.chat-orb-spin` en `global.css` (conic + blur). Deep link `?asistente=kaiman` abre el chat.
+- Burbujas estilo WhatsApp; sin sources; panel más grande.
+
 ### 2026-11-06 — Footer sin bloque Legal
 
 - Quitada la columna Legal del `SiteFooter` (términos/privacidad) hasta definir contenido legal.

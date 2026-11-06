@@ -70,7 +70,7 @@ Queda pendiente revisar redirecciones desde las URLs existentes del sitio anteri
 
 ## Chat público
 
-El intermediario de servidor `POST /api/public/chat` está implementado y probado contra el servicio público; el orbe y la interfaz quedan pendientes. El retest posterior al hotfix conservó el contexto en los ejemplos de anuncios y videos y devolvió títulos de fuentes legibles. Ver [guía para frontend](integracion-chat-publico.md) y [evaluación](chat-publico-evaluacion.md).
+El intermediario de servidor `POST /api/public/chat` está implementado y probado contra el servicio público. El orbe y el panel flotante viven en `src/components/chat/ChatOrb.tsx` (inferior derecho, junto a «Volver arriba»). El retest posterior al hotfix conservó el contexto en los ejemplos de anuncios y videos y devolvió títulos de fuentes legibles. Ver [guía para frontend](integracion-chat-publico.md) y [evaluación](chat-publico-evaluacion.md).
 
 ## Siguientes pasos
 
