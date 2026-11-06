@@ -3,6 +3,7 @@ import { useEffect, useId, useRef, useState, useTransition } from 'react';
 import type { AdminCopy } from '../../i18n/locales/es/admin';
 import { blogPostPath } from '../../lib/blog-paths';
 import type { ContentLocale } from '../../server/db/schema';
+import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
 
 export type AdminPostRow = {
 	id: string;
@@ -46,6 +47,7 @@ export function PostsAdmin({ initial, copy, locale }: Props) {
 	const [loading, setLoading] = useState(false);
 	const [status, setStatus] = useState('');
 	const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+	const [pending, setPending] = useState<{ title: string; question: string; targets: Target[]; warning?: string; label: string; danger?: boolean; run: () => void } | null>(null);
 	const [, startTransition] = useTransition();
 
 	useEffect(() => {
@@ -154,15 +156,9 @@ export function PostsAdmin({ initial, copy, locale }: Props) {
 		});
 	};
 
-	const listOf = (targets: Target[]) =>
-		targets
-			.slice(0, 8)
-			.map((target) => `• ${target.title}`)
-			.join('\n') + (targets.length > 8 ? `\n… +${targets.length - 8}` : '');
-
 	const pluralCount = (n: number) => `${n} ${n === 1 ? copy.articleOne : copy.articleMany}`;
 
-	const changeStatus = async (targets: Target[], next: 'published' | 'draft') => {
+	const changeStatus = async (targets: Target[], next: 'published' | 'draft', confirmed = false) => {
 		const toChange = targets.filter((target) => target.published !== (next === 'published'));
 		if (!toChange.length) {
 			setStatus(next === 'published' ? copy.alreadyPublished : copy.alreadyDraft);
@@ -172,7 +168,10 @@ export function PostsAdmin({ initial, copy, locale }: Props) {
 			next === 'published'
 				? fill(copy.confirmPublish, { count: pluralCount(toChange.length) })
 				: fill(copy.confirmDraft, { count: pluralCount(toChange.length) });
-		if (!window.confirm(`${question}\n\n${listOf(toChange)}`)) return;
+		if (!confirmed) {
+			setPending({ title: next === 'published' ? copy.publish : copy.toDraft, question, targets: toChange, label: next === 'published' ? copy.publish : copy.toDraft, run: () => void changeStatus(toChange, next, true) });
+			return;
+		}
 		setStatus(next === 'published' ? copy.publishing : copy.drafting);
 		try {
 			const response = await fetch('/api/admin/posts/status', {
@@ -207,16 +206,19 @@ export function PostsAdmin({ initial, copy, locale }: Props) {
 		}
 	};
 
-	const remove = async (targets: Target[]) => {
+	const remove = async (targets: Target[], confirmed = false) => {
 		const published = targets.filter((target) => target.published).length;
 		const warning = published
-			? `\n\n${published} ${published === 1 ? copy.deletePublishedWarnOne : copy.deletePublishedWarnMany}`
+			? `${published} ${published === 1 ? copy.deletePublishedWarnOne : copy.deletePublishedWarnMany}`
 			: '';
 		const confirmText =
 			targets.length === 1
 				? copy.confirmDeleteOne
 				: fill(copy.confirmDeleteMany, { count: targets.length });
-		if (!window.confirm(`${confirmText}\n\n${listOf(targets)}${warning}`)) return;
+		if (!confirmed) {
+			setPending({ title: copy.deleteSelected, question: confirmText, targets, warning, label: copy.delete, danger: true, run: () => void remove(targets, true) });
+			return;
+		}
 		let failed = 0;
 		for (const [index, target] of targets.entries()) {
 			setStatus(fill(copy.deleting, { current: index + 1, total: targets.length }));
@@ -248,6 +250,7 @@ export function PostsAdmin({ initial, copy, locale }: Props) {
 
 	return (
 		<div className="space-y-4">
+			<ConfirmDialog open={!!pending} title={pending?.title ?? ''} description={pending?.question ?? ''} items={pending?.targets.map((target) => target.title) ?? []} warning={pending?.warning} confirmLabel={pending?.label ?? ''} cancelLabel={locale === 'en' ? 'Cancel' : 'Cancelar'} danger={pending?.danger} onCancel={() => setPending(null)} onConfirm={() => { const action = pending?.run; setPending(null); action?.(); }} />
 			<div
 				role="toolbar"
 				aria-label={`${copy.publish} / ${copy.toDraft} / ${copy.deleteSelected}`}
@@ -256,12 +259,12 @@ export function PostsAdmin({ initial, copy, locale }: Props) {
 				<p className="font-body text-sm font-semibold text-black">
 					<span id="selected-count">{selectedCount}</span> {copy.selected}
 				</p>
-				<div className="flex flex-wrap items-center gap-2">
+				<div className="flex w-full items-center gap-1.5 sm:w-auto sm:gap-2">
 					<button
 						type="button"
 						disabled={actionsDisabled}
 						onClick={() => void changeStatus(selected(), 'published')}
-						className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-success-700 px-4 font-body text-sm font-semibold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+						className="inline-flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1 rounded-lg bg-success-700 px-2 font-body text-xs font-semibold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40 sm:flex-none sm:gap-2 sm:px-4 sm:text-sm"
 					>
 						<Send aria-hidden="true" size={16} /> {copy.publish}
 					</button>
@@ -269,7 +272,7 @@ export function PostsAdmin({ initial, copy, locale }: Props) {
 						type="button"
 						disabled={actionsDisabled}
 						onClick={() => void changeStatus(selected(), 'draft')}
-						className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-black/40 px-4 font-body text-sm font-semibold hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-40"
+						className="inline-flex min-h-11 min-w-0 flex-[1.5] items-center justify-center gap-1 rounded-lg border border-black/40 px-2 font-body text-xs font-semibold hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-40 sm:flex-none sm:gap-2 sm:px-4 sm:text-sm"
 					>
 						<EyeOff aria-hidden="true" size={16} /> {copy.toDraft}
 					</button>
@@ -278,7 +281,7 @@ export function PostsAdmin({ initial, copy, locale }: Props) {
 						disabled={actionsDisabled}
 						aria-label={copy.deleteSelected}
 						onClick={() => void remove(selected())}
-						className="inline-flex size-11 items-center justify-center rounded-lg border border-error-700 text-error-700 hover:bg-error-100 disabled:cursor-not-allowed disabled:opacity-40"
+						className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg border border-error-700 text-error-700 hover:bg-error-100 disabled:cursor-not-allowed disabled:opacity-40"
 					>
 						<Trash2 aria-hidden="true" size={16} />
 					</button>
@@ -330,7 +333,7 @@ export function PostsAdmin({ initial, copy, locale }: Props) {
 							<th className={cellClass}>{copy.columns.locale}</th>
 							<th className={cellClass}>{copy.columns.status}</th>
 							<th className={cellClass}>{copy.columns.updated}</th>
-							<th className={cellClass}>
+							<th className={`relative ${cellClass}`}>
 								<span className="sr-only">{copy.columns.actions}</span>
 							</th>
 						</tr>

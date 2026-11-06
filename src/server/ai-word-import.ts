@@ -2,6 +2,7 @@ import OpenAI from 'openai';
 import { zodTextFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
 import type { ImportedTopic, ImportedVersion, ImportLocale } from '../features/posts/word-import';
+import { editorialMarker } from '../features/posts/editorial-markers';
 import { getEnv } from './env';
 
 const metadataFields = ['title', 'slug', 'excerpt', 'seoTitle', 'seoDescription', 'coverAlt', 'coverCaption', 'coverPrompt', 'bodyAlt', 'bodyCaption', 'bodyPrompt'] as const;
@@ -59,7 +60,16 @@ export function buildWordPreview(blocks: string[], rawStructure: unknown, rawFie
     if(field){
      if(field==='bodyPrompt' && !version.markdown.includes('[IMAGEN_INTERIOR]')) version.markdown += `${version.markdown?'\n\n':''}[IMAGEN_INTERIOR]`;
      version[field] += `${version[field]?'\n\n':''}${plain(block)}`;
-    }else version.markdown += `${version.markdown?'\n\n':''}${block}`;
+    }else {
+     const marker = editorialMarker(block, part.locale);
+     if (marker !== null) {
+      excludedBlocks.push(block);
+      const cta = /^(?:__|\*\*)CLOSING CTA\s*[—–-]\s*(HOOK LINE|HEADLINE)\s*:(?:__|\*\*)$/i.exec(block.trim());
+      const preservedMarker = cta ? `<!-- kaiman:cta-${cta[1].toLowerCase().replace(' ', '-')} -->` : marker;
+      if (preservedMarker) version.markdown += `${version.markdown?'\n\n':''}${preservedMarker}`;
+     }
+     else version.markdown += `${version.markdown?'\n\n':''}${block}`;
+    }
    }
    for (const [name,value] of [['título',version.title],['slug',version.slug],['entradilla',version.excerpt],['título SEO',version.seoTitle],['descripción SEO',version.seoDescription],['contenido',version.markdown]] as const) if(!value) version.warnings.push(`Falta ${name}.`);
    if(version.title.length>1000 || version.slug.length>140) throw new Error('La IA no pudo separar los campos con seguridad.');

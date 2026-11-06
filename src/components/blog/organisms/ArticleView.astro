@@ -2,7 +2,7 @@
 import { ArrowLeft } from 'lucide-react';
 import type { Locale } from '../../../i18n';
 import { blogCategoryPath, blogIndexPath, blogTagPath } from '../../../lib/blog-paths';
-import { renderMarkdown } from '../../../lib/markdown';
+import { renderArticleMarkdown } from '../../../features/posts/article-faq';
 import { categoryDisplayName, getPostById, tagDisplayName } from '../../../server/repositories/posts';
 
 /** Article body shared by the public page and the admin preview, so both render identically. */
@@ -18,12 +18,12 @@ const imageCaption = post.editorial?.bodyCaption ?? '';
 const imageMarkdown = post.editorial?.bodyImageUrl
 	? `![${imageAlt}](${post.editorial.bodyImageUrl})${imageCaption ? `\n\n*${imageCaption}*` : ''}`
 	: '';
-const html = await renderMarkdown(post.markdown.replace('[IMAGEN_INTERIOR]', imageMarkdown));
+const html = await renderArticleMarkdown(post.markdown.replace('[IMAGEN_INTERIOR]', imageMarkdown), locale);
 const backLabel = locale === 'en' ? 'Back to blog' : 'Volver al blog';
 ---
 
 <article class="mx-auto max-w-3xl px-5 py-14 md:py-20">
-	<a href={blogIndexPath(locale)} class="mb-gap-page inline-flex min-h-11 items-center gap-2 font-bold text-primary-800 hover:text-primary">
+	<a href={blogIndexPath(locale)} class="mb-gap-page flex min-h-11 w-fit items-center gap-2 font-bold text-primary-800 hover:text-primary">
 		<ArrowLeft aria-hidden="true" size={18} /> {backLabel}
 	</a>
 	{post.category && (
@@ -57,3 +57,21 @@ const backLabel = locale === 'en' ? 'Back to blog' : 'Volver al blog';
 		set:html={html}
 	/>
 </article>
+
+<style>
+	:global(.article-faq) { border-bottom: 1px solid var(--color-primary-200, #e2dcff); }
+	:global(.article-faq summary) { display: flex; justify-content: space-between; gap: 1rem; cursor: pointer; padding: 1.25rem 0; font-weight: 700; list-style: none; }
+	:global(.article-faq summary::-webkit-details-marker) { display: none; }
+	:global(.article-faq summary span) { color: var(--color-primary, #6545e9); font-size: 1.5rem; line-height: 1; transition: transform 200ms ease; }
+	:global(.article-faq[open] summary span) { transform: rotate(45deg); }
+	:global(.article-faq > div) { padding: 0 0 1.25rem; }
+	:global(.article-faq > div p:first-child) { margin-top: 0; }
+	:global(.article-faq > div p:last-child) { margin-bottom: 0; }
+	:global(.article-cta) { margin: 3rem 0; border-radius: 1.25rem; background: linear-gradient(115deg, #5b1cda, #2858df); padding: 2rem 1.5rem; color: white; text-align: center; }
+	:global(.article-cta-headline p), :global(.article-cta-headline p strong) { color: #fff; }
+	:global(.article-cta-headline p) { margin: 0; font-family: inherit; font-size: 1.5rem; font-weight: 700; line-height: 1.3; }
+	:global(.article-cta-hook p) { margin: 0.75rem 0 1.5rem; color: white; font-style: normal; }
+	:global(.article-cta a) { display: inline-block; border-radius: 0.625rem; background: white; padding: 0.75rem 1.5rem; color: #281061; text-decoration: none; }
+	:global(.article-cta a:hover) { background: #f0edff; text-decoration: none; }
+	:global(.article-cta a:focus-visible) { outline: 3px solid white; outline-offset: 4px; }
+</style>

@@ -5,7 +5,7 @@ import { getLanding, type Locale } from '../../../i18n';
 import { blogCategoryPath, blogIndexPath } from '../../../lib/blog-paths';
 import { localeUrl } from '../../../lib/locale-url';
 import { alertaUrl, instagramUrl, loginUrl, signupUrl } from '../../../lib/plans';
-import { listTags, tagDisplayName } from '../../../server/repositories/posts';
+import { listPublishedCategories, categoryDisplayName } from '../../../server/repositories/posts';
 
 interface Props {
 	locale: Locale;
@@ -16,7 +16,7 @@ const copy = getLanding(locale);
 const year = new Date().getFullYear();
 const home = localeUrl(locale);
 const blog = blogIndexPath(locale);
-const categories = await listTags();
+const categories = (await listPublishedCategories(locale)).slice(0, 6);
 
 const exploreLabel = locale === 'en' ? 'Explore' : 'Explorar';
 const categoriesLabel = locale === 'en' ? 'Categories' : 'Categorías';
@@ -55,11 +55,12 @@ const headingClass =
 						<p id="footer-categories" class={headingClass}>
 							{categoriesLabel}
 						</p>
-						{categories.map((tag) => (
-							<a class={linkClass} href={blogCategoryPath(locale, tag.slug)}>
-								{tagDisplayName(tag, locale)}
+						{categories.map((category) => (
+							<a class={linkClass} href={blogCategoryPath(locale, category.slug)}>
+								{categoryDisplayName(category, locale)}
 							</a>
 						))}
+						<a class={linkClass} href={blog}>{locale === 'en' ? 'View all articles' : 'Ver todos los artículos'}</a>
 					</nav>
 				) : (
 					<nav class="flex flex-col gap-1" aria-labelledby="footer-resources">

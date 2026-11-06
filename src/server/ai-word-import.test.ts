@@ -22,7 +22,8 @@ describe('Word AI mapping', () => {
   const input=splitWordBlocks('__TITLE:__\n\nA real title\n\n__KEY TAKEAWAY:__\n\nThe original editorial paragraph.');
   const x=buildWordPreview(input,{topics:[{label:'A',versions:[{locale:'en',start:0,end:3}]}]},[{fields:[{field:'title',blocks:[1]}],labels:[]}]);
   expect(x.topics[0].versions[0].markdown).not.toContain('__TITLE:__');
-  expect(x.topics[0].versions[0].markdown).toContain('__KEY TAKEAWAY:__');
+  expect(x.topics[0].versions[0].markdown).not.toContain('__KEY TAKEAWAY:__');
+  expect(x.excludedBlocks).toContain('__KEY TAKEAWAY:__');
   expect(x.topics[0].versions[0].markdown).toContain('The original editorial paragraph.');
   expect(x.excludedBlocks).toContain('__TITLE:__');
  });
@@ -31,5 +32,11 @@ describe('Word AI mapping', () => {
   const parsed=postInputSchema.parse(input);
   expect(parsed.title).toBe(input.title.trim());
   expect(parsed.excerpt).toBe(input.excerpt.trim());
+ });
+ it('preserves closing CTA structure for rendering after import',()=>{
+  const input=splitWordBlocks('__CLOSING CTA — HOOK LINE:__\n\nUna invitación.\n\n__CLOSING CTA — HEADLINE:__\n\nEl siguiente paso.');
+  const x=buildWordPreview(input,{topics:[{label:'A',versions:[{locale:'es',start:0,end:3}]}]},[{fields:[],labels:[]}]);
+  expect(x.topics[0].versions[0].markdown).toContain('<!-- kaiman:cta-hook-line -->');
+  expect(x.topics[0].versions[0].markdown).toContain('<!-- kaiman:cta-headline -->');
  });
 });

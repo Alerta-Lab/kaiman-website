@@ -2,7 +2,7 @@
 import { Search } from 'lucide-react';
 import { localeLabels, locales, type Locale } from '../../../i18n';
 import { blogCategoryPath, blogIndexPath, blogSearchPath, swapBlogLocalePath } from '../../../lib/blog-paths';
-import { listTags, tagDisplayName } from '../../../server/repositories/posts';
+import { listPublishedCategories, categoryDisplayName } from '../../../server/repositories/posts';
 
 interface Props {
 	locale: Locale;
@@ -11,7 +11,7 @@ interface Props {
 const { locale } = Astro.props;
 const home = blogIndexPath(locale);
 const search = blogSearchPath(locale);
-const categories = await listTags();
+const categories = (await listPublishedCategories(locale)).slice(0, 6);
 const copy =
 	locale === 'en'
 		? {
@@ -84,12 +84,12 @@ const copy =
 			</a>
 			<div class="flex min-w-0 flex-1 items-center gap-4 overflow-x-auto">
 				{
-					categories.map((tag) => (
+					categories.map((category) => (
 						<a
-							href={blogCategoryPath(locale, tag.slug)}
+							href={blogCategoryPath(locale, category.slug)}
 							class="shrink-0 text-sm font-bold text-primary-800 opacity-80 hover:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
 						>
-							{tagDisplayName(tag, locale)}
+							{categoryDisplayName(category, locale)}
 						</a>
 					))
 				}

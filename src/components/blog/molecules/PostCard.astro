@@ -53,8 +53,8 @@ const href = blogPostPath(locale, post.slug);
 			<h2 class="font-headline text-xl font-bold leading-snug tracking-tight text-black group-hover:text-primary-800">
 				{post.title}
 			</h2>
-			<p class="mt-gap-control line-clamp-3 max-w-prose flex-1 leading-relaxed text-black/75">{post.excerpt}</p>
-			<div class="mt-gap-block flex items-center justify-between gap-3 text-sm font-bold text-primary-800">
+			<p class="mt-gap-control max-w-prose leading-relaxed text-black/75">{post.excerpt}</p>
+			<div class="mt-auto flex items-center justify-between gap-3 pt-gap-block text-sm font-bold text-primary-800">
 				<time datetime={post.publishedAt?.toISOString()}>
 					{new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(post.publishedAt ?? post.createdAt)}
 				</time>

@@ -64,8 +64,8 @@ async function attachTags(rows: Post[]): Promise<PostWithTags[]> {
 
 /** Works for tags and categories: both store the Spanish name in `name` and the English one in `nameEn`. */
 export function tagDisplayName(tag: Pick<Tag, 'name' | 'nameEn'>, locale: ContentLocale) {
-	if (locale === 'en' && tag.nameEn) return tag.nameEn;
-	return tag.name;
+	const name = (locale === 'en' && tag.nameEn ? tag.nameEn : tag.name).trim();
+	return name ? name[0].toLocaleUpperCase(locale) + name.slice(1) : name;
 }
 
 export const categoryDisplayName = tagDisplayName;
