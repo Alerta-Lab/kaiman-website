@@ -12,6 +12,10 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-09 — CTAs planes/blog a primary
+
+- «Agenda una llamada» (enterprise) y «Ver todos los artículos» en `WireframeLanding` pasan a `Button` primary (antes secondary).
+
 ### 2026-11-06 — Demo video: autoplay muted loop
 
 - `#demo` en `WireframeLanding`: `autoplay`, `muted`, `loop`, `playsinline`, `preload="auto"` (controles se mantienen).
