@@ -12,6 +12,53 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-10 — Problem Sin Kaiman: section-4 / 4-1
+
+- «Sin Kaiman»: `section-4.jpg` + `section-4-1.jpg` (900×1117, ~160–180 KB). PNG originales pesados sustituidos por JPEG optimizado.
+- Compare derecha iguala altura del copy (`lg:h-0 lg:min-h-full`); contenedores `aspect-[4/5]` (section-4 es 900×1117 ≈ 4:5; no 9:16 ni 3:4).
+
+### 2026-11-10 — Hero: section-1-1.png
+
+- `section-1-1.jpg` → PNG optimizado 800×1433 (~404 KB, 256c); hero usa `section-1-1.png`.
+
+### 2026-11-10 — Brand Understanding: h2 con gradiente
+
+- Eyebrow de `#brand-understanding` y audiencias (Martinez/Ana/Carlos/Sofia): `h2` con gradiente hero (`gradientH2`), sin caja; título debajo en `h3`.
+
+### 2026-11-10 — Hero prompt: blanqueamiento dental
+
+- `hero.promptText`: «Promocionar blanqueamiento dental» / «Promote teeth whitening».
+
+### 2026-11-10 — Planes: plazas, storage, /mes
+
+- Cards Starter/Pro/Business: créditos + plazas (1/3/5) + GB almacenamiento (1/3/5); sin precio por crédito.
+- `plans.perMonth`: `/mes` · `/month` (antes «USD»). ES: «plaza/plazas» (cupo de equipo, no «asientos»).
+- Filas con icono Lucide + `Tooltip` (`cursor-help`); copy tip desde kaimanstudio.ai planes (`creditsTip` / `seatsTip` / `storageTip`).
+
+### 2026-11-10 — Value: Brand Understanding subrayado
+
+- En card Kaiman (`#value`), el highlight subraya solo «Brand Understanding» (`rightHighlightBrand` + `rightHighlightRest`).
+
+### 2026-11-10 — Tools: intro 2 cols desktop
+
+- `#tools` cabecera: título izquierda / cuerpos derecha en `lg:grid-cols-2` (mismo patrón que `#menos`); sin `text-center`.
+- Título tools más grande: `clamp(2.15rem, 5vw, 3.75rem)`.
+- Tags de features en plural + título encima `categoriesTitle` («Herramientas para generar» / «Tools to generate»).
+
+### 2026-11-10 — Enterprise: blurb 2 líneas + CTA centrado
+
+- Card Enterprise: fila `items-center justify-between`; blurb `flex-1` / `max-w-[38rem]`; CTA `shrink-0 self-center`.
+- Copy enterprise acortado (ES/EN) para favorecer ~2 líneas.
+
+### 2026-11-10 — Eyebrows Brand/audiencias como tags
+
+- Brand Understanding + Martinez/Ana/Carlos/Sofia: tag rectangular `bg-primary` + `text-primary-100` (~4.75:1 AA; `primary-900` sobre primary no alcanza).
+
+### 2026-11-10 — Problem: texto izq + compare der + bullets 2×2
+
+- `#problem`: copy a la izquierda; derecha solo columnas «Sin/Con Kaiman» con 3 crops c/u (`public/problem/without-*.jpg`, `with-*.jpg` desde `section-3.4` / `consistency`).
+- Bullets de marca: solo texto en grid 2×2 (sin imágenes).
+
 ### 2026-11-09 — CTAs planes/blog a primary
 
 - «Agenda una llamada» (enterprise) y «Ver todos los artículos» en `WireframeLanding` pasan a `Button` primary (antes secondary).

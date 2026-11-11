@@ -388,13 +388,17 @@ export const landing = {
 		title: 'Better marketing should be within reach for your business.',
 		intro:
 			'Choose the plan that best fits your company’s needs. Every Kaiman plan starts from the same Brand Understanding and gives you access to marketing capabilities designed to help you work better and more efficiently.',
-		perMonth: 'USD',
+		perMonth: '/month',
 		credits: 'credits',
+		creditsTip: 'Number of credits included in the plan.',
 		seat: 'seat',
 		seats: 'seats',
-		storage: 'GB',
+		seatsTip: 'Number of people who can access the account and work in it.',
+		storage: 'GB storage',
+		storageTip: 'Space available to store files and resources.',
 		brand: 'brand',
 		brands: 'brands',
+		brandsTip: 'Number of brands you can manage in your account.',
 		perCredit: 'per credit',
 		cta: 'Register now',
 		popular: 'Most popular',
@@ -417,7 +421,7 @@ export const landing = {
 			pro: 'Best for freelancers or lean marketing teams managing one or more brands.',
 			scale: 'Best for established teams and organizations coordinating marketing efforts.',
 			enterprise:
-				'Custom pricing and allowance. For organizations that need credits, seats, or brands beyond these three plans, or an AI marketing copilot tailored to how they work.',
+				'Custom pricing and allowance for organizations that need credits, seats, or brands beyond these three plans, or an AI marketing copilot tailored to their work.',
 		},
 	},
 	playbooks: {

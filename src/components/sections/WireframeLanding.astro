@@ -1,21 +1,25 @@
 ---
 import {
 	BarChart3,
+	Coins,
 	FileText,
 	Globe,
+	HardDrive,
 	Image as ImageIcon,
 	Presentation,
+	Users,
 	Video,
 	Volume2,
 } from 'lucide-react';
 import { getLanding, getWireframe, type Locale } from '../../i18n';
 import { blogIndexPath, blogPostPath } from '../../lib/blog-paths';
 import { signupUrlForPlan } from '../../lib/plan-handoff';
-import { creditUnitUsd, formatUsd, plans, signupUrl } from '../../lib/plans';
+import { formatUsd, plans, signupUrl } from '../../lib/plans';
 import { asset } from '../../lib/asset';
 import { listPublishedPosts } from '../../server/repositories/posts';
 import { PlanFinder } from '../plan/PlanFinder';
 import Button from '../ui/Button.astro';
+import Tooltip from '../ui/Tooltip.astro';
 
 interface Props {
 	locale: Locale;
@@ -38,7 +42,7 @@ const audiencePhotos: Record<string, string> = {
 
 const heroOutputs = [
 	asset('/section-1.jpg'),
-	asset('/section-1-1.jpg'),
+	asset('/section-1-1.png'),
 	asset('/section-1-2.jpg'),
 ];
 
@@ -52,10 +56,18 @@ const heroModes = [
 	{ id: 'website', label: wf.hero.modes.website, Icon: Globe, active: false },
 ] as const;
 
-/** S3 compare — section-4.png (sin) · section-4-2.png (con) */
+/** S3 compare — section-4 / section-4-1 (sin) · consistency crops (con) */
+const problemWithout = [
+	{ src: asset('/section-4.jpg'), alt: `${wf.problem.withoutAlt} 1` },
+	{ src: asset('/section-4-1.jpg'), alt: `${wf.problem.withoutAlt} 2` },
+];
+const problemWith = [1, 2].map((n) => ({
+	src: asset(`/problem/with-${n}.jpg`),
+	alt: `${wf.problem.withAlt} ${n}`,
+}));
 const problemCompare = [
-	{ src: asset('/section-4.png'), label: wf.problem.withoutLabel, alt: wf.problem.withoutAlt },
-	{ src: asset('/section-4-2.png'), label: wf.problem.withLabel, alt: wf.problem.withAlt },
+	{ label: wf.problem.withoutLabel, items: problemWithout },
+	{ label: wf.problem.withLabel, items: problemWith },
 ] as const;
 
 /** Tools blitz — public/{image}.png (p.ej. section-13-1, section-11-2…) */
@@ -86,7 +98,8 @@ const h3 =
 const lead = 'mt-4 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base';
 const body = 'mt-3 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base';
 const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-tight text-white sm:text-xl';
-const audienceEyebrow = 'font-display text-sm font-semibold tracking-tight text-primary-300 sm:text-base';
+const gradientH2 =
+	'w-fit font-display text-[clamp(1.65rem,3.4vw,2.75rem)] leading-[1.08] font-semibold tracking-tight text-balance bg-[linear-gradient(90deg,#00cfff_0%,#7149fb_100%)] bg-clip-text text-transparent';
 ---
 
 <main id="contenido" class:list={[night, 'relative text-white']}>
@@ -231,40 +244,51 @@ const audienceEyebrow = 'font-display text-sm font-semibold tracking-tight text-
 	{/* S3 · Problem */}
 	<section id="problem" class:list={[sectionY, band, hairline]}>
 		<div class:list={[shell, 'relative']}>
-			<div class="grid items-start gap-10 lg:grid-cols-2 lg:gap-14">
+			<div class="grid gap-10 lg:grid-cols-2 lg:items-stretch lg:gap-14">
 				<div>
 					<h2 class={h2}>
 						{wf.problem.titleBefore}{' '}
 						<span class="text-primary-300">{wf.problem.titleAccent}</span>
 					</h2>
-					<div class="mt-8 grid grid-cols-2 gap-3">
+					<p class="mt-6 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.problem.body1}</p>
+					<p class="mt-3 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.problem.body2}</p>
+					<ul class="mt-5 grid grid-cols-2 gap-x-6 gap-y-1.5 text-[0.95rem] leading-relaxed text-neutral-300 sm:text-base">
 						{
-							problemCompare.map((item) => (
-								<figure class="min-w-0">
-									<p class="mb-2 text-sm font-semibold text-primary-300">{item.label}</p>
-									<div class="overflow-hidden rounded-2xl border border-white/10 bg-ink-200">
-										<img
-											src={item.src}
-											alt={item.alt}
-											class="aspect-[4/5] h-auto w-full object-cover"
-											loading="lazy"
-											decoding="async"
-										/>
-									</div>
-								</figure>
+							wf.problem.bullets.map((item) => (
+								<li class="flex items-start gap-2">
+									<span class="mt-[0.55em] size-1.5 shrink-0 rounded-full bg-primary-300" aria-hidden="true"></span>
+									<span>{item}</span>
+								</li>
 							))
 						}
-					</div>
-				</div>
-				<div>
-					<p class="text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.problem.body1}</p>
-					<p class="mt-3 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.problem.body2}</p>
-					<ul class="mt-4 list-disc space-y-1.5 pl-5 text-[0.95rem] leading-relaxed text-neutral-300 sm:text-base">
-						{wf.problem.bullets.map((item) => (
-							<li>{item}</li>
-						))}
 					</ul>
-					<p class="mt-4 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.problem.after}</p>
+					<p class="mt-5 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.problem.after}</p>
+				</div>
+				<div class="grid grid-cols-2 gap-3 sm:gap-4 lg:h-0 lg:min-h-full">
+					{
+						problemCompare.map((group) => (
+							<figure class="flex min-h-0 min-w-0 flex-col">
+								<p class="mb-2 shrink-0 text-center text-sm font-semibold text-white">{group.label}</p>
+								<div class="flex min-h-0 flex-1 flex-col gap-2 sm:gap-3">
+									{group.items.map((item) => (
+										<div class="flex min-h-0 flex-1 items-stretch justify-center max-lg:flex-none">
+											<div class="aspect-[4/5] w-full overflow-hidden rounded-xl border border-white/10 bg-ink-200 lg:h-full lg:w-auto lg:max-w-full">
+												<img
+													src={item.src}
+													alt={item.alt}
+													width="900"
+													height="1117"
+													class="h-full w-full object-cover object-top"
+													loading="lazy"
+													decoding="async"
+												/>
+											</div>
+										</div>
+									))}
+								</div>
+							</figure>
+						))
+					}
 				</div>
 			</div>
 		</div>
@@ -290,8 +314,8 @@ const audienceEyebrow = 'font-display text-sm font-semibold tracking-tight text-
 		<div class:list={[shell, 'relative']}>
 			<div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
 				<div>
-					<p class="font-display font-medium text-primary-300">{wf.brandKnowledge.eyebrow}</p>
-					<h2 class:list={[h2, 'mt-2']}>{wf.brandKnowledge.title}</h2>
+					<h2 class={gradientH2}>{wf.brandKnowledge.eyebrow}</h2>
+					<h3 class={h3}>{wf.brandKnowledge.title}</h3>
 					<p class={lead}>{wf.brandKnowledge.body1}</p>
 					<p class={body}>{wf.brandKnowledge.body2}</p>
 				</div>
@@ -371,7 +395,7 @@ const audienceEyebrow = 'font-display text-sm font-semibold tracking-tight text-
 			<div class="rounded-3xl border border-white/10 bg-ink-200 p-6 sm:p-10 lg:p-12">
 				<div class="grid items-start gap-10 lg:grid-cols-2">
 					<div>
-						<p class={audienceEyebrow}>{wf.professionals.eyebrow}</p>
+						<h2 class={gradientH2}>{wf.professionals.eyebrow}</h2>
 						<h3 class={h3}>{wf.professionals.title}</h3>
 						<p class="mt-4 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.professionals.body}</p>
 					</div>
@@ -415,7 +439,7 @@ const audienceEyebrow = 'font-display text-sm font-semibold tracking-tight text-
 					/>
 				</div>
 				<div>
-					<p class={audienceEyebrow}>{wf.products.eyebrow}</p>
+					<h2 class={gradientH2}>{wf.products.eyebrow}</h2>
 					<h3 class={h3}>{wf.products.title}</h3>
 					<p class="mt-4 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.products.body}</p>
 				</div>
@@ -439,7 +463,7 @@ const audienceEyebrow = 'font-display text-sm font-semibold tracking-tight text-
 		<div class:list={[shell, 'relative']}>
 			<div class="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
 				<div>
-					<p class={audienceEyebrow}>{wf.sellers.eyebrow}</p>
+					<h2 class={gradientH2}>{wf.sellers.eyebrow}</h2>
 					<h3 class={h3}>{wf.sellers.title}</h3>
 					<p class="mt-4 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.sellers.body}</p>
 				</div>
@@ -473,7 +497,7 @@ const audienceEyebrow = 'font-display text-sm font-semibold tracking-tight text-
 			<div class="rounded-3xl border border-white/10 bg-ink-200 p-6 sm:p-10 lg:p-12">
 				<div class="grid items-start gap-10 lg:grid-cols-2">
 					<div>
-						<p class={audienceEyebrow}>{wf.coaches.eyebrow}</p>
+						<h2 class={gradientH2}>{wf.coaches.eyebrow}</h2>
 						<h3 class={h3}>{wf.coaches.title}</h3>
 						<p class="mt-4 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.coaches.body}</p>
 					</div>
@@ -505,13 +529,17 @@ const audienceEyebrow = 'font-display text-sm font-semibold tracking-tight text-
 	{/* S9 · Tools / blitz */}
 	<section id="tools" class:list={[sectionY, band, hairline]}>
 		<div class:list={[shell, 'relative']}>
-			<div class="mx-auto max-w-5xl text-center">
-				<h2 class={h2}>{wf.tools.title}</h2>
-				<p class={lead}>{wf.tools.body1}</p>
-				<p class={body}>{wf.tools.body2}</p>
-				<p class={body}>{wf.tools.body3}</p>
+			<div class="grid items-start gap-8 lg:grid-cols-2 lg:gap-14">
+				<h2 class="font-display text-[clamp(2.15rem,5vw,3.75rem)] leading-[1.05] font-semibold tracking-tight text-balance text-white">
+					{wf.tools.title}
+				</h2>
+				<div>
+					<p class="text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.tools.body1}</p>
+					<p class="mt-3 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.tools.body2}</p>
+					<p class="mt-3 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.tools.body3}</p>
+				</div>
 			</div>
-			<div class="mt-11 grid grid-cols-[repeat(auto-fit,minmax(16.25rem,1fr))] gap-4">
+			<div class="mt-11 grid grid-cols-[repeat(auto-fit,minmax(16.25rem,1fr))] gap-6 sm:gap-8">
 				{
 					toolItems.map((item) => (
 						<article class="overflow-hidden rounded-2xl border border-white/10 bg-ink-200">
@@ -532,14 +560,19 @@ const audienceEyebrow = 'font-display text-sm font-semibold tracking-tight text-
 					))
 				}
 			</div>
-			<div class="mt-8 grid w-full grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
-				{
-					wf.tools.categories.map((cat) => (
-						<span class="flex items-center justify-center rounded-lg border border-white px-3 py-2.5 text-center font-display text-xs font-semibold tracking-tight text-balance text-white last:col-span-2 sm:text-sm sm:last:col-span-3 md:last:col-span-1">
-							{cat.label}
-						</span>
-					))
-				}
+			<div class="mt-14 flex flex-col items-center text-center">
+				<p class="mb-5 font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+					{wf.tools.categoriesTitle}
+				</p>
+				<div class="grid w-full grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
+					{
+						wf.tools.categories.map((cat) => (
+							<span class="flex items-center justify-center rounded-lg border border-white px-3 py-2.5 text-center font-display text-xs font-semibold tracking-tight text-balance text-white last:col-span-2 sm:text-sm sm:last:col-span-3 md:last:col-span-1">
+								{cat.label}
+							</span>
+						))
+					}
+				</div>
 			</div>
 		</div>
 	</section>
@@ -596,7 +629,9 @@ const audienceEyebrow = 'font-display text-sm font-semibold tracking-tight text-
 					<ul class="mt-5 flex list-disc flex-col gap-2 pl-5 text-white/95">
 						{wf.value.rightItems.map((item) => <li>{item}</li>)}
 						<li class="mt-1 font-display text-lg font-semibold tracking-tight text-white sm:text-xl">
-							{wf.value.rightHighlight}
+							<span class="underline underline-offset-[0.18em]">{wf.value.rightHighlightBrand}</span>
+							{' '}
+							{wf.value.rightHighlightRest}
 						</li>
 					</ul>
 					<div class="mt-auto pt-8">
@@ -625,13 +660,33 @@ const audienceEyebrow = 'font-display text-sm font-semibold tracking-tight text-
 								{formatUsd(plan.monthlyUsd)}
 								<span class="text-base font-semibold text-neutral-400"> {copy.plans.perMonth}</span>
 							</p>
-							<p class="text-sm text-neutral-300">
-								{plan.credits.toLocaleString('en-US')} {copy.plans.credits}
-							</p>
+							<ul class="flex flex-col gap-1.5 text-sm text-neutral-300">
+								<li>
+									<Tooltip content={copy.plans.creditsTip}>
+										<span class="inline-flex items-center gap-2">
+											<Coins size={16} aria-hidden="true" className="shrink-0 text-primary-300" />
+											{plan.credits.toLocaleString('en-US')} {copy.plans.credits}
+										</span>
+									</Tooltip>
+								</li>
+								<li>
+									<Tooltip content={copy.plans.seatsTip}>
+										<span class="inline-flex items-center gap-2">
+											<Users size={16} aria-hidden="true" className="shrink-0 text-primary-300" />
+											{plan.seats} {plan.seats === 1 ? copy.plans.seat : copy.plans.seats}
+										</span>
+									</Tooltip>
+								</li>
+								<li>
+									<Tooltip content={copy.plans.storageTip}>
+										<span class="inline-flex items-center gap-2">
+											<HardDrive size={16} aria-hidden="true" className="shrink-0 text-primary-300" />
+											{plan.storageGb} {copy.plans.storage}
+										</span>
+									</Tooltip>
+								</li>
+							</ul>
 							<p class="flex-1 text-sm text-neutral-400">{copy.plans.blurbs[plan.id]}</p>
-							<p class="text-xs text-neutral-500">
-								{formatUsd(creditUnitUsd(plan.monthlyUsd, plan.credits))} {copy.plans.perCredit}
-							</p>
 							<div class="pt-2">
 								<Button href={signupUrlForPlan(plan.id)} plan={plan.id}>{copy.plans.cta}</Button>
 							</div>
@@ -641,9 +696,11 @@ const audienceEyebrow = 'font-display text-sm font-semibold tracking-tight text-
 			</ul>
 			<div class="mt-4 rounded-2xl border border-white/10 bg-ink-200 p-7">
 				<h3 class="font-display text-2xl font-semibold text-white">{copy.plans.names.enterprise}</h3>
-				<div class="mt-4 flex flex-col sm:flex-row sm:items-center">
-					<p class="max-w-2xl text-pretty text-neutral-300">{copy.plans.blurbs.enterprise}</p>
-					<div class="flex w-full items-center justify-center">
+				<div class="mt-4 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+					<p class="min-w-0 flex-1 text-pretty text-neutral-300 sm:max-w-[38rem]">
+						{copy.plans.blurbs.enterprise}
+					</p>
+					<div class="flex shrink-0 items-center justify-center sm:self-center">
 						<Button
 							href={`mailto:${copy.footer.email}`}
 							plan="enterprise"
