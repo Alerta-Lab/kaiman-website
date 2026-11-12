@@ -12,6 +12,14 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-12 — Problem: compare = alto del copy
+
+- `#problem` derecha: `lg:h-0 lg:min-h-full`; frames `lg:flex-1`; imágenes `object-contain` (ratio intacto). Sin `bg` ni borde en el frame. Móvil: `aspect-[43/24]`.
+
+### 2026-11-12 — Menos eyebrow contrast
+
+- Cards `#menos` (`#18154E`): eyebrow `text-primary-300` (AA) en lugar de `text-primary`.
+
 ### 2026-11-12 — Cards huérfanas full-width
 
 - En grids `sm:2` (planes, Brand Understanding, audiencias, menos): `max-lg:last:odd:col-span-full` para que la última sola ocupe el ancho.
