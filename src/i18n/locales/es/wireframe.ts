@@ -268,7 +268,7 @@ export const wireframe = {
 			{ title: 'Editar fotos, video y audio.', body: '', image: '7' },
 			{ title: 'Analizar tu mercado y encontrar oportunidades de negocio.', body: '', image: '8' },
 		],
-		categoriesTitle: 'Herramientas para generar',
+		categoriesTitle: 'Herramientas para generar:',
 		categories: [
 			{ id: 'image', label: 'Imágenes' },
 			{ id: 'video', label: 'Videos' },

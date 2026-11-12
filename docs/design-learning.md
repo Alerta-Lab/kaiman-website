@@ -12,6 +12,10 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-12 — Tools categoriesTitle
+
+- ES/EN: `Herramientas para generar:` / `Tools to generate:` (dos puntos al final).
+
 ### 2026-11-12 — Problem: compare = alto del copy
 
 - `#problem` derecha: `lg:h-0 lg:min-h-full`; frames `lg:flex-1`; imágenes `object-contain` (ratio intacto). Sin `bg` ni borde en el frame. Móvil: `aspect-[43/24]`.

@@ -266,7 +266,7 @@ export const wireframe = {
 			{ title: 'Edit photos, video, and audio.', body: '', image: '7' },
 			{ title: 'Analyze your market and find business opportunities.', body: '', image: '8' },
 		],
-		categoriesTitle: 'Tools to generate',
+		categoriesTitle: 'Tools to generate:',
 		categories: [
 			{ id: 'image', label: 'Images' },
 			{ id: 'video', label: 'Videos' },
