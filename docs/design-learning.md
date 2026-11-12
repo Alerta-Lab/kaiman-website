@@ -12,6 +12,14 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-12 — Problem compare PNG con radio
+
+- `problem/01–06.png` (radio en asset, alpha); JPG eliminados. pngquant+oxipng ~412–644KB. Markup sin `rounded` en frames; rutas `.png`.
+
+### 2026-11-12 — Problem compare labels
+
+- Sin/Con: `font-display` `text-lg`/`sm:text-xl`; «Sin» `text-ink/80`; «Con» gradiente hero (`.text-gradient`).
+
 ### 2026-11-12 — Problem compare gap
 
 - Sin/Con Kaiman: más separación horizontal (`gap-x-6` / `sm:gap-x-8` / `lg:gap-x-10`).

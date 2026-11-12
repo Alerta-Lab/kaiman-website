@@ -74,18 +74,18 @@ const heroModes = [
 	{ id: 'website', label: wf.hero.modes.website, Icon: Globe, active: false },
 ] as const;
 
-/** S3 compare — problem/01–03 (sin) · problem/04–06 (con) */
+/** S3 compare — problem/01–03 (sin) · problem/04–06 (con); PNG con radio en asset */
 const problemWithout = ['01', '02', '03'].map((n, i) => ({
-	src: asset(`/problem/${n}.jpg`),
+	src: asset(`/problem/${n}.png`),
 	alt: `${wf.problem.withoutAlt} ${i + 1}`,
 }));
 const problemWith = ['04', '05', '06'].map((n, i) => ({
-	src: asset(`/problem/${n}.jpg`),
+	src: asset(`/problem/${n}.png`),
 	alt: `${wf.problem.withAlt} ${i + 1}`,
 }));
 const problemCompare = [
-	{ label: wf.problem.withoutLabel, items: problemWithout },
-	{ label: wf.problem.withLabel, items: problemWith },
+	{ label: wf.problem.withoutLabel, items: problemWithout, accent: false },
+	{ label: wf.problem.withLabel, items: problemWith, accent: true },
 ] as const;
 
 /** Tools blitz — public/tools/{n}.png|.jpg */
@@ -320,15 +320,24 @@ const gradientLabel =
 					{
 						problemCompare.map((group) => (
 							<figure class="flex min-h-0 min-w-0 flex-col">
-								<p class="mb-2 shrink-0 text-center text-sm font-semibold text-ink">{group.label}</p>
+								<p
+									class:list={[
+										'mb-2.5 shrink-0 text-center font-display text-lg font-semibold tracking-tight sm:text-xl',
+										group.accent
+											? 'bg-[linear-gradient(90deg,#00cfff_0%,#7149fb_100%)] text-gradient'
+											: 'text-ink/80',
+									]}
+								>
+									{group.label}
+								</p>
 								<div class="flex min-h-0 flex-1 flex-col gap-2 sm:gap-2.5">
 									{group.items.map((item) => (
-										<div class="flex w-full items-center justify-center overflow-hidden rounded-xl max-lg:aspect-[43/24] lg:min-h-0 lg:flex-1">
+										<div class="flex w-full items-center justify-center max-lg:aspect-[43/24] lg:min-h-0 lg:flex-1">
 											<img
 												src={item.src}
 												alt={item.alt}
 												width="1600"
-												height="893"
+												height="902"
 												class="max-h-full max-w-full object-contain"
 												loading="lazy"
 												decoding="async"
