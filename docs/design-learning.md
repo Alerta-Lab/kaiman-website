@@ -12,6 +12,14 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-12 — Problem compare gap
+
+- Sin/Con Kaiman: más separación horizontal (`gap-x-6` / `sm:gap-x-8` / `lg:gap-x-10`).
+
+### 2026-11-12 — Problem Sin Kaiman 01–03
+
+- Nuevos PNG ~2.1–2.3MB → JPEG 1600w q82 (~230–250KB). Rutas `problem/01–03.jpg` (wireframe ya las usaba).
+
 ### 2026-11-12 — Tools categoriesTitle
 
 - ES/EN: `Herramientas para generar:` / `Tools to generate:` (dos puntos al final).
