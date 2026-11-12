@@ -14,6 +14,17 @@
 	--ease-brand: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/*
+  Gradient text: WebKit/Blink (Safari, Electron/Responsively) need -webkit-*.
+  Without them, Tailwind `bg-clip-text` paints a solid gradient rectangle.
+*/
+.text-gradient {
+	background-clip: text;
+	-webkit-background-clip: text;
+	color: transparent;
+	-webkit-text-fill-color: transparent;
+}
+
 /* Range thumbs cannot be drawn with utilities alone. */
 .piece-slider {
 	appearance: none;

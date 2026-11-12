@@ -8,6 +8,24 @@
         "value": "menlo",
         "createdAt": "2026-11-02T17:50:07.524Z",
         "reason": "pre-existing sw-copy__num monospace for scene index numerals, not brand display type"
+      },
+      {
+        "rule": "gradient-text",
+        "value": "*",
+        "files": [
+          "src/styles/global.css"
+        ],
+        "createdAt": "2026-11-12T17:16:32.652Z",
+        "reason": "Agent: established brand gradient headings on landing; file only adds -webkit-background-clip for Responsively/Safari support"
+      },
+      {
+        "rule": "gradient-text",
+        "value": "*",
+        "files": [
+          "src/components/sections/WireframeLanding.astro"
+        ],
+        "createdAt": "2026-11-12T17:16:32.666Z",
+        "reason": "Agent: same brand gradient text already shipped; applying text-gradient utility for cross-browser clip"
       }
     ]
   }

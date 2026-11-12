@@ -56,16 +56,16 @@ const chapters = [
 ];
 
 const audiencePhotos: Record<string, string> = {
-	professionals: asset('/martinez.png'),
-	products: asset('/ana.png'),
-	sellers: asset('/carlos.png'),
-	creators: asset('/sofia.png'),
+	professionals: asset('/audiences/martinez.png'),
+	products: asset('/audiences/ana.png'),
+	sellers: asset('/audiences/carlos.png'),
+	creators: asset('/audiences/sofia.png'),
 };
 
 const tourMedia = [
-	asset('/brand-profile.png'),
-	asset('/single-item-order.png'),
-	asset('/order-ready.png'),
+	asset('/hero/output-1.jpg'),
+	asset('/hero/output-2.png'),
+	asset('/hero/output-3.jpg'),
 ] as const;
 
 const origenLead = copy.origin.paragraphs[0] ?? '';
@@ -367,7 +367,7 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 							class="relative mt-8 flex items-center justify-center lg:absolute lg:inset-0 lg:mt-0 lg:px-8 lg:py-10"
 						>
 							<img
-								src={asset('/inconsistence.png')}
+								src={asset('/problem/without-1.jpg')}
 								alt={copy.consistency.inconsistencyAlt}
 								width="1600"
 								height="2000"
@@ -465,7 +465,7 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 							class="relative mt-8 flex items-center justify-center lg:absolute lg:inset-0 lg:mt-0 lg:px-8 lg:py-10"
 						>
 							<img
-								src={asset('/consistency.png')}
+								src={asset('/problem/with-1.jpg')}
 								alt={copy.consistency.consistencyAlt}
 								width="1600"
 								height="1600"

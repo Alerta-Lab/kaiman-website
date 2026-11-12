@@ -80,10 +80,10 @@ export const landing = {
 			'Todo negocio necesita generar marketing constantemente. Y hoy, más que nunca, las empresas pequeñas y medianas, especialmente, deben hacerlo para conseguir clientes.',
 		body: 'La mayoría utiliza inteligencia artificial para crear sus publicaciones. Pero con cada nueva generación, su marca puede perder consistencia porque la IA no tiene presentes detalles esenciales como:',
 		points: [
-			{ label: 'Colores', image: '/brand/point-colors.webp' },
-			{ label: 'Tipografías', image: '/brand/point-type.webp' },
-			{ label: 'Tono de comunicación', image: '/brand/point-tone.webp' },
-			{ label: 'Estilo visual', image: '/brand/point-style.webp' },
+			{ label: 'Colores', image: '/tools/1.png' },
+			{ label: 'Tipografías', image: '/tools/2.png' },
+			{ label: 'Tono de comunicación', image: '/tools/3.png' },
+			{ label: 'Estilo visual', image: '/tools/4.png' },
 		],
 		consequence:
 			'Sin esos detalles, su contenido empieza a parecerse al de todos los demás y pierde algo fundamental: lo que hace única a su marca.',
@@ -117,17 +117,17 @@ export const landing = {
 				images: {
 					left: [
 						{
-							src: '/brand/showcase-salsana.webp',
-							alt: 'Pieza de marca Salsana generada con el contexto de Kaiman',
+							src: '/audiences/sofia.png',
+							alt: 'Pieza de marca generada con el contexto de Kaiman',
 						},
 						{
-							src: '/brand/showcase-carlos.webp',
+							src: '/audiences/carlos.png',
 							alt: 'Pieza de marca Carlos generada con el contexto de Kaiman',
 						},
 					],
 					right: [
 						{
-							src: '/brand/showcase-martinez.webp',
+							src: '/audiences/martinez.png',
 							alt: 'Perfil Martinez con identidad visual coherente',
 						},
 					],

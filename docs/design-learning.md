@@ -12,14 +12,96 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-12 — Cards huérfanas full-width
+
+- En grids `sm:2` (planes, Brand Understanding, audiencias, menos): `max-lg:last:odd:col-span-full` para que la última sola ocupe el ancho.
+
+### 2026-11-12 — Planes tablet
+
+- `#planes`: grid `sm:2 / lg:3` (evita 3 cols apretadas en iPad); CTAs `w-full` + `mt-auto`; Enterprise en columna hasta `lg`.
+
+### 2026-11-12 — Tools cards: imagen completa
+
+- `#tools` media: `aspect-[43/24]` + `object-contain` (ratio nativo ~1600×893), sin crop de `h-[9.375rem]`/`object-cover`.
+
+### 2026-11-12 — Gradiente de texto cross-browser
+
+- Utilidad `.text-gradient` en `global.css` con `-webkit-background-clip` y `-webkit-text-fill-color` (Safari / Electron / Responsively). Reemplaza `bg-clip-text text-transparent` en la landing.
+
+### 2026-11-12 — Audiences: stories vs features
+
+- `#stories` usa solo `public/audiences/stories/{id}.jpg`.
+- Secciones detalle usan `public/audiences/features/{id}.jpg` (sin reutilizar stories).
+
+### 2026-11-12 — Optimizar audiences/tools nuevos
+
+- `audiences/carlos|martinez` y `tools/1|7`: PNG ~2–6MB → JPEG 1600w (~100–225KB).
+
+### 2026-11-12 — Playbooks blanco + cards #18154E
+
+- `#playbooks`: fondo blanco; título gradiente cian→violeta; lead `text-ink`; items como `div` con `bg-[#18154E]` (ya no enlaces).
+
+### 2026-11-12 — Planes: blanco + cards #18154E
+
+- `#planes`: fondo `bg-white`; título gradiente `#18154E` → `#3730B4`; intro `text-ink`; cards/Enterprise `#18154E` con features y blurbs en blanco.
+
+### 2026-11-12 — Menos: blanco + cards #18154E
+
+- `#menos`: fondo blanco; copy `text-ink`; acento de título en gradiente; cards `#18154E` con eyebrow `text-primary`.
+
+### 2026-11-12 — Stories blanco + Sofia card #18154E
+
+- `#stories`: fondo `bg-white`.
+- `#sofia`: sección blanca; card contenedora `#18154E`; steps `bg-black`.
+
+### 2026-11-12 — Ana: blanco + cards #18154E
+
+- `#ana`: fondo `bg-white`; copy intro `text-ink`; steps `bg-[#18154E]`.
+
+### 2026-11-12 — Labels gradiente más chicos
+
+- Brand Understanding + audiencias (`#martinez` `#ana` `#carlos` `#sofia`): `gradientLabel` `clamp(1.35rem,2.6vw,2.15rem)`.
+
+### 2026-11-12 — Martinez #01001E
+
+- `#martinez`: fondo `#01001E` (sin caja `ink-200` anidada).
+
+### 2026-11-12 — Stories + cards 4/3
+
+- `#stories`: título gradiente centrado; lead `text-ink`; cards imagen `aspect-[4/3]` + panel `#18154E`.
+
+### 2026-11-12 — Problem assets 01–06 + ratio 43/24
+
+- «Sin/Con Kaiman»: `public/problem/01–06.jpg` (PNG → JPEG 1600×893).
+- Ratio nativo `43/24` (~1.79), no 16:9; frames con `aspect-[43/24]`.
+
+### 2026-11-12 — Problem: altura al copy
+
+- `#problem`: compare derecha (`lg:h-0 lg:min-h-full`) iguala la altura del texto; 3+3 en `aspect-video` repartidos en esa altura.
+
+### 2026-11-12 — Problem compare 3×3 en 16:9
+
+- `#problem`: fondo blanco; copy `text-ink`; acento con gradiente hero; grid `0.9fr / 1.2fr`.
+
+### 2026-11-12 — Demo blanco + Origen gradiente
+
+- `#demo`: fondo `bg-white`.
+- `#origen`: gradiente vertical con blanco dominante hasta ~58%, lavanda ~82%, `#7149FB` al final (evita mitad/mitad sobre el copy). Copy en `text-ink`.
+
+### 2026-11-12 — Public assets por carpeta
+
+- `public/` organizado: `brand/`, `hero/`, `origin/`, `problem/`, `brand-understanding/`, `audiences/`, `tools/`, `video/`.
+- Eliminados no usados en la landing activa (section-11/3.4/4-2, crops extra, demos/salsana, scrub videos, showcases/points, consistency, carlos-01, etc.).
+- Favicons de blog (`favicon.ico`, sizes, apple-touch, og-default) se mantienen en la raíz.
+
 ### 2026-11-10 — Problem Sin Kaiman: section-4 / 4-1
 
-- «Sin Kaiman»: `section-4.jpg` + `section-4-1.jpg` (900×1117, ~160–180 KB). PNG originales pesados sustituidos por JPEG optimizado.
-- Compare derecha iguala altura del copy (`lg:h-0 lg:min-h-full`); contenedores `aspect-[4/5]` (section-4 es 900×1117 ≈ 4:5; no 9:16 ni 3:4).
+- «Sin Kaiman»: ahora `problem/without-1.jpg` + `without-2.jpg` (ex section-4 / 4-1).
+- Compare derecha iguala altura del copy (`lg:h-0 lg:min-h-full`); contenedores `aspect-[4/5]`.
 
 ### 2026-11-10 — Hero: section-1-1.png
 
-- `section-1-1.jpg` → PNG optimizado 800×1433 (~404 KB, 256c); hero usa `section-1-1.png`.
+- Hero outputs en `hero/output-1.jpg`, `output-2.png`, `output-3.jpg`.
 
 ### 2026-11-10 — Brand Understanding: h2 con gradiente
 

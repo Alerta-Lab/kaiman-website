@@ -1,4 +1,6 @@
 ---
+import fs from 'node:fs';
+import path from 'node:path';
 import {
 	BarChart3,
 	Coins,
@@ -33,17 +35,33 @@ const blogHref = blogIndexPath(locale);
 const demoVideo = asset(locale === 'en' ? '/video/demo-en.mp4' : '/video/demo-es.mp4');
 const demoPoster = asset(locale === 'en' ? '/video/demo-en-poster.jpg' : '/video/demo-es-poster.jpg');
 
-const audiencePhotos: Record<string, string> = {
-	martinez: asset('/martinez.png'),
-	ana: asset('/ana.png'),
-	carlos: asset('/carlos.png'),
-	sofia: asset('/sofia.png'),
+const audienceIds = ['martinez', 'ana', 'carlos', 'sofia'] as const;
+type AudienceId = (typeof audienceIds)[number];
+
+const resolveAudienceAsset = (folder: 'stories' | 'features', id: AudienceId): string | null => {
+	const dir = path.join(process.cwd(), 'public/audiences', folder);
+	for (const ext of ['jpg', 'jpeg', 'png', 'webp'] as const) {
+		if (fs.existsSync(path.join(dir, `${id}.${ext}`))) {
+			return asset(`/audiences/${folder}/${id}.${ext}`);
+		}
+	}
+	return null;
 };
 
+/** Stories cards only — never reuse these in detail sections */
+const audienceStoryPhotos = Object.fromEntries(
+	audienceIds.map((id) => [id, resolveAudienceAsset('stories', id)]),
+) as Record<AudienceId, string | null>;
+
+/** Detail sections — drop files in public/audiences/features/{id}.jpg|png */
+const audienceFeaturePhotos = Object.fromEntries(
+	audienceIds.map((id) => [id, resolveAudienceAsset('features', id)]),
+) as Record<AudienceId, string | null>;
+
 const heroOutputs = [
-	asset('/section-1.jpg'),
-	asset('/section-1-1.png'),
-	asset('/section-1-2.jpg'),
+	asset('/hero/output-1.jpg'),
+	asset('/hero/output-2.png'),
+	asset('/hero/output-3.jpg'),
 ];
 
 const heroModes = [
@@ -56,24 +74,31 @@ const heroModes = [
 	{ id: 'website', label: wf.hero.modes.website, Icon: Globe, active: false },
 ] as const;
 
-/** S3 compare — section-4 / section-4-1 (sin) · consistency crops (con) */
-const problemWithout = [
-	{ src: asset('/section-4.jpg'), alt: `${wf.problem.withoutAlt} 1` },
-	{ src: asset('/section-4-1.jpg'), alt: `${wf.problem.withoutAlt} 2` },
-];
-const problemWith = [1, 2].map((n) => ({
-	src: asset(`/problem/with-${n}.jpg`),
-	alt: `${wf.problem.withAlt} ${n}`,
+/** S3 compare — problem/01–03 (sin) · problem/04–06 (con) */
+const problemWithout = ['01', '02', '03'].map((n, i) => ({
+	src: asset(`/problem/${n}.jpg`),
+	alt: `${wf.problem.withoutAlt} ${i + 1}`,
+}));
+const problemWith = ['04', '05', '06'].map((n, i) => ({
+	src: asset(`/problem/${n}.jpg`),
+	alt: `${wf.problem.withAlt} ${i + 1}`,
 }));
 const problemCompare = [
 	{ label: wf.problem.withoutLabel, items: problemWithout },
 	{ label: wf.problem.withLabel, items: problemWith },
 ] as const;
 
-/** Tools blitz — public/{image}.png (p.ej. section-13-1, section-11-2…) */
+/** Tools blitz — public/tools/{n}.png|.jpg */
+const toolImageExt: Record<string, 'jpg' | 'png'> = {
+	'1': 'jpg',
+	'2': 'jpg',
+	'5': 'jpg',
+	'7': 'jpg',
+	'8': 'jpg',
+};
 const toolItems = wf.tools.items.map((item) => ({
 	...item,
-	src: asset(`/${item.image}.png`),
+	src: asset(`/tools/${item.image}.${toolImageExt[item.image] ?? 'png'}`),
 }));
 
 const shell = 'mx-auto w-full max-w-[1600px] px-8 sm:px-12 lg:px-20';
@@ -99,7 +124,10 @@ const lead = 'mt-4 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 s
 const body = 'mt-3 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base';
 const closing = 'mt-6 font-display text-lg leading-snug font-semibold tracking-tight text-white sm:text-xl';
 const gradientH2 =
-	'w-fit font-display text-[clamp(1.65rem,3.4vw,2.75rem)] leading-[1.08] font-semibold tracking-tight text-balance bg-[linear-gradient(90deg,#00cfff_0%,#7149fb_100%)] bg-clip-text text-transparent';
+	'w-fit font-display text-[clamp(1.65rem,3.4vw,2.75rem)] leading-[1.08] font-semibold tracking-tight text-balance bg-[linear-gradient(90deg,#00cfff_0%,#7149fb_100%)] text-gradient';
+/** Audience / Brand Understanding section labels — slightly smaller than page H2 */
+const gradientLabel =
+	'w-fit font-display text-[clamp(1.35rem,2.6vw,2.15rem)] leading-[1.1] font-semibold tracking-tight text-balance bg-[linear-gradient(90deg,#00cfff_0%,#7149fb_100%)] text-gradient';
 ---
 
 <main id="contenido" class:list={[night, 'relative text-white']}>
@@ -119,7 +147,7 @@ const gradientH2 =
 					{wf.hero.titleBefore}
 					<br />
 					{wf.hero.titleAfter}{' '}
-					<span class="whitespace-nowrap bg-[linear-gradient(90deg,#00cfff_0%,#7149fb_100%)] bg-clip-text text-transparent">
+					<span class="whitespace-nowrap bg-[linear-gradient(90deg,#00cfff_0%,#7149fb_100%)] text-gradient">
 						{wf.hero.titleAccent}
 					</span>
 				</h1>
@@ -194,9 +222,9 @@ const gradientH2 =
 	</section>
 
 	{/* S2 · Demo */}
-	<section id="demo" class:list={[sectionY, 'scroll-mt-28', band, hairline]}>
+	<section id="demo" class:list={[sectionY, 'scroll-mt-28', 'bg-white']}>
 		<div class:list={[shell, 'relative']}>
-			<div class="overflow-hidden rounded-2xl border border-white/10 bg-ink">
+			<div class="overflow-hidden rounded-2xl border border-black/10 bg-ink">
 				<video
 					class="aspect-video w-full object-cover"
 					poster={demoPoster}
@@ -214,75 +242,97 @@ const gradientH2 =
 	</section>
 
 	{/* S3 · Origin */}
-	<section id="origen" class:list={[sectionY, 'scroll-mt-28', hairline]}>
+	<section
+		id="origen"
+		class:list={[
+			sectionY,
+			'scroll-mt-28',
+			'border-b-[10px] border-[#7149FB]',
+			'bg-[linear-gradient(180deg,#ffffff_0%,#ffffff_64%,#f7f5ff_78%,#ddd6ff_90%,#a894fc_100%)]',
+		]}
+	>
 		<div class:list={[shell, 'relative grid items-center gap-8 lg:grid-cols-2 lg:gap-12']}>
 			<div>
-				<h2 class={h2}>{wf.origin.title}</h2>
-				<p class={lead}>{wf.origin.body1}</p>
-				<p class="mt-3 max-w-2xl text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.origin.body2}</p>
-				<p class="mt-3 max-w-2xl text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.origin.body3}</p>
-				<p class={closing}>
+				<h2 class={gradientH2}>{wf.origin.title}</h2>
+				<p class="mt-4 text-[0.95rem] leading-relaxed text-pretty text-ink/75 sm:text-base">{wf.origin.body1}</p>
+				<p class="mt-3 max-w-2xl text-[0.95rem] leading-relaxed text-pretty text-ink/75 sm:text-base">{wf.origin.body2}</p>
+				<p class="mt-3 max-w-2xl text-[0.95rem] leading-relaxed text-pretty text-ink/75 sm:text-base">{wf.origin.body3}</p>
+				<p class="mt-6 max-w-2xl font-display text-lg leading-snug font-semibold tracking-tight text-pretty text-ink sm:text-xl">
 					{wf.origin.closing}{' '}
-					<span class="text-primary-300">{wf.origin.closingAccent}</span>
+					<span class="text-primary">{wf.origin.closingAccent}</span>
 				</p>
 			</div>
 			<div class="flex flex-col gap-4">
-				<div class="overflow-hidden rounded-2xl border border-white/10 bg-ink-200">
+				<div class="overflow-hidden rounded-2xl border border-black/10 bg-white/40">
 					<img
-						src={asset('/section-2.png')}
+						src={asset('/origin/main.png')}
 						alt={wf.origin.imageAlt}
 						class="aspect-[16/10] h-auto w-full object-cover"
 						loading="lazy"
 						decoding="async"
 					/>
 				</div>
-				<p class="text-sm text-pretty text-neutral-400">{wf.origin.imageCaption}</p>
+				<p class="text-sm text-pretty text-ink/65">{wf.origin.imageCaption}</p>
 			</div>
 		</div>
 	</section>
 
-	{/* S3 · Problem */}
-	<section id="problem" class:list={[sectionY, band, hairline]}>
+	{/* S3 · Brand secret */}
+	<section id="secreto" class:list={['relative py-20 sm:py-28 lg:py-32', 'bg-[#18154E]', hairline]}>
 		<div class:list={[shell, 'relative']}>
-			<div class="grid gap-10 lg:grid-cols-2 lg:items-stretch lg:gap-14">
-				<div>
-					<h2 class={h2}>
+			<div class="mx-auto max-w-3xl text-center">
+				<p class={h2}>
+					{wf.problem.secretBefore}{' '}
+					<span class="text-feature-image">{wf.problem.secretAccent}</span>
+				</p>
+				<p class="mt-4 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.problem.secretBody1}</p>
+				<p class="mt-3 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.problem.secretBody2}</p>
+			</div>
+		</div>
+	</section>
+
+	{/* S3b · Problem */}
+	<section id="problem" class:list={[sectionY, 'bg-white']}>
+		<div class:list={[shell, 'relative']}>
+			<div class="grid items-start gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.2fr)] lg:gap-12">
+				<div class="min-w-0">
+					<h2 class="font-display text-[clamp(1.65rem,3.4vw,2.75rem)] leading-[1.08] font-semibold tracking-tight text-balance text-ink">
 						{wf.problem.titleBefore}{' '}
-						<span class="text-primary-300">{wf.problem.titleAccent}</span>
+						<span class="bg-[linear-gradient(90deg,#00cfff_0%,#7149fb_100%)] text-gradient">
+							{wf.problem.titleAccent}
+						</span>
 					</h2>
-					<p class="mt-6 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.problem.body1}</p>
-					<p class="mt-3 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.problem.body2}</p>
-					<ul class="mt-5 grid grid-cols-2 gap-x-6 gap-y-1.5 text-[0.95rem] leading-relaxed text-neutral-300 sm:text-base">
+					<p class="mt-6 text-[0.95rem] leading-relaxed text-pretty text-ink/75 sm:text-base">{wf.problem.body1}</p>
+					<p class="mt-3 text-[0.95rem] leading-relaxed text-pretty text-ink/75 sm:text-base">{wf.problem.body2}</p>
+					<ul class="mt-5 grid grid-cols-2 gap-x-6 gap-y-1.5 text-[0.95rem] leading-relaxed text-ink/75 sm:text-base">
 						{
 							wf.problem.bullets.map((item) => (
 								<li class="flex items-start gap-2">
-									<span class="mt-[0.55em] size-1.5 shrink-0 rounded-full bg-primary-300" aria-hidden="true"></span>
+									<span class="mt-[0.55em] size-1.5 shrink-0 rounded-full bg-primary" aria-hidden="true"></span>
 									<span>{item}</span>
 								</li>
 							))
 						}
 					</ul>
-					<p class="mt-5 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.problem.after}</p>
+					<p class="mt-5 text-[0.95rem] leading-relaxed text-pretty text-ink/75 sm:text-base">{wf.problem.after}</p>
 				</div>
-				<div class="grid grid-cols-2 gap-3 sm:gap-4 lg:h-0 lg:min-h-full">
+				<div class="grid min-w-0 grid-cols-2 gap-3 sm:gap-4">
 					{
 						problemCompare.map((group) => (
-							<figure class="flex min-h-0 min-w-0 flex-col">
-								<p class="mb-2 shrink-0 text-center text-sm font-semibold text-white">{group.label}</p>
-								<div class="flex min-h-0 flex-1 flex-col gap-2 sm:gap-3">
+							<figure class="min-w-0">
+								<p class="mb-2 text-center text-sm font-semibold text-ink">{group.label}</p>
+								<div class="flex flex-col gap-2 sm:gap-2.5">
 									{group.items.map((item) => (
-										<div class="flex min-h-0 flex-1 items-stretch justify-center max-lg:flex-none">
-											<div class="aspect-[4/5] w-full overflow-hidden rounded-xl border border-white/10 bg-ink-200 lg:h-full lg:w-auto lg:max-w-full">
-												<img
-													src={item.src}
-													alt={item.alt}
-													width="900"
-													height="1117"
-													class="h-full w-full object-cover object-top"
-													loading="lazy"
-													decoding="async"
-												/>
-											</div>
+										<div class="aspect-[43/24] w-full overflow-hidden rounded-xl border border-black/10 bg-neutral-100">
+											<img
+												src={item.src}
+												alt={item.alt}
+												width="1600"
+												height="893"
+												class="h-full w-full object-cover object-top"
+												loading="lazy"
+												decoding="async"
+											/>
 										</div>
 									))}
 								</div>
@@ -294,34 +344,19 @@ const gradientH2 =
 		</div>
 	</section>
 
-	{/* S3b · Brand secret */}
-	<section id="secreto" class:list={['relative py-20 sm:py-28 lg:py-32', hairline]}>
-		<div class={glowCenter} aria-hidden="true"></div>
-		<div class:list={[shell, 'relative']}>
-			<div class="mx-auto max-w-3xl text-center">
-				<p class={h2}>
-					{wf.problem.secretBefore}{' '}
-					<span class="text-primary-300">{wf.problem.secretAccent}</span>
-				</p>
-				<p class="mt-4 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.problem.secretBody1}</p>
-				<p class="mt-3 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.problem.secretBody2}</p>
-			</div>
-		</div>
-	</section>
-
 	{/* S4 · Brand Understanding */}
 	<section id="brand-understanding" class:list={[sectionY, 'scroll-mt-28', band, hairline]}>
 		<div class:list={[shell, 'relative']}>
 			<div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
 				<div>
-					<h2 class={gradientH2}>{wf.brandKnowledge.eyebrow}</h2>
+					<h2 class={gradientLabel}>{wf.brandKnowledge.eyebrow}</h2>
 					<h3 class={h3}>{wf.brandKnowledge.title}</h3>
 					<p class={lead}>{wf.brandKnowledge.body1}</p>
 					<p class={body}>{wf.brandKnowledge.body2}</p>
 				</div>
 				<div class="overflow-hidden rounded-2xl border border-white/10 bg-ink-200">
 					<img
-						src={asset('/section-5.png')}
+						src={asset('/brand-understanding/main.png')}
 						alt={wf.brandKnowledge.resultAlt}
 						class="h-auto w-full object-contain object-center"
 						loading="lazy"
@@ -332,7 +367,7 @@ const gradientH2 =
 			<div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 				{
 					wf.brandKnowledge.steps.map((step) => (
-						<article class="rounded-2xl border border-white/10 bg-ink-200 p-7">
+						<article class="rounded-2xl border border-white/10 bg-ink-200 p-7 max-lg:last:odd:col-span-full">
 							<p class="font-display text-sm font-semibold tracking-[0.12em] text-primary-300">{step.n}</p>
 							<h3 class="mt-1.5 font-display text-xl leading-snug font-semibold text-white sm:text-2xl">{step.title}</h3>
 							<p class="mt-2 text-base text-pretty text-neutral-300">{step.body}</p>
@@ -354,27 +389,33 @@ const gradientH2 =
 	</section>
 
 	{/* S5 · Stories intro */}
-	<section id="stories" class:list={[sectionY, hairline, 'pb-10']}>
+	<section id="stories" class:list={[sectionY, 'bg-white', 'pb-10']}>
 		<div class:list={[shell, 'relative']}>
-			<h2 class={h2}>{wf.stories.title}</h2>
-			<p class={lead}>{wf.stories.body}</p>
+			<div class="mx-auto max-w-4xl text-center">
+				<h2 class:list={[gradientH2, 'mx-auto']}>{wf.stories.title}</h2>
+				<p class="mt-5 text-[0.95rem] leading-relaxed text-pretty text-ink/75 sm:text-base">{wf.stories.body}</p>
+			</div>
 			<div class="mt-11 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 				{
 					wf.stories.personas.map((persona) => (
 						<a
 							href={persona.href}
-							class="group overflow-hidden rounded-2xl border border-white/10 bg-ink-200 text-white transition-colors hover:border-primary/40"
+							class="group flex h-full flex-col overflow-hidden rounded-2xl bg-[#18154E] text-white transition-colors hover:brightness-110"
 						>
-							<div class="aspect-video overflow-hidden">
-								<img
-									src={audiencePhotos[persona.id]}
-									alt=""
-									class="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
-									loading="lazy"
-									decoding="async"
-								/>
+							<div class="aspect-[4/3] overflow-hidden bg-[#18154E]">
+								{
+									audienceStoryPhotos[persona.id as AudienceId] ? (
+										<img
+											src={audienceStoryPhotos[persona.id as AudienceId]!}
+											alt=""
+											class="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
+											loading="lazy"
+											decoding="async"
+										/>
+									) : null
+								}
 							</div>
-							<div class="p-5">
+							<div class="flex flex-1 flex-col p-5 sm:p-6">
 								<p class="font-display text-lg leading-snug font-semibold tracking-tight text-white sm:text-xl">{persona.who}</p>
 								<p class="mt-2 text-sm leading-relaxed text-white">{persona.job}</p>
 								<p class="mt-1 inline-flex items-center gap-2 text-sm leading-relaxed text-white">
@@ -390,67 +431,78 @@ const gradientH2 =
 	</section>
 
 	{/* S6 · Martinez · Independent professionals */}
-	<section id="martinez" class:list={[sectionY, band, hairline, 'pt-10']}>
+	<section id="martinez" class:list={[sectionY, 'bg-[#01001E]', hairline, 'pt-10']}>
 		<div class:list={[shell, 'relative']}>
-			<div class="rounded-3xl border border-white/10 bg-ink-200 p-6 sm:p-10 lg:p-12">
-				<div class="grid items-start gap-10 lg:grid-cols-2">
-					<div>
-						<h2 class={gradientH2}>{wf.professionals.eyebrow}</h2>
-						<h3 class={h3}>{wf.professionals.title}</h3>
-						<p class="mt-4 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.professionals.body}</p>
-					</div>
-					<div class="overflow-hidden rounded-2xl border border-white/10 bg-ink">
-						<img
-							src={audiencePhotos.martinez}
-							alt={wf.professionals.imageAlt}
-							class="aspect-video h-auto w-full object-cover object-top"
-							loading="lazy"
-							decoding="async"
-						/>
-					</div>
+			<div class="grid items-start gap-10 lg:grid-cols-2">
+				<div>
+					<h2 class={gradientLabel}>{wf.professionals.eyebrow}</h2>
+					<h3 class={h3}>{wf.professionals.title}</h3>
+					<p class="mt-4 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.professionals.body}</p>
 				</div>
-				<div class="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+				<div class="overflow-hidden rounded-2xl border border-white/10 bg-[#01001E]">
 					{
-						wf.professionals.steps.map((step) => (
-							<article class="rounded-xl border border-white/10 bg-ink p-5">
-								<p class="font-display text-xs font-semibold tracking-[0.14em] text-primary-300">{step.n}</p>
-								<p class="mt-1 font-display text-lg leading-snug font-semibold text-white">{step.title}</p>
-								<p class="mt-2 text-sm text-pretty text-neutral-400">{step.body}</p>
-							</article>
-						))
+						audienceFeaturePhotos.martinez ? (
+							<img
+								src={audienceFeaturePhotos.martinez}
+								alt={wf.professionals.imageAlt}
+								class="aspect-video h-auto w-full object-cover object-top"
+								loading="lazy"
+								decoding="async"
+							/>
+						) : (
+							<div class="aspect-video w-full bg-[#01001E]" aria-hidden="true"></div>
+						)
 					}
 				</div>
+			</div>
+			<div class="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+				{
+					wf.professionals.steps.map((step) => (
+						<article class="rounded-xl border border-white/10 bg-black p-5 max-lg:last:odd:col-span-full">
+							<p class="font-display text-xs font-semibold tracking-[0.14em] text-primary-300">{step.n}</p>
+							<p class="mt-1 font-display text-lg leading-snug font-semibold text-white">{step.title}</p>
+							<p class="mt-2 text-sm text-pretty text-neutral-400">{step.body}</p>
+						</article>
+					))
+				}
 			</div>
 		</div>
 	</section>
 
 	{/* S7 · Ana · Product creators */}
-	<section id="ana" class:list={[sectionY, hairline]}>
-		<div class={glowMist} aria-hidden="true"></div>
+	<section id="ana" class:list={[sectionY, 'bg-white']}>
 		<div class:list={[shell, 'relative']}>
 			<div class="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
-				<div class="overflow-hidden rounded-2xl border border-white/10 bg-ink-200">
-					<img
-						src={asset('/section-9.png')}
-						alt={wf.products.imageAlt}
-						class="aspect-video h-auto w-full object-cover"
-						loading="lazy"
-						decoding="async"
-					/>
+				<div class="overflow-hidden rounded-2xl border border-black/10 bg-white">
+					{
+						audienceFeaturePhotos.ana ? (
+							<img
+								src={audienceFeaturePhotos.ana}
+								alt={wf.products.imageAlt}
+								class="aspect-video h-auto w-full object-cover"
+								loading="lazy"
+								decoding="async"
+							/>
+						) : (
+							<div class="aspect-video w-full bg-neutral-100" aria-hidden="true"></div>
+						)
+					}
 				</div>
 				<div>
-					<h2 class={gradientH2}>{wf.products.eyebrow}</h2>
-					<h3 class={h3}>{wf.products.title}</h3>
-					<p class="mt-4 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.products.body}</p>
+					<h2 class={gradientLabel}>{wf.products.eyebrow}</h2>
+					<h3 class="mt-2 font-display text-[clamp(1.5rem,2.8vw,2.15rem)] leading-[1.1] font-semibold tracking-tight text-balance text-ink">
+						{wf.products.title}
+					</h3>
+					<p class="mt-4 text-[0.95rem] leading-relaxed text-pretty text-ink/75 sm:text-base">{wf.products.body}</p>
 				</div>
 			</div>
 			<div class="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
 				{
 					wf.products.steps.map((step) => (
-						<article class="rounded-xl border border-white/10 bg-ink-200 p-5">
+						<article class="rounded-xl border border-white/10 bg-[#18154E] p-5 max-lg:last:odd:col-span-full">
 							<p class="font-display text-xs font-semibold tracking-[0.14em] text-primary-300">{step.n}</p>
 							<p class="mt-1 font-display text-lg leading-snug font-semibold text-white">{step.title}</p>
-							<p class="mt-2 text-sm text-pretty text-neutral-400">{step.body}</p>
+							<p class="mt-2 text-sm text-pretty text-neutral-300">{step.body}</p>
 						</article>
 					))
 				}
@@ -463,24 +515,30 @@ const gradientH2 =
 		<div class:list={[shell, 'relative']}>
 			<div class="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
 				<div>
-					<h2 class={gradientH2}>{wf.sellers.eyebrow}</h2>
+					<h2 class={gradientLabel}>{wf.sellers.eyebrow}</h2>
 					<h3 class={h3}>{wf.sellers.title}</h3>
 					<p class="mt-4 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.sellers.body}</p>
 				</div>
 				<div class="overflow-hidden rounded-2xl border border-white/10 bg-ink-200">
-					<img
-						src={audiencePhotos.carlos}
-						alt={wf.sellers.imageAlt}
-						class="aspect-video h-auto w-full object-cover object-top"
-						loading="lazy"
-						decoding="async"
-					/>
+					{
+						audienceFeaturePhotos.carlos ? (
+							<img
+								src={audienceFeaturePhotos.carlos}
+								alt={wf.sellers.imageAlt}
+								class="aspect-video h-auto w-full object-cover object-top"
+								loading="lazy"
+								decoding="async"
+							/>
+						) : (
+							<div class="aspect-video w-full bg-ink-200" aria-hidden="true"></div>
+						)
+					}
 				</div>
 			</div>
 			<div class="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
 				{
 					wf.sellers.steps.map((step) => (
-						<article class="rounded-xl border border-white/10 bg-ink-200 p-5">
+						<article class="rounded-xl border border-white/10 bg-ink-200 p-5 max-lg:last:odd:col-span-full">
 							<p class="font-display text-xs font-semibold tracking-[0.14em] text-primary-300">{step.n}</p>
 							<p class="mt-1 font-display text-lg leading-snug font-semibold text-white">{step.title}</p>
 							<p class="mt-2 text-sm text-pretty text-neutral-400">{step.body}</p>
@@ -492,29 +550,35 @@ const gradientH2 =
 	</section>
 
 	{/* S8b · Sofia · Coaches */}
-	<section id="sofia" class:list={[sectionY, hairline, 'pt-4']}>
+	<section id="sofia" class:list={[sectionY, 'bg-white', 'pt-4']}>
 		<div class:list={[shell, 'relative']}>
-			<div class="rounded-3xl border border-white/10 bg-ink-200 p-6 sm:p-10 lg:p-12">
+			<div class="rounded-3xl border border-white/10 bg-[#18154E] p-6 sm:p-10 lg:p-12">
 				<div class="grid items-start gap-10 lg:grid-cols-2">
 					<div>
-						<h2 class={gradientH2}>{wf.coaches.eyebrow}</h2>
+						<h2 class={gradientLabel}>{wf.coaches.eyebrow}</h2>
 						<h3 class={h3}>{wf.coaches.title}</h3>
 						<p class="mt-4 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.coaches.body}</p>
 					</div>
-					<div class="overflow-hidden rounded-2xl border border-white/10 bg-ink">
-						<img
-							src={asset('/section-10.png')}
-							alt={wf.coaches.imageAlt}
-							class="aspect-video h-auto w-full object-cover object-top"
-							loading="lazy"
-							decoding="async"
-						/>
+					<div class="overflow-hidden rounded-2xl border border-white/10 bg-[#18154E]">
+						{
+							audienceFeaturePhotos.sofia ? (
+								<img
+									src={audienceFeaturePhotos.sofia}
+									alt={wf.coaches.imageAlt}
+									class="aspect-video h-auto w-full object-cover object-top"
+									loading="lazy"
+									decoding="async"
+								/>
+							) : (
+								<div class="aspect-video w-full bg-[#18154E]" aria-hidden="true"></div>
+							)
+						}
 					</div>
 				</div>
 				<div class="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
 					{
 						wf.coaches.steps.map((step) => (
-							<article class="rounded-xl border border-white/10 bg-ink p-5">
+							<article class="rounded-xl border border-white/10 bg-black p-5 max-lg:last:odd:col-span-full">
 								<p class="font-display text-xs font-semibold tracking-[0.14em] text-primary-300">{step.n}</p>
 								<p class="mt-1 font-display text-lg leading-snug font-semibold text-white">{step.title}</p>
 								<p class="mt-2 text-sm text-pretty text-neutral-400">{step.body}</p>
@@ -530,7 +594,7 @@ const gradientH2 =
 	<section id="tools" class:list={[sectionY, band, hairline]}>
 		<div class:list={[shell, 'relative']}>
 			<div class="grid items-start gap-8 lg:grid-cols-2 lg:gap-14">
-				<h2 class="font-display text-[clamp(2.15rem,5vw,3.75rem)] leading-[1.05] font-semibold tracking-tight text-balance text-white">
+				<h2 class="font-display text-[clamp(2.15rem,5vw,3.75rem)] leading-[1.05] font-semibold tracking-tight text-balance bg-[linear-gradient(90deg,#00cfff_0%,#7149fb_100%)] text-gradient">
 					{wf.tools.title}
 				</h2>
 				<div>
@@ -543,11 +607,13 @@ const gradientH2 =
 				{
 					toolItems.map((item) => (
 						<article class="overflow-hidden rounded-2xl border border-white/10 bg-ink-200">
-							<div class="h-[9.375rem] overflow-hidden border-b border-white/10 bg-ink">
+							<div class="border-b border-white/10 bg-ink">
 								<img
 									src={item.src}
 									alt=""
-									class="h-full w-full object-cover object-top"
+									width="1600"
+									height="893"
+									class="aspect-[43/24] h-auto w-full object-contain object-center"
 									loading="lazy"
 									decoding="async"
 								/>
@@ -578,26 +644,30 @@ const gradientH2 =
 	</section>
 
 	{/* S9b · Menos / Más */}
-	<section id="menos" class:list={[sectionY, hairline]}>
-		<div class={glowBottom} aria-hidden="true"></div>
+	<section id="menos" class:list={[sectionY, 'bg-white']}>
 		<div class:list={[shell, 'relative']}>
 			<div class="grid items-end gap-8 lg:grid-cols-2 lg:gap-14">
-				<h2 class={h2}>{wf.menos.title}</h2>
+				<h2 class="font-display text-[clamp(1.65rem,3.4vw,2.75rem)] leading-[1.08] font-semibold tracking-tight text-balance text-ink">
+					<span class="bg-[linear-gradient(90deg,#00cfff_0%,#7149fb_100%)] text-gradient">
+						{wf.menos.titleAccent}
+					</span>
+					{wf.menos.titleRest}
+				</h2>
 				<div>
-					<p class="text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.menos.body1}</p>
-					<p class="mt-3 text-[0.95rem] leading-relaxed text-pretty text-neutral-300 sm:text-base">{wf.menos.body2}</p>
+					<p class="text-[0.95rem] leading-relaxed text-pretty text-ink/75 sm:text-base">{wf.menos.body1}</p>
+					<p class="mt-3 text-[0.95rem] leading-relaxed text-pretty text-ink/75 sm:text-base">{wf.menos.body2}</p>
 				</div>
 			</div>
 			<div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-				<article class="rounded-2xl bg-primary p-7 text-white">
+				<article class="rounded-2xl bg-primary p-7 text-white max-lg:last:odd:col-span-full">
 					<p class="font-display text-xs font-semibold tracking-[0.14em] text-primary-100 uppercase">{wf.menos.moreEyebrow}</p>
 					<h3 class="mt-2 font-display text-xl font-semibold sm:text-2xl">{wf.menos.moreTitle}</h3>
 					<p class="mt-3 text-sm text-pretty text-primary-100 sm:text-base">{wf.menos.moreBody}</p>
 				</article>
 				{
 					wf.menos.cards.map((card) => (
-						<article class="rounded-2xl border border-white/10 bg-ink-200 p-7">
-							<p class="font-display text-xs font-semibold tracking-[0.14em] text-primary-300 uppercase">{card.eyebrow}</p>
+						<article class="rounded-2xl border border-white/10 bg-[#18154E] p-7 max-lg:last:odd:col-span-full">
+							<p class="font-display text-xs font-semibold tracking-[0.14em] text-primary uppercase">{card.eyebrow}</p>
 							<h3 class="mt-2 font-display text-xl font-semibold text-white sm:text-2xl">{card.title}</h3>
 							<p class="mt-3 text-sm text-pretty text-neutral-300 sm:text-base">{card.body}</p>
 						</article>
@@ -647,20 +717,24 @@ const gradientH2 =
 	</section>
 
 	{/* S11 · Pricing */}
-	<section id="planes" class:list={[sectionY, 'scroll-mt-28', hairline]}>
+	<section id="planes" class:list={[sectionY, 'scroll-mt-28', 'bg-white']}>
 		<div class:list={[shell, 'relative']}>
-			<h2 class:list={[h2, 'text-center text-balance']}>{copy.plans.title}</h2>
-			<p class:list={[lead, 'text-center']}>{copy.plans.intro}</p>
-			<ul class="mt-11 grid gap-4 md:grid-cols-3">
+			<h2 class="mx-auto w-fit text-center font-display text-[clamp(1.65rem,3.4vw,2.75rem)] leading-[1.08] font-semibold tracking-tight text-balance bg-[linear-gradient(90deg,#18154E_0%,#3730B4_100%)] text-gradient">
+				{copy.plans.title}
+			</h2>
+			<p class="mx-auto mt-4 max-w-3xl text-center text-[0.95rem] leading-relaxed text-pretty text-ink/75 sm:text-base">
+				{copy.plans.intro}
+			</p>
+			<ul class="mt-11 grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
 				{
 					plans.map((plan) => (
-						<li class="flex flex-col gap-3 rounded-2xl border border-white/10 bg-ink-200 p-7">
+						<li class="flex h-full min-w-0 flex-col gap-3 rounded-2xl border border-white/10 bg-[#18154E] p-5 max-lg:last:odd:col-span-full sm:p-6 lg:p-7">
 							<p class="font-display text-2xl font-semibold text-white">{copy.plans.names[plan.id]}</p>
 							<p class="font-display text-4xl font-semibold text-white">
 								{formatUsd(plan.monthlyUsd)}
-								<span class="text-base font-semibold text-neutral-400"> {copy.plans.perMonth}</span>
+								<span class="text-base font-semibold text-white/70"> {copy.plans.perMonth}</span>
 							</p>
-							<ul class="flex flex-col gap-1.5 text-sm text-neutral-300">
+							<ul class="flex flex-col gap-1.5 text-sm text-white">
 								<li>
 									<Tooltip content={copy.plans.creditsTip}>
 										<span class="inline-flex items-center gap-2">
@@ -686,25 +760,31 @@ const gradientH2 =
 									</Tooltip>
 								</li>
 							</ul>
-							<p class="flex-1 text-sm text-neutral-400">{copy.plans.blurbs[plan.id]}</p>
-							<div class="pt-2">
-								<Button href={signupUrlForPlan(plan.id)} plan={plan.id}>{copy.plans.cta}</Button>
+							<p class="flex-1 text-sm text-pretty text-white">{copy.plans.blurbs[plan.id]}</p>
+							<div class="mt-auto pt-4">
+								<Button
+									href={signupUrlForPlan(plan.id)}
+									plan={plan.id}
+									class="w-full min-w-0 [&_.k-btn-l]:min-w-0 [&_.k-btn-l]:flex-1 [&_.k-btn-l]:justify-center [&_.k-btn-l]:px-3 sm:[&_.k-btn-l]:px-4 lg:[&_.k-btn-l]:px-[1.35rem]"
+								>
+									{copy.plans.cta}
+								</Button>
 							</div>
 						</li>
 					))
 				}
 			</ul>
-			<div class="mt-4 rounded-2xl border border-white/10 bg-ink-200 p-7">
+			<div class="mt-4 rounded-2xl border border-white/10 bg-[#18154E] p-5 sm:p-6 lg:p-7">
 				<h3 class="font-display text-2xl font-semibold text-white">{copy.plans.names.enterprise}</h3>
-				<div class="mt-4 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
-					<p class="min-w-0 flex-1 text-pretty text-neutral-300 sm:max-w-[38rem]">
+				<div class="mt-4 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
+					<p class="min-w-0 flex-1 text-pretty text-white lg:max-w-[38rem]">
 						{copy.plans.blurbs.enterprise}
 					</p>
-					<div class="flex shrink-0 items-center justify-center sm:self-center">
+					<div class="flex w-full shrink-0 items-center lg:w-auto lg:justify-center">
 						<Button
 							href={`mailto:${copy.footer.email}`}
 							plan="enterprise"
-							class="[&_.k-btn-l]:!px-12"
+							class="w-full min-w-0 lg:w-auto [&_.k-btn-l]:flex-1 [&_.k-btn-l]:justify-center [&_.k-btn-l]:px-4 lg:[&_.k-btn-l]:px-10"
 						>
 							{copy.plans.enterpriseCta}
 						</Button>
@@ -729,22 +809,20 @@ const gradientH2 =
 	</section>
 
 	{/* Playbooks */}
-	<section id="playbooks" class:list={[sectionY, 'scroll-mt-28', hairline]}>
-		<div class={glowMist} aria-hidden="true"></div>
+	<section id="playbooks" class:list={[sectionY, 'scroll-mt-28', 'bg-white']}>
 		<div class:list={[shell, 'relative']}>
-			<h2 class={h2}>{wf.playbooks.title}</h2>
-			<p class={lead}>{wf.playbooks.body}</p>
+			<h2 class="w-fit font-display text-[clamp(1.65rem,3.4vw,2.75rem)] leading-[1.08] font-semibold tracking-tight text-balance bg-[linear-gradient(90deg,#00cfff_0%,#7149fb_100%)] text-gradient">
+				{wf.playbooks.title}
+			</h2>
+			<p class="mt-4 text-[0.95rem] leading-relaxed text-pretty text-ink/75 sm:text-base">{wf.playbooks.body}</p>
 			<ul class="mt-10 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
 				{
 					wf.playbooks.items.map((item) => (
 						<li>
-							<a
-								href="#blog"
-								class="flex h-full flex-col rounded-2xl border border-white/10 bg-ink-200 p-5 transition-colors hover:border-primary/40"
-							>
+							<div class="flex h-full flex-col rounded-2xl border border-white/10 bg-[#18154E] p-5">
 								<p class="text-sm text-primary-300">{item.industry}</p>
 								<p class="mt-2 font-display text-base leading-snug font-semibold text-white sm:text-lg">{item.title}</p>
-							</a>
+							</div>
 						</li>
 					))
 				}

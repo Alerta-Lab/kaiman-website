@@ -36,7 +36,7 @@ export const wireframe = {
 			'Pero empezamos a conocer emprendedores, pequeños negocios y profesionales independientes que hoy necesitan las mismas capacidades de marketing, pero de una manera diseñada para la realidad de sus negocios.',
 		body3: 'Kaiman nació para poner ese poder en sus manos.',
 		closing: 'Marketing más inteligente, más accesible y',
-		closingAccent: 'construido alrededor de tu negocio.',
+		closingAccent: 'construido alrededor de tu\u00A0negocio.',
 		imageCaption:
 			'Si eres emprendedor no tienes tiempo extra para aprender marketing. Kaiman llegó para apoyarte.',
 		imageAlt: 'Producción creativa de Alerta',
@@ -259,14 +259,14 @@ export const wireframe = {
 		body3:
 			'Y como todo parte del mismo entendimiento de tu negocio, puedes pasar de una necesidad a una estrategia, de una estrategia a una pieza y de una pieza a una campaña sin empezar de cero cada vez.',
 		items: [
-			{ title: 'Generar imagen, video y música de calidad.', body: '', image: 'section-13-1' },
-			{ title: 'Crear anuncios específicos para tu marca.', body: '', image: 'section-13-2' },
-			{ title: 'Programar campañas en tus redes con calendario.', body: '', image: 'section-13-3' },
-			{ title: 'Analizar tus resultados y mejorar tu desempeño.', body: '', image: 'section-13-4' },
-			{ title: 'Crear tus propios avatares y hablar en cualquier idioma.', body: '', image: 'section-13-5' },
-			{ title: 'Desarrollar websites listos para publicar.', body: '', image: 'section-13-6' },
-			{ title: 'Editar fotos, video y audio.', body: '', image: 'section-13-7' },
-			{ title: 'Analizar tu mercado y encontrar oportunidades de negocio.', body: '', image: 'section-13-8' },
+			{ title: 'Generar imagen, video y música de calidad.', body: '', image: '1' },
+			{ title: 'Crear anuncios específicos para tu marca.', body: '', image: '2' },
+			{ title: 'Programar campañas en tus redes con calendario.', body: '', image: '3' },
+			{ title: 'Analizar tus resultados y mejorar tu desempeño.', body: '', image: '4' },
+			{ title: 'Crear tus propios avatares y hablar en cualquier idioma.', body: '', image: '5' },
+			{ title: 'Desarrollar websites listos para publicar.', body: '', image: '6' },
+			{ title: 'Editar fotos, video y audio.', body: '', image: '7' },
+			{ title: 'Analizar tu mercado y encontrar oportunidades de negocio.', body: '', image: '8' },
 		],
 		categoriesTitle: 'Herramientas para generar',
 		categories: [
@@ -280,7 +280,8 @@ export const wireframe = {
 		],
 	},
 	menos: {
-		title: 'Más capacidad de marketing con menos complejidad, tiempo y esfuerzo.',
+		titleAccent: 'Más capacidad de marketing',
+		titleRest: ' con menos complejidad, tiempo y esfuerzo.',
 		body1: 'Hacer mejor marketing no debería significar agregar más herramientas, más procesos y más cosas que aprender.',
 		body2:
 			'Kaiman reúne las capacidades que necesitas alrededor de un mismo entendimiento de tu negocio para que puedas dedicar menos tiempo a manejar el marketing y más tiempo a hacer crecer tu empresa.',

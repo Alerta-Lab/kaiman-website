@@ -14,25 +14,25 @@ type GalleryBase = {
 const mediaPool: GalleryBase[] = [
 	{
 		kind: 'image',
-		src: asset('/demos/salsana/pieza-2.webp'),
+		src: asset('/hero/output-1.jpg'),
+		tool: 'image',
+		altKey: 'imageAlt',
+	},
+	{
+		kind: 'image',
+		src: asset('/hero/output-2.png'),
+		tool: 'image',
+		altKey: 'sweetAlt',
+	},
+	{
+		kind: 'image',
+		src: asset('/hero/output-3.jpg'),
 		tool: 'image',
 		altKey: 'imageAlt',
 	},
 	{
 		kind: 'video',
-		src: asset('/demos/salsana/pieza-1.mp4'),
-		tool: 'video',
-		altKey: 'videoAlt',
-	},
-	{
-		kind: 'image',
-		src: asset('/demos/salsana/pieza-dulce.webp'),
-		tool: 'image',
-		altKey: 'sweetAlt',
-	},
-	{
-		kind: 'video',
-		src: asset('/demos/salsana/pieza-2.mp4'),
+		src: asset('/video/demo-es.mp4'),
 		tool: 'video',
 		altKey: 'videoAlt',
 	},
@@ -49,11 +49,6 @@ const orientations: GalleryOrientation[] = [
 	'square',
 	'landscape',
 	'portrait',
-	'landscape',
-	'square',
-	'portrait',
-	'landscape',
-	'portrait',
 	'square',
 	'landscape',
 	'portrait',
@@ -65,15 +60,20 @@ const orientations: GalleryOrientation[] = [
 	'square',
 	'landscape',
 	'portrait',
+	'square',
+	'landscape',
+	'portrait',
 	'landscape',
 	'square',
 	'portrait',
 	'landscape',
+	'portrait',
 	'square',
+	'landscape',
 ];
 
 export const galleryItems = orientations.map((orientation, index) => {
-	const media = mediaPool[index % mediaPool.length];
+	const media = mediaPool[index % mediaPool.length]!;
 	return {
 		id: `salsana-${index + 1}`,
 		orientation,

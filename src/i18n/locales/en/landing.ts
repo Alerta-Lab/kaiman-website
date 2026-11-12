@@ -82,10 +82,10 @@ export const landing = {
 			'Every business needs to create marketing constantly. Today more than ever, small and mid-size companies especially need to do it to win customers.',
 		body: 'Most people use artificial intelligence to create their posts. But with every new generation, their brand can lose consistency because the AI does not keep essential details present, such as:',
 		points: [
-			{ label: 'Colors', image: '/brand/point-colors.webp' },
-			{ label: 'Typefaces', image: '/brand/point-type.webp' },
-			{ label: 'Communication tone', image: '/brand/point-tone.webp' },
-			{ label: 'Visual style', image: '/brand/point-style.webp' },
+			{ label: 'Colors', image: '/tools/1.png' },
+			{ label: 'Typefaces', image: '/tools/2.png' },
+			{ label: 'Communication tone', image: '/tools/3.png' },
+			{ label: 'Visual style', image: '/tools/4.png' },
 		],
 		consequence:
 			'Without those details, their content starts to look like everyone else’s and loses something fundamental: what makes their brand unique.',
@@ -118,17 +118,17 @@ export const landing = {
 				images: {
 					left: [
 						{
-							src: '/brand/showcase-salsana.webp',
-							alt: 'Salsana brand piece made with Kaiman context',
+							src: '/audiences/sofia.png',
+							alt: 'Brand piece made with Kaiman context',
 						},
 						{
-							src: '/brand/showcase-carlos.webp',
+							src: '/audiences/carlos.png',
 							alt: 'Carlos brand piece made with Kaiman context',
 						},
 					],
 					right: [
 						{
-							src: '/brand/showcase-martinez.webp',
+							src: '/audiences/martinez.png',
 							alt: 'Martinez profile with a coherent visual identity',
 						},
 					],
