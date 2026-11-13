@@ -80,7 +80,7 @@ const copy =
 					posts.length === 0 ? (
 						<p class="rounded-xl bg-primary-100 p-gap-block font-bold text-primary-900">{copy.empty}</p>
 					) : (
-						<div class="grid gap-gap-block overflow-visible md:grid-cols-2 lg:grid-cols-3 lg:gap-gap-page">
+						<div class="grid grid-cols-1 gap-gap-block overflow-visible md:grid-cols-2 lg:grid-cols-3 lg:gap-gap-page">
 							{posts.map((post) => (
 								<PostCard post={post} locale={locale} />
 							))}

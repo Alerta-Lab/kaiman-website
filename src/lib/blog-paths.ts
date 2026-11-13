@@ -23,6 +23,15 @@ export function blogPostPath(locale: Locale, slug: string) {
 	return localeUrl(locale, `blogs/${slug}`).replace(/\/$/, '');
 }
 
+/** Use the translated article's own slug; unpublished translations are not exposed. */
+export function blogArticleLanguagePaths(locale: Locale, slug: string, sibling: { slug: string; status: string } | null): Record<Locale, string> {
+	const other: Locale = locale === 'es' ? 'en' : 'es';
+	return {
+		[locale]: blogPostPath(locale, slug),
+		[other]: sibling?.status === 'published' ? blogPostPath(other, sibling.slug) : blogIndexPath(other),
+	} as Record<Locale, string>;
+}
+
 /** Business-sector category (one per article). */
 export function blogCategoryPath(locale: Locale, slug: string) {
 	return localeUrl(locale, `blogs/categoria/${slug}`).replace(/\/$/, '');

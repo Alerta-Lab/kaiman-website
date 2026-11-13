@@ -6,9 +6,10 @@ import { listPublishedCategories, categoryDisplayName } from '../../../server/re
 
 interface Props {
 	locale: Locale;
+	languagePaths?: Partial<Record<Locale, string>>;
 }
 
-const { locale } = Astro.props;
+const { locale, languagePaths } = Astro.props;
 const home = blogIndexPath(locale);
 const search = blogSearchPath(locale);
 const categories = (await listPublishedCategories(locale)).slice(0, 6);
@@ -16,14 +17,14 @@ const copy =
 	locale === 'en'
 		? {
 				search: 'Search articles',
-				enter: 'Enter Kaiman',
+				enter: 'Log in',
 				language: 'Language',
 				mainNav: 'Main navigation',
 				categoriesNav: 'Categories',
 			}
 		: {
 				search: 'Buscar artículos',
-				enter: 'Ingresa a Kaiman',
+				enter: 'Ingresar',
 				language: 'Idioma',
 				mainNav: 'Navegación principal',
 				categoriesNav: 'Categorías',
@@ -45,7 +46,7 @@ const copy =
 			<div class="flex items-center gap-3" role="group" aria-label={copy.language}>
 				{
 					locales.map((code) => {
-						const href = swapBlogLocalePath(Astro.url.pathname, code);
+						const href = languagePaths?.[code] ?? swapBlogLocalePath(Astro.url.pathname, code);
 						return (
 							<a
 								href={href}
@@ -64,7 +65,7 @@ const copy =
 			</div>
 			<a
 				href="https://app.kaimanstudio.ai/auth/login"
-				class="inline-flex h-10 items-center rounded-lg bg-primary px-4 text-sm font-bold text-white hover:bg-primary-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+				class="inline-flex h-10 shrink-0 items-center whitespace-nowrap rounded-lg bg-primary px-3 text-sm font-bold text-white hover:bg-primary-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:px-4"
 			>
 				{copy.enter}
 			</a>

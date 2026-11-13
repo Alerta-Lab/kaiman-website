@@ -4,7 +4,7 @@ import PublicFooter from '../../../components/blog/organisms/PublicFooter.astro'
 import PublicHeader from '../../../components/blog/organisms/PublicHeader.astro';
 import { isLocale, locales, type Locale } from '../../../i18n';
 import BlogLayout from '../../../layouts/BlogLayout.astro';
-import { blogIndexPath, blogPostPath } from '../../../lib/blog-paths';
+import { blogArticleLanguagePaths, blogIndexPath, blogPostPath } from '../../../lib/blog-paths';
 import { localeUrl } from '../../../lib/locale-url';
 import { getPublishedPost, getSiblingPost, listPublishedPosts } from '../../../server/repositories/posts';
 
@@ -30,6 +30,7 @@ if (!post) return Astro.redirect(localeUrl(locale, 'blogs'));
 const otherLocale: Locale = locale === 'es' ? 'en' : 'es';
 const sibling = await getSiblingPost(post.translationGroupId, otherLocale);
 const siblingPublished = sibling?.status === 'published' ? sibling : null;
+const languagePaths = blogArticleLanguagePaths(locale, post.slug, sibling);
 
 const canonical = new URL(blogPostPath(locale, post.slug), Astro.site).toString();
 const alternateEs =
@@ -78,7 +79,7 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
 	alternateEs={alternateEs}
 	alternateEn={alternateEn}
 >
-	<PublicHeader locale={locale} />
+	<PublicHeader locale={locale} languagePaths={languagePaths} />
 	<main id="contenido" class="bg-white">
 		<ArticleView post={post} locale={locale} />
 		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />

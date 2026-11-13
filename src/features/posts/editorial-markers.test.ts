@@ -20,4 +20,12 @@ describe('editorial markers', () => {
 		expect(result.match(/STAT HIGHLIGHT/g)).toHaveLength(1);
 		expect(result).toContain('Texto');
 	});
+	it('hides standalone language markers without removing article headings or content', () => {
+		const spanish = cleanEditorialMarkdown('### VERSIÓN EN ESPAÑOL\n\nTexto del artículo.\n\n## Una sección real', 'es');
+		expect(spanish).not.toContain('VERSIÓN EN ESPAÑOL');
+		expect(spanish).toContain('Texto del artículo.');
+		expect(spanish).toContain('## Una sección real');
+		expect(cleanEditorialMarkdown('### ENGLISH VERSION\n\nArticle text.', 'en')).toContain('Article text.');
+		expect(cleanEditorialMarkdown('### ENGLISH VERSION\n\nArticle text.', 'en')).not.toContain('ENGLISH VERSION');
+	});
 });

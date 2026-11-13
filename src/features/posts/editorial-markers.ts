@@ -3,6 +3,8 @@ import type { ImportLocale } from './word-import';
 /** Recognize only standalone production labels; ordinary headings and text stay intact. */
 export function editorialMarker(block: string, locale: ImportLocale): string | null {
 	const trimmed = block.trim();
+	const languageHeading = trimmed.replace(/^#{1,6}\s+/, '').replace(/^(?:__|\*\*)(.*?)(?:__|\*\*)$/, '$1').trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+	if (/^(?:VERSION EN ESPANOL|SPANISH VERSION|ENGLISH VERSION|VERSION EN INGLES)\s*:?$/.test(languageHeading)) return '';
 	const wrapped = /^(?:__|\*\*)([\s\S]*?)(?:__|\*\*)$/.exec(trimmed);
 	if (!wrapped || wrapped[1].includes('\n')) return null;
 	const label = wrapped[1].replace(/\\([!"#$%&'()*+,\-./:;<=>?@[\]\\^_`{|}~])/g, '$1').trim().replace(/\s+/g, ' ').toUpperCase();

@@ -20,6 +20,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode, type
 import { Toast, type ToastTone } from '../../components/blog/molecules/Toast';
 import type { AdminCopy } from '../../i18n/locales/es/admin';
 import { keywordsForSave } from './keyword-save';
+import { ImageUpload } from './ImageUpload';
 
 type ContentLocale = 'es' | 'en';
 type EditorCopy = AdminCopy['editor'];
@@ -542,6 +543,14 @@ export function PostEditor({
 							/>
 						</div>
 					</label>
+					<ImageUpload locale={activeLocale} disabled={busy} onBusyChange={setBusy} label={activeLocale === 'en' ? 'Upload an image for the article' : 'Subir imagen para el contenido'} onUploaded={(url, alt) => {
+						const image = `![${alt.replace(/[\[\]\\]/g, '\\$&')}](${url})`;
+						setDirtyLocales((current) => ({ ...current, [activeLocale]: true }));
+						setVersions((current) => {
+							const content = current[activeLocale].markdown;
+							return { ...current, [activeLocale]: { ...current[activeLocale], markdown: content.includes('[IMAGEN_INTERIOR]') ? content.replace('[IMAGEN_INTERIOR]', image) : `${content.trimEnd()}\n\n${image}` } };
+						});
+					}} />
 				</SectionCard>
 
 				<SectionCard number={3} title={copy.sectionSettings}>
@@ -691,6 +700,7 @@ export function PostEditor({
 								onChange={(e) => updateActive({ coverAlt: e.target.value })}
 							/>
 						</label>
+						<ImageUpload locale={activeLocale} disabled={busy} onBusyChange={setBusy} label={activeLocale === 'en' ? 'Upload cover image' : 'Subir imagen de portada'} onUploaded={(url, alt) => updateActive({ coverUrl: url, coverAlt: alt })} />
 					</div>
 				</SectionCard>
 
