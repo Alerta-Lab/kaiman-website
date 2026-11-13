@@ -6,9 +6,9 @@ import PublicFooter from '../../../components/blog/organisms/PublicFooter.astro'
 import PublicHeader from '../../../components/blog/organisms/PublicHeader.astro';
 import { isLocale, locales, type Locale } from '../../../i18n';
 import BlogLayout from '../../../layouts/BlogLayout.astro';
-import { blogCategoryPath, blogIndexPath } from '../../../lib/blog-paths';
+import { blogIndexPath } from '../../../lib/blog-paths';
 import { localeUrl } from '../../../lib/locale-url';
-import { categoryDisplayName, listPublishedCategories, listPublishedPosts } from '../../../server/repositories/posts';
+import { listPublishedPosts } from '../../../server/repositories/posts';
 
 export function getStaticPaths() {
 	return locales.map((locale) => ({ params: { locale } }));
@@ -18,14 +18,12 @@ const param = Astro.params.locale;
 if (!param || !isLocale(param)) return Astro.redirect(localeUrl('es', 'blogs'));
 const locale = param as Locale;
 
-const [posts, categories] = await Promise.all([
-	listPublishedPosts({ limit: 12, locale }),
-	listPublishedCategories(locale),
-]);
+const posts = await listPublishedPosts({ limit: 12, locale });
 const canonical = new URL(blogIndexPath(locale), Astro.site).toString();
 const alternateEs = new URL(blogIndexPath('es'), Astro.site).toString();
 const alternateEn = new URL(blogIndexPath('en'), Astro.site).toString();
-Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=86400');
+// The list must reflect publishing changes immediately in each language.
+Astro.response.headers.set('Cache-Control', 'no-store');
 
 const copy =
 	locale === 'en'
@@ -35,7 +33,6 @@ const copy =
 				headline: 'Design, technology, and AI without the noise.',
 				support: 'Concrete lessons for useful experiences, product launches, and working with artificial intelligence.',
 				latest: 'Latest articles',
-				byCategory: 'Browse by business type',
 				latestSupport: 'Short, practical reads on product, design, and artificial intelligence.',
 				empty: 'No published articles yet.',
 			}
@@ -45,7 +42,6 @@ const copy =
 				headline: 'Diseño, tecnología e IA sin el ruido.',
 				support: 'Aprendizajes concretos para diseñar experiencias útiles, lanzar productos y trabajar con inteligencia artificial.',
 				latest: 'Últimos artículos',
-				byCategory: 'Explorar por tipo de negocio',
 				latestSupport: 'Lecturas cortas y aplicables sobre producto, diseño e inteligencia artificial.',
 				empty: 'Todavía no hay artículos publicados.',
 			};
@@ -80,20 +76,6 @@ const copy =
 					<Headline as="h2" size="4xl">{copy.latest}</Headline>
 					<Text class="mt-gap-control text-black/75">{copy.latestSupport}</Text>
 				</div>
-				{
-					categories.length > 0 ? (
-						<nav aria-label={copy.byCategory} class="mb-gap-page flex flex-wrap gap-gap-chip">
-							{categories.map((category) => (
-								<a
-									href={blogCategoryPath(locale, category.slug)}
-									class="inline-flex min-h-11 items-center rounded-full border border-primary-300 bg-white px-4 font-bold text-primary-800 hover:border-primary hover:bg-primary-100"
-								>
-									{categoryDisplayName(category, locale)}
-								</a>
-							))}
-						</nav>
-					) : null
-				}
 				{
 					posts.length === 0 ? (
 						<p class="rounded-xl bg-primary-100 p-gap-block font-bold text-primary-900">{copy.empty}</p>
