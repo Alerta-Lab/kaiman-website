@@ -39,21 +39,17 @@ const href = blogPostPath(locale, post.slug);
 					</span>
 				) : null
 			}
-			{
-				post.tags.length > 0 ? (
-					<div class="mb-gap-control flex flex-wrap gap-gap-chip">
-						{post.tags.slice(0, 3).map((tag) => (
-							<span class="rounded-md bg-primary-100 px-2.5 py-1 text-sm font-bold text-primary-800">
-								{tagDisplayName(tag, locale)}
-							</span>
-						))}
-					</div>
-				) : null
-			}
-			<h2 class="font-headline text-xl font-bold leading-snug tracking-tight text-black group-hover:text-primary-800">
+			<div class="mb-gap-control flex h-7 min-w-0 flex-nowrap gap-gap-chip overflow-hidden">
+				{post.tags.slice(0, 3).map((tag) => (
+					<span class="min-w-0 shrink truncate rounded-md bg-primary-100 px-2.5 py-1 text-sm font-bold text-primary-800" title={tagDisplayName(tag, locale)}>
+						{tagDisplayName(tag, locale)}
+					</span>
+				))}
+			</div>
+			<h2 class="line-clamp-4 h-28 font-headline text-xl font-bold leading-7 tracking-tight text-black group-hover:text-primary-800">
 				{post.title}
 			</h2>
-			<p class="mt-gap-control max-w-prose leading-relaxed text-black/75">{post.excerpt}</p>
+			<p class="mt-gap-control line-clamp-4 h-24 max-w-prose leading-6 text-black/75">{post.excerpt}</p>
 			<div class="mt-auto flex items-center justify-between gap-3 pt-gap-block text-sm font-bold text-primary-800">
 				<time datetime={post.publishedAt?.toISOString()}>
 					{new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(post.publishedAt ?? post.createdAt)}
