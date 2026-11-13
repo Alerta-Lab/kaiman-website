@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Post } from './db/schema';
 
-const mock = vi.hoisted(() => ({ generate: vi.fn(), put: vi.fn(), del: vi.fn(), readFile: vi.fn(), transaction: vi.fn(), select: vi.fn(), insert: vi.fn(), update: vi.fn() }));
+const mock = vi.hoisted(() => ({ generate: vi.fn(), put: vi.fn(), del: vi.fn(), list: vi.fn(), getEnv: vi.fn(), readFile: vi.fn(), transaction: vi.fn(), select: vi.fn(), insert: vi.fn(), update: vi.fn() }));
 vi.mock('openai', () => ({ default: class { images = { generate: mock.generate }; } }));
-vi.mock('@vercel/blob', () => ({ put: mock.put, del: mock.del }));
+vi.mock('@vercel/blob', () => ({ put: mock.put, del: mock.del, list: mock.list }));
 vi.mock('node:fs/promises', () => ({ readFile: mock.readFile }));
-vi.mock('./env', () => ({ getEnv: () => 'test-only' }));
+vi.mock('./env', () => ({ getEnv: mock.getEnv }));
 vi.mock('./db/client', () => ({ requireDb: () => ({ transaction: mock.transaction }) }));
 import { generateBlogImages, imagePrompts, uploadLocalBlogImages } from './blog-images';
 
@@ -14,6 +14,8 @@ const post = { id: 'id', translationGroupId: 'group', status: 'draft', title: 'A
 describe('imágenes con Blob', () => {
 	beforeEach(() => {
 		vi.resetAllMocks();
+		mock.getEnv.mockReturnValue('test-only');
+		mock.list.mockResolvedValue({ blobs: [], hasMore: false });
 		mock.generate.mockResolvedValue({ data: [{ b64_json: Buffer.from('image').toString('base64') }] });
 		mock.put.mockImplementation(async (pathname: string, _body: unknown, options: { onUploadProgress?: (value: { percentage: number }) => void }) => { options.onUploadProgress?.({ percentage: 47 }); return { url: `https://example.com/${pathname}`, pathname }; });
 		mock.del.mockResolvedValue(undefined);
@@ -45,6 +47,17 @@ describe('imágenes con Blob', () => {
 		await expect(generateBlogImages({ ...post, editorial: { ...post.editorial!, approvedAt: null } })).rejects.toThrow();
 		expect(mock.generate).not.toHaveBeenCalled();
 		expect(mock.put).not.toHaveBeenCalled();
+	});
+	it('usa OIDC cuando no hay token de escritura y sí hay almacén', async () => {
+		mock.getEnv.mockImplementation((name: string) => name === 'BLOB_READ_WRITE_TOKEN' ? undefined : 'test-only');
+		await generateBlogImages(post);
+		expect(mock.list).toHaveBeenCalledWith({ limit: 1 });
+		expect(mock.put.mock.calls[0][2].token).toBeUndefined();
+	});
+	it('no consume créditos si Blob rechaza la conexión', async () => {
+		mock.list.mockRejectedValue(new Error('Blob no disponible'));
+		await expect(generateBlogImages(post)).rejects.toThrow('Blob no disponible');
+		expect(mock.generate).not.toHaveBeenCalled();
 	});
 	it('envía al modelo las instrucciones que revisó el usuario', async () => {
 		await generateBlogImages(post, '9:16', () => {}, ['Portada revisada', 'Interior revisado']);

@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import OpenAI from 'openai';
-import { del, put } from '@vercel/blob';
+import { del, list, put } from '@vercel/blob';
 import { and, eq } from 'drizzle-orm';
 import { media, posts, type Post } from './db/schema';
 import { requireDb } from './db/client';
@@ -10,6 +10,14 @@ import { getEnv } from './env';
 import type { ImageProgressEvent } from '../features/posts/image-progress';
 
 type BodyAspect = '9:16' | '3:2';
+
+/** Check Blob access before spending credits on image generation. */
+async function verifyBlobAccess() {
+	const token = getEnv('BLOB_READ_WRITE_TOKEN');
+	if (!token && !getEnv('BLOB_STORE_ID')) throw new Error('Vercel Blob no está configurado.');
+	await list({ limit: 1, ...(token ? { token } : {}) });
+	return token;
+}
 
 /**
  * Kaiman house style, distilled from the hero/body images of the published kaimanstudio.ai blog
@@ -62,8 +70,7 @@ export async function generateBlogImages(post: Post, bodyAspect: BodyAspect = '9
 	const prompts = reviewedPrompts ?? defaults;
 	const apiKey = getEnv('OPENAI_API_KEY');
 	if (!apiKey) throw new Error('OpenAI no está configurado.');
-	const blobToken = getEnv('BLOB_READ_WRITE_TOKEN');
-	if (!blobToken) throw new Error('Vercel Blob no está configurado.');
+	const blobToken = await verifyBlobAccess();
 	const client = new OpenAI({ apiKey, timeout: 180_000, maxRetries: 0 });
 	const files: { url: string; pathname: string; filename: string }[] = [];
 	try {
@@ -105,8 +112,7 @@ export async function generateBlogImages(post: Post, bodyAspect: BodyAspect = '9
 
 /** Upload an existing local pair without changing or deleting the original files. */
 export async function uploadLocalBlogImages(post: Post) {
-	const token = getEnv('BLOB_READ_WRITE_TOKEN');
-	if (!token) throw new Error('Vercel Blob no está configurado.');
+	const token = await verifyBlobAccess();
 	const original = [post.coverUrl, post.editorial?.bodyImageUrl];
 	if (!original.every((url) => typeof url === 'string' && /^\/blog-generated\/[0-9a-f-]+\.webp$/i.test(url))) throw new Error('El artículo no tiene dos imágenes locales válidas.');
 	const files: { url: string; pathname: string; filename: string }[] = [];
