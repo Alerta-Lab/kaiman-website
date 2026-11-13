@@ -1,5 +1,5 @@
 ---
-import { Search } from 'lucide-react';
+import { Menu, Search, X } from 'lucide-react';
 import { localeLabels, locales, type Locale } from '../../../i18n';
 import { blogCategoryPath, blogIndexPath, blogSearchPath, swapBlogLocalePath } from '../../../lib/blog-paths';
 import { listPublishedCategories, categoryDisplayName } from '../../../server/repositories/posts';
@@ -13,6 +13,9 @@ const { locale, languagePaths } = Astro.props;
 const home = blogIndexPath(locale);
 const search = blogSearchPath(locale);
 const categories = (await listPublishedCategories(locale)).slice(0, 6);
+const login = 'https://app.kaimanstudio.ai/auth/login';
+const languageHref = (code: Locale) => languagePaths?.[code] ?? swapBlogLocalePath(Astro.url.pathname, code);
+const focusRing = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary';
 const copy =
 	locale === 'en'
 		? {
@@ -21,6 +24,7 @@ const copy =
 				language: 'Language',
 				mainNav: 'Main navigation',
 				categoriesNav: 'Categories',
+				menu: 'Blog menu',
 			}
 		: {
 				search: 'Buscar artículos',
@@ -28,6 +32,7 @@ const copy =
 				language: 'Idioma',
 				mainNav: 'Navegación principal',
 				categoriesNav: 'Categorías',
+				menu: 'Menú del blog',
 			};
 ---
 
@@ -36,17 +41,48 @@ const copy =
 		aria-label={copy.mainNav}
 		class="mx-auto flex h-14 max-w-7xl items-center justify-between gap-gap-control border-b border-primary-200 px-5 lg:px-8"
 	>
-		<a href={home} class="inline-flex items-center gap-2.5 font-headline text-xl font-bold tracking-tight text-black">
+		<a href={home} class="inline-flex items-center gap-2.5 whitespace-nowrap font-headline text-xl font-bold tracking-tight text-black">
 			<img src="/brand/logo.png" alt="" width="32" height="32" class="size-8 rounded-lg bg-black object-contain p-1" />
 			<span>
 				Kaiman <span class="text-primary">Blog</span>
 			</span>
 		</a>
-		<div class="flex items-center gap-3 sm:gap-4">
+		<details class="group md:hidden">
+			<summary class:list={['flex size-11 cursor-pointer list-none items-center justify-center rounded-lg bg-primary-100 text-primary-800 [&::-webkit-details-marker]:hidden', focusRing]}>
+				<span class="sr-only">{copy.menu}</span>
+				<Menu aria-hidden="true" size={22} className="group-open:hidden" />
+				<X aria-hidden="true" size={22} className="hidden group-open:block" />
+			</summary>
+			<div class="absolute inset-x-0 top-full max-h-[calc(100dvh-3.5rem)] space-y-4 overflow-y-auto border-t border-primary-200 bg-white px-5 py-4 shadow-lg">
+				{categories.length > 0 && (
+					<div role="group" aria-label={copy.categoriesNav} class="border-b border-primary-200 pb-2">
+						{categories.slice(0, 3).map((category) => (
+							<a href={blogCategoryPath(locale, category.slug)} class:list={['flex min-h-11 items-center rounded-lg px-2 text-sm font-bold text-primary-800 hover:bg-primary-100', focusRing]}>
+								{categoryDisplayName(category, locale)}
+							</a>
+						))}
+					</div>
+				)}
+				<a href={login} class:list={['flex min-h-11 w-full items-center justify-center rounded-lg bg-primary px-4 text-sm font-bold text-white hover:bg-primary-700', focusRing]}>{copy.enter}</a>
+				<div class="flex items-stretch gap-2">
+					<div role="group" aria-label={copy.language} class="flex shrink-0 gap-2">
+						{locales.map((code) => (
+							<a href={languageHref(code)} hreflang={code} aria-current={code === locale ? 'true' : undefined} class:list={['inline-flex min-h-11 items-center rounded-lg border border-primary-200 px-2 text-sm font-bold text-primary-800 hover:bg-primary-100 aria-[current=true]:bg-primary-100 aria-[current=true]:underline', focusRing]}>
+								{localeLabels[code]}
+							</a>
+						))}
+					</div>
+					<a href={search} class:list={['flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-lg border border-primary-200 px-2 py-1 text-sm font-bold leading-tight text-primary-800 hover:bg-primary-100', focusRing]}>
+						<Search aria-hidden="true" size={16} className="shrink-0" /> <span>{copy.search}</span>
+					</a>
+				</div>
+			</div>
+		</details>
+		<div class="hidden items-center gap-4 md:flex">
 			<div class="flex items-center gap-3" role="group" aria-label={copy.language}>
 				{
 					locales.map((code) => {
-						const href = languagePaths?.[code] ?? swapBlogLocalePath(Astro.url.pathname, code);
+						const href = languageHref(code);
 						return (
 							<a
 								href={href}
@@ -64,14 +100,14 @@ const copy =
 				}
 			</div>
 			<a
-				href="https://app.kaimanstudio.ai/auth/login"
+				href={login}
 				class="inline-flex h-10 shrink-0 items-center whitespace-nowrap rounded-lg bg-primary px-3 text-sm font-bold text-white hover:bg-primary-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:px-4"
 			>
 				{copy.enter}
 			</a>
 		</div>
 	</nav>
-	<div class="bg-primary-100/50">
+	<div class="hidden bg-primary-100/50 md:block">
 		<nav
 			aria-label={copy.categoriesNav}
 			class="mx-auto flex h-8 max-w-7xl items-center gap-gap-control px-5 lg:px-8"
@@ -98,5 +134,4 @@ const copy =
 		</nav>
 	</div>
 </header>
-{/* Spacer: main h-14 (56) + mini h-8 (32) = 88px */}
-<div class="h-[5.5rem]" aria-hidden="true"></div>
+<div class="h-14 md:h-[5.5rem]" aria-hidden="true"></div>
