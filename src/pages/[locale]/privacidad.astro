@@ -1,4 +1,5 @@
 ---
+import LegalDocument from '../../components/common/LegalDocument.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import SiteHeader from '../../components/layout/SiteHeader.astro';
 import { getLanding, isLocale, locales, type Locale } from '../../i18n';
@@ -15,13 +16,18 @@ const param = Astro.params.locale;
 if (!param || !isLocale(param)) return Astro.redirect(localeUrl('es'));
 const locale = param as Locale;
 const copy = getLanding(locale);
+const doc = copy.privacy;
 ---
 
-<BaseLayout locale={locale} title={`${copy.privacy.title} · ${copy.meta.title}`} description={copy.privacy.body}>
+<BaseLayout locale={locale} title={`${doc.title} · ${copy.meta.title}`} description={doc.description}>
 	<SiteHeader locale={locale} />
-	<main id="contenido" class="mx-auto max-w-copy px-4 pt-24 pb-16 sm:px-6">
-		<h1 class="text-4xl font-semibold text-balance">{copy.privacy.title}</h1>
-		<p class="mt-6 text-lg text-pretty text-neutral-300">{copy.privacy.body}</p>
-	</main>
+	<LegalDocument
+		title={doc.title}
+		updated={doc.updated}
+		intro={doc.intro}
+		sections={doc.sections}
+		contactHeading={doc.contactHeading}
+		contactBody={doc.contactBody}
+	/>
 	<SiteFooter locale={locale} />
 </BaseLayout>

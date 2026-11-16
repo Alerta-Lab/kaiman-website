@@ -527,7 +527,7 @@ export const landing = {
 		alerta: 'Alerta',
 		instagram: 'Instagram',
 		address: '535 5th Ave, New York NY 10017',
-		email: 'hello@alertacreative.com',
+		email: 'info@kaimanstudio.ai',
 		phone: '+1 (586) 202-4830',
 		studio: 'Kaiman Studio',
 		lead: 'Better marketing, built around your business.',
@@ -554,12 +554,182 @@ export const landing = {
 		assistant: 'Assistant',
 	},
 	privacy: {
-		title: 'Privacy',
-		body: 'This page describes the Kaiman product. It does not install third-party advertising. Account data is managed at app.kaimanstudio.ai. For a data request, write to hello@alertacreative.com.',
+		title: 'Privacy policy',
+		description:
+			'How Kaiman Studio and this site handle personal data, cookies, analytics, and contact rights.',
+		updated: 'Last updated: November 16, 2026',
+		intro:
+			'This policy explains how Alerta Creative (“we”) handles personal information when you visit kaimanstudio.ai, use materials related to Kaiman Studio, or contact us. The product with user accounts is provided at app.kaimanstudio.ai; additional notices may apply there when you create or use an account.',
+		sections: [
+			{
+				heading: '1. Who we are',
+				paragraphs: [
+					'Kaiman Studio is an AI marketing software product operated in connection with Alerta Creative. Contact: info@kaimanstudio.ai · 535 5th Ave, New York, NY 10017 · +1 (586) 202-4830.',
+					'Sites covered by this policy: the public site kaimanstudio.ai (landing, blog, and informational pages) and, where we receive or process data to or from the product, app.kaimanstudio.ai.',
+				],
+			},
+			{
+				heading: '2. What data we may process',
+				paragraphs: ['Depending on how you use our services, we may process:'],
+				bullets: [
+					'Browsing and device data: IP address, browser type, pages viewed, referrer, language, and similar technical data.',
+					'Contact or support data: name, email, and message content you send us (form, email, or site assistance chat, if enabled).',
+					'Account and product usage data (in the app): account identifiers, preferences, brands or content you upload, and usage logs needed to provide the service, bill credits, and support you.',
+					'Payment data: processed by payment providers; we do not store full card numbers on this marketing site.',
+				],
+			},
+			{
+				heading: '3. How we use data',
+				paragraphs: ['We use information to:'],
+				bullets: [
+					'Operate, maintain, and improve the site and Kaiman Studio.',
+					'Respond to inquiries and provide support.',
+					'Measure site audience and performance (for example with Google Analytics 4) and measure or optimize advertising campaigns (for example Google Ads / Google tag) when configured in the published environment.',
+					'Meet legal obligations, prevent abuse, and protect service security.',
+					'Manage trials, subscriptions, credits, and billing on the platform.',
+				],
+			},
+			{
+				heading: '4. Cookies, tags, and similar technologies',
+				paragraphs: [
+					'This site may use cookies or equivalent technologies needed for technical operation, and Google measurement or advertising tags (for example Google Analytics, Google Ads, or Google Tag Manager identifiers) when they are active in the published environment.',
+					'You can control cookies in your browser settings. Blocking certain cookies may affect measurement or platform features.',
+				],
+			},
+			{
+				heading: '5. Legal bases and retention',
+				paragraphs: [
+					'We process data to provide the requested service, based on our contractual or pre-contractual relationship with you, our legitimate interest in operating and improving the product and site, legal obligations, or your consent when required by law (for example for certain cookie uses or communications).',
+					'We keep information as long as needed for the purposes described, for legal or accounting requirements, or while you keep an active account, unless law allows or requires a different period.',
+				],
+			},
+			{
+				heading: '6. Processors and transfers',
+				paragraphs: [
+					'We may use providers that process data on our behalf (hosting, analytics, email, payments, AI infrastructure, or other technical services). We require appropriate safeguards for the type of service.',
+					'If personal data is transferred internationally, we apply safeguards required under applicable law and our contracts with those providers.',
+				],
+			},
+			{
+				heading: '7. AI-generated content',
+				paragraphs: [
+					'Kaiman Studio may generate or transform text, images, audio, video, or other materials from instructions and assets you provide. You are responsible for what you input and how you use outputs. Do not use the service to process third-party personal data without a legal basis, or for unlawful content.',
+				],
+			},
+			{
+				heading: '8. Your rights',
+				paragraphs: [
+					'Depending on applicable law, you may request access, correction, update, deletion, restriction or objection to processing, and portability where available. You may also withdraw consent when processing is based on consent.',
+					'To exercise rights or ask a privacy question, write to info@kaimanstudio.ai. We may ask for reasonable information to verify your identity. If the request concerns account data in the app, say so we can locate it.',
+				],
+			},
+			{
+				heading: '9. Children',
+				paragraphs: [
+					'Kaiman Studio and this site are intended for professionals and businesses. They are not directed to anyone under 18. If you believe a minor has provided us data, contact us so we can review.',
+				],
+			},
+			{
+				heading: '10. Changes',
+				paragraphs: [
+					'We may update this policy. The “Last updated” date shows the current version. For material changes, we may provide notice on the site or by other reasonable means.',
+				],
+			},
+		],
+		contactHeading: '11. Contact',
+		contactBody:
+			'Privacy and personal data: info@kaimanstudio.ai. Postal address: 535 5th Ave, New York, NY 10017. Phone: +1 (586) 202-4830.',
 	},
 	terms: {
-		title: 'Terms',
-		body: 'The plans, credits, and seats described here summarize the public Kaiman Studio offer. Signup and payment are completed on the platform. For contract terms, write to hello@alertacreative.com.',
+		title: 'Terms of service',
+		description:
+			'Terms of use for kaimanstudio.ai and the Kaiman Studio service, including the 14-day free trial.',
+		updated: 'Last updated: November 16, 2026',
+		intro:
+			'These terms govern use of the public site kaimanstudio.ai and, where applicable, access to Kaiman Studio at app.kaimanstudio.ai. By using the site or creating an account, you agree to these terms. If you do not agree, do not use the service.',
+		sections: [
+			{
+				heading: '1. The service',
+				paragraphs: [
+					'Kaiman Studio is a software platform that helps create and organize marketing materials with AI tools, aimed at brands and teams. The kaimanstudio.ai site describes the product, plans, and related content (including the blog).',
+					'Features, plans, credits, and prices published on the site are informational and may change. Signup, purchase, and payment are completed on the platform or through channels we indicate.',
+				],
+			},
+			{
+				heading: '2. Account and eligibility',
+				paragraphs: [
+					'To use the app you must register with accurate information and keep your credentials confidential. You are responsible for activity under your account.',
+					'The service is intended for professional or business use. You must have legal capacity to accept these terms.',
+				],
+			},
+			{
+				heading: '3. Free trial',
+				paragraphs: [
+					'We offer a 14-day free trial to create an account and review the product. Credits, limits, or features included in the trial are confirmed at registration or in the product interface.',
+					'We may modify, suspend, or withdraw the trial, or refuse it in cases of abuse, fraud, or breach. When the trial ends, paid access or suspension of paid features follows the plan you choose and the platform rules.',
+				],
+			},
+			{
+				heading: '4. Plans, credits, and payments',
+				paragraphs: [
+					'Plans (for example Starter, Pro, Business, or Enterprise) describe brand seats, seats, or other limits as published. Credits are the unit of use for generation tools or other quota-consuming features.',
+					'Prices, taxes, billing cycles, and payment methods appear in the platform checkout flow. Unless law or a written offer says otherwise, charges for started periods or consumed credits are non-refundable.',
+				],
+			},
+			{
+				heading: '5. Acceptable use',
+				paragraphs: ['You agree not to:'],
+				bullets: [
+					'Use the service unlawfully, deceptively, or in ways that infringe third-party rights (including intellectual property and privacy).',
+					'Attempt unauthorized access to systems, accounts, or others’ data, or interfere with security or availability of the service.',
+					'Abuse the trial, create mass accounts, or circumvent credit or plan limits.',
+					'Upload malware or content that violates the law.',
+				],
+			},
+			{
+				heading: '6. Content and intellectual property',
+				paragraphs: [
+					'You retain rights in materials you submit to Kaiman (brands, text, images, and so on), and you grant us a limited license to process them only as needed to provide the service.',
+					'Kaiman, Kaiman Studio, the brand, software, and site materials are owned by Alerta Creative or its licensors. No license is granted except as needed to use the service under these terms.',
+					'AI outputs may not be unique. You are responsible for reviewing, editing, and deciding public use of those outputs, and for obtaining permissions when required.',
+				],
+			},
+			{
+				heading: '7. Third-party services and AI',
+				paragraphs: [
+					'The service may rely on cloud, AI model, analytics, advertising, or payment providers. Their availability and policies may affect specific features.',
+					'AI outputs may contain errors or omissions. They do not replace professional advice (legal, medical, financial, or otherwise).',
+				],
+			},
+			{
+				heading: '8. Availability and changes',
+				paragraphs: [
+					'We work to keep the site and platform available, but we do not guarantee uninterrupted or error-free operation. We may change features, limits, or these terms; material changes will appear on this page or in the app.',
+				],
+			},
+			{
+				heading: '9. Suspension and termination',
+				paragraphs: [
+					'You may stop using the service and, where the platform allows, close your account. We may suspend or end access if you breach these terms, if there is a security or fraud risk, or if required by law.',
+				],
+			},
+			{
+				heading: '10. Limitation of liability',
+				paragraphs: [
+					'To the extent permitted by applicable law, the site and Kaiman Studio are provided “as is” and “as available.” We are not liable for indirect damages, lost profits, data loss, or business interruption arising from use or inability to use the service, except for willful misconduct or where liability cannot be limited by law.',
+					'Our aggregate liability related to the service is limited, to the extent permitted, to amounts you paid for Kaiman Studio in the three (3) months before the claim arose, or to zero if you used only the free trial with no payment.',
+				],
+			},
+			{
+				heading: '11. Governing law',
+				paragraphs: [
+					'Unless mandatory law provides otherwise, these terms are interpreted under the laws applicable in the State of New York, United States, without affecting non-waivable rights you may have in your place of residence.',
+				],
+			},
+		],
+		contactHeading: '12. Contact',
+		contactBody:
+			'Questions about these terms or contracting: info@kaimanstudio.ai · 535 5th Ave, New York, NY 10017 · +1 (586) 202-4830. Platform: app.kaimanstudio.ai.',
 	},
 	notFound: {
 		title: 'This page is not here',

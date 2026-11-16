@@ -12,6 +12,18 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-16 — Legal: ancho de lectura
+
+- `LegalDocument`: `max-w-3xl` / `lg:max-w-4xl` + más padding X (`px-6` → `sm:px-10` → `lg:px-12`).
+
+### 2026-11-16 — Contacto legal info@
+
+- Footer + privacidad/términos: correo de contacto/soporte `info@kaimanstudio.ai`.
+
+### 2026-11-16 — Políticas legales completas
+
+- `/privacidad` y `/terminos`: documentos seccionados ES/EN (Alerta Creative, cookies/GTM-GA-Ads, prueba 14 días, créditos, IA). Componente `LegalDocument.astro`.
+
 ### 2026-11-16 — Ads compliance: legal + trial 14d
 
 - Footer landing: links reales a `/privacidad` y `/terminos`.
