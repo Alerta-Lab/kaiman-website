@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import GoogleTag from '../components/common/GoogleTag.astro';
 import type { Locale } from '../i18n';
 
 interface Props {
@@ -29,7 +30,6 @@ const {
 	atmosphere = 'light',
 } = Astro.props;
 const night = atmosphere === 'night';
-const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
 const defaultImage = new URL('/og-default.png', Astro.site).toString();
 const socialImage = image ? new URL(image, Astro.site).toString() : defaultImage;
 ---
@@ -64,17 +64,7 @@ const socialImage = image ? new URL(image, Astro.site).toString() : defaultImage
 		<meta name="twitter:card" content="summary_large_image" />
 		<meta name="twitter:image" content={socialImage} />
 		<link rel="alternate" type="application/rss+xml" title="Kaiman Blog" href="/rss.xml" />
-		{gaId && (
-			<>
-				<script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
-				<script is:inline define:vars={{ gaId }}>
-					window.dataLayer = window.dataLayer || [];
-					function gtag(){dataLayer.push(arguments);}
-					gtag('js', new Date());
-					gtag('config', gaId, { anonymize_ip: true });
-				</script>
-			</>
-		)}
+		<GoogleTag placement="head" />
 	</head>
 	<body
 		class:list={[
@@ -82,6 +72,7 @@ const socialImage = image ? new URL(image, Astro.site).toString() : defaultImage
 			night ? 'bg-[#01001E] text-white' : 'bg-white text-black',
 		]}
 	>
+		<GoogleTag placement="body" />
 		{
 			night ? (
 				<div
