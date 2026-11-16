@@ -1,39 +1,56 @@
 ---
 /**
- * Google tag platform: gtag.js (G- / AW- / …) or Tag Manager (GTM-).
- * Use placement="head" in <head> and placement="body" right after <body>.
+ * Google tag (gtag.js) for Ads (AW-) + GA4 (G-), and optional Tag Manager (GTM-).
+ * Head: scripts. Body: GTM noscript only.
  * @see https://developers.google.com/tag-platform/gtagjs
- * @see https://developers.google.com/tag-platform/tag-manager/web
  */
 interface Props {
 	placement?: 'head' | 'body';
 }
 
 const { placement = 'head' } = Astro.props;
-const tagId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID?.trim() ?? '';
-const isGtm = /^GTM-[A-Z0-9]+$/i.test(tagId);
-const isGtag = Boolean(tagId) && !isGtm;
+
+const adsId = import.meta.env.PUBLIC_GOOGLE_ADS_ID?.trim() ?? '';
+const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID?.trim() ?? '';
+const gtmId = import.meta.env.PUBLIC_GTM_ID?.trim() ?? '';
+
+/** Prefer dedicated Ads ID; allow a lone AW- value in PUBLIC_GA_MEASUREMENT_ID. */
+const googleAdsId = /^AW-/i.test(adsId) ? adsId : /^AW-/i.test(gaId) ? gaId : '';
+const ga4Id = /^G-/i.test(gaId) ? gaId : '';
+const tagManagerId = /^GTM-/i.test(gtmId) ? gtmId : /^GTM-/i.test(gaId) && !ga4Id && !googleAdsId ? gaId : '';
+
+const gtagIds = [googleAdsId, ga4Id].filter(Boolean);
+const primaryGtagId = gtagIds[0] ?? '';
+const hasGtag = gtagIds.length > 0;
+const hasGtm = Boolean(tagManagerId);
+
+const linkerDomains = ['kaimanstudio.ai', 'app.kaimanstudio.ai'] as const;
 ---
 
 {
-	placement === 'head' && isGtag ? (
+	placement === 'head' && hasGtag ? (
 		<>
-			<script async src={`https://www.googletagmanager.com/gtag/js?id=${tagId}`}></script>
-			<script is:inline define:vars={{ tagId }}>
+			<script async src={`https://www.googletagmanager.com/gtag/js?id=${primaryGtagId}`}></script>
+			<script is:inline define:vars={{ gtagIds, linkerDomains }}>
 				window.dataLayer = window.dataLayer || [];
 				function gtag() {
 					dataLayer.push(arguments);
 				}
 				gtag('js', new Date());
-				gtag('config', tagId, { anonymize_ip: true });
+				for (const id of gtagIds) {
+					gtag('config', id, {
+						anonymize_ip: true,
+						linker: { domains: linkerDomains },
+					});
+				}
 			</script>
 		</>
 	) : null
 }
 
 {
-	placement === 'head' && isGtm ? (
-		<script is:inline define:vars={{ tagId }}>
+	placement === 'head' && hasGtm ? (
+		<script is:inline define:vars={{ tagManagerId }}>
 			(function (w, d, s, l, i) {
 				w[l] = w[l] || [];
 				w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
@@ -43,16 +60,16 @@ const isGtag = Boolean(tagId) && !isGtm;
 				j.async = true;
 				j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
 				f.parentNode.insertBefore(j, f);
-			})(window, document, 'script', 'dataLayer', tagId);
+			})(window, document, 'script', 'dataLayer', tagManagerId);
 		</script>
 	) : null
 }
 
 {
-	placement === 'body' && isGtm ? (
+	placement === 'body' && hasGtm ? (
 		<noscript>
 			<iframe
-				src={`https://www.googletagmanager.com/ns.html?id=${tagId}`}
+				src={`https://www.googletagmanager.com/ns.html?id=${tagManagerId}`}
 				height="0"
 				width="0"
 				style="display:none;visibility:hidden"

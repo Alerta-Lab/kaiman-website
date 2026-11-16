@@ -391,7 +391,7 @@ export const wireframe = {
 			},
 			{
 				q: '¿Qué incluye la prueba gratis?',
-				a: 'Los detalles sobre duración, créditos y funciones de la prueba se confirmarán aquí.',
+				a: 'Incluye 14 días de prueba gratis para crear una cuenta y revisar el producto. El detalle de créditos disponibles se confirma al registrarte en la plataforma.',
 			},
 			{
 				q: '¿Puedo conectar mis redes sociales a Kaiman?',

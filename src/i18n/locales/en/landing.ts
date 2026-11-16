@@ -490,7 +490,7 @@ export const landing = {
 			},
 			{
 				q: 'What does the free trial include?',
-				a: 'You can create an account and review the product. Trial length and credits are confirmed when you register on the platform.',
+				a: 'It includes a 14-day free trial to create an account and review the product. Available credits are confirmed when you register on the platform.',
 			},
 			{
 				q: 'Can I connect my social networks to Kaiman?',

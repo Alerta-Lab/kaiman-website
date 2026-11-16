@@ -1,5 +1,6 @@
 ---
 import { BookOpen, Home, Languages } from 'lucide-react';
+import GoogleTag from '../components/common/GoogleTag.astro';
 import Button from '../components/ui/Button.astro';
 import { asset } from '../lib/asset';
 import '../styles/global.css';
@@ -21,10 +22,12 @@ const blogHome = `${base}es/blogs/`;
 		<link rel="icon" type="image/png" href={asset('/brand/favicon.png')} />
 		<link rel="icon" href={asset('/favicon.ico')} />
 		<title>Página no encontrada — Kaiman</title>
+		<GoogleTag placement="head" />
 	</head>
 	<body
 		class="min-h-full overflow-x-clip bg-ink bg-[radial-gradient(ellipse_at_top_left,rgba(107,72,233,0.42),transparent_52%),radial-gradient(ellipse_at_80%_20%,rgba(219,39,119,0.22),transparent_46%),radial-gradient(ellipse_at_bottom,rgba(8,145,178,0.16),transparent_40%)] font-sans font-semibold text-white antialiased"
 	>
+		<GoogleTag placement="body" />
 		<a
 			href="#contenido"
 			class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:rounded-lg focus:bg-primary focus:px-3 focus:py-2 focus:text-sm focus:font-semibold"

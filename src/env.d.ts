@@ -8,7 +8,9 @@ interface ImportMetaEnv {
 	readonly GA4_PROPERTY_ID?: string;
 	readonly GOOGLE_SERVICE_ACCOUNT_JSON?: string;
 	readonly PUBLIC_SITE_URL?: string;
+	readonly PUBLIC_GOOGLE_ADS_ID?: string;
 	readonly PUBLIC_GA_MEASUREMENT_ID?: string;
+	readonly PUBLIC_GTM_ID?: string;
 	readonly ADMIN_EMAIL?: string;
 	readonly ADMIN_PASSWORD?: string;
 	readonly SESSION_SECRET?: string;

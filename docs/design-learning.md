@@ -12,6 +12,12 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-16 — Ads compliance: legal + trial 14d
+
+- Footer landing: links reales a `/privacidad` y `/terminos`.
+- FAQ prueba gratis: menciona explícitamente **14 días** (ES/EN wireframe + landing).
+- Google tag: `PUBLIC_GOOGLE_ADS_ID` (AW) + `PUBLIC_GA_MEASUREMENT_ID` (G-) en layouts; conversión trial es en la app Next.
+
 ### 2026-11-12 — Problem compare PNG con radio
 
 - `problem/01–06.png` (radio en asset, alpha); JPG eliminados. pngquant+oxipng ~412–644KB. Markup sin `rounded` en frames; rutas `.png`.
