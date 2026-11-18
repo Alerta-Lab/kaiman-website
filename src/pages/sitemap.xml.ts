@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { blogCategoryPath, blogIndexPath, blogPostPath, blogTagPath } from '../lib/blog-paths';
+import { productionSiteOrigin } from '../lib/site-origin.mjs';
 import { listPublishedCategories, listPublishedPosts, listTags } from '../server/repositories/posts';
 
 const escape = (value: string) => value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
@@ -12,7 +13,7 @@ export const GET: APIRoute = async ({ site }) => {
 		listPublishedCategories('es'),
 		listPublishedCategories('en'),
 	]);
-	const base = site ?? new URL('http://localhost:4321');
+	const base = site ?? productionSiteOrigin;
 	const urls = [
 		{ loc: new URL('/es/', base).toString(), modified: new Date() },
 		{ loc: new URL('/en/', base).toString(), modified: new Date() },

@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { blogPostPath } from '../lib/blog-paths';
+import { productionSiteOrigin } from '../lib/site-origin.mjs';
 import { listPublishedPosts } from '../server/repositories/posts';
 
 const escape = (value: string) =>
@@ -13,7 +14,7 @@ export const GET: APIRoute = async ({ site }) => {
 	const posts = [...esPosts, ...enPosts].sort(
 		(a, b) => (b.publishedAt ?? b.createdAt).getTime() - (a.publishedAt ?? a.createdAt).getTime(),
 	);
-	const base = site ?? new URL('http://localhost:4321');
+	const base = site ?? productionSiteOrigin;
 	const xml = `<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>Kaiman Blog</title><link>${base}</link><description>Diseño, tecnología e inteligencia artificial.</description>${posts
 		.map(
 			(post) =>

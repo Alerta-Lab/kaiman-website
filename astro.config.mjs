@@ -3,11 +3,13 @@ import react from '@astrojs/react';
 import vercel from '@astrojs/vercel';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
+import { productionSiteOrigin } from './src/lib/site-origin.mjs';
 
 const githubPages = process.env.GITHUB_PAGES === 'true';
-const site =
-	process.env.PUBLIC_SITE_URL ??
-	(githubPages ? 'https://alerta-lab.github.io' : 'http://localhost:4321');
+const configuredSite = process.env.PUBLIC_SITE_URL?.trim();
+const site = githubPages
+	? configuredSite || 'https://alerta-lab.github.io'
+	: productionSiteOrigin;
 
 // https://astro.build/config
 export default defineConfig({
