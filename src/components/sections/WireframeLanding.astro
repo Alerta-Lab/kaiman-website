@@ -154,7 +154,10 @@ const gradientLabel =
 				<p class="mt-5 max-w-xl text-base leading-relaxed text-pretty text-neutral-300 sm:text-lg">{wf.hero.body1}</p>
 				<p class="mt-3 max-w-xl text-base leading-relaxed text-pretty text-neutral-300 sm:text-lg">{wf.hero.body2}</p>
 				<div class="mt-7 flex flex-wrap gap-3">
-					<Button href={signupUrl}>{wf.hero.cta}</Button>
+					<div class="flex flex-col items-start gap-2">
+						<Button href={signupUrl}>{wf.hero.cta}</Button>
+						<p class="text-sm font-medium text-neutral-300">{wf.hero.trial}</p>
+					</div>
 					<Button href="#brand-understanding" variant="secondary">{wf.hero.secondaryCta}</Button>
 				</div>
 				<p class="mt-3 text-sm text-neutral-400">{wf.hero.note}</p>

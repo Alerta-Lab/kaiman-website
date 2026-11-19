@@ -1,6 +1,6 @@
 export const landing = {
 	meta: {
-		title: 'Kaiman',
+		title: 'Kaiman | Marketing con IA para tu negocio',
 		description:
 			'Kaiman es una plataforma de inteligencia artificial que aprende sobre tu negocio, entiende tu marca y te ayuda a crear estrategias, campañas, imágenes, videos, sitios web y más.',
 	},
@@ -489,7 +489,7 @@ export const landing = {
 			},
 			{
 				q: '¿Qué incluye la prueba gratis?',
-				a: 'Incluye 14 días de prueba gratis para crear una cuenta y revisar el producto. El detalle de créditos disponibles se confirma al registrarte en la plataforma.',
+				a: 'La prueba gratis incluye 14 días y 300 créditos para explorar las funciones de Kaiman y crear contenido para tu negocio.',
 			},
 			{
 				q: '¿Puedo conectar mis redes sociales a Kaiman?',

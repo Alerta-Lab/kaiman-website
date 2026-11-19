@@ -2,7 +2,8 @@
 import WireframeLanding from '../../components/sections/WireframeLanding.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import SiteHeader from '../../components/layout/SiteHeader.astro';
-import { getLanding, isLocale, locales, type Locale } from '../../i18n';
+import { getLanding, getWireframe, isLocale, locales, type Locale } from '../../i18n';
+import { plans, signupUrl } from '../../lib/plans';
 import { localeUrl } from '../../lib/locale-url';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
@@ -18,9 +19,45 @@ if (!param || !isLocale(param)) {
 
 const locale = param as Locale;
 const copy = getLanding(locale);
+const wf = getWireframe(locale);
+const origin = new URL('/', Astro.site).toString();
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+const structuredData = {
+	'@context': 'https://schema.org',
+	'@graph': [
+		{
+			'@type': 'Organization',
+			'@id': `${origin}#organization`,
+			name: 'Kaiman',
+			url: origin,
+			logo: new URL('/brand/logo.png', origin).toString(),
+		},
+		{
+			'@type': 'SoftwareApplication',
+			'@id': `${origin}#software`,
+			name: 'Kaiman',
+			url: canonical,
+			description: copy.meta.description,
+			applicationCategory: 'BusinessApplication',
+			operatingSystem: 'Web',
+			publisher: { '@id': `${origin}#organization` },
+			offers: { '@type': 'Offer', price: plans[0].monthlyUsd, priceCurrency: 'USD', url: signupUrl },
+		},
+		{
+			'@type': 'FAQPage',
+			'@id': `${canonical}#preguntas`,
+			inLanguage: locale === 'es' ? 'es-419' : 'en',
+			mainEntity: wf.faq.items.map(({ q, a }) => ({
+				'@type': 'Question', name: q,
+				acceptedAnswer: { '@type': 'Answer', text: a },
+			})),
+		},
+	],
+};
 ---
 
 <BaseLayout locale={locale} title={copy.meta.title} description={copy.meta.description}>
+	<script slot="structured-data" type="application/ld+json" set:html={JSON.stringify(structuredData).replaceAll('<', '\\u003c')} />
 	<SiteHeader locale={locale} />
 	<WireframeLanding locale={locale} />
 	<SiteFooter locale={locale} />

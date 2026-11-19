@@ -3,5 +3,5 @@ import { defaultLocale } from '../i18n';
 import { localeUrl } from '../lib/locale-url';
 
 // Must include Astro `base` (e.g. /kaiman-website/) for GitHub project Pages.
-return Astro.redirect(localeUrl(defaultLocale));
+return Astro.redirect(localeUrl(defaultLocale), 301);
 ---

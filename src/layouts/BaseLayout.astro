@@ -11,6 +11,7 @@ interface Props {
 }
 
 const { locale, title, description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 const socialImage = 'https://cmylqqaypknpci5z.public.blob.vercel-storage.com/images/5f788c45-c0da-42ca-95b8-7f48eea5172d-kaiman-og.png';
 ---
 
@@ -20,6 +21,9 @@ const socialImage = 'https://cmylqqaypknpci5z.public.blob.vercel-storage.com/ima
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:locale" content={locale === 'es' ? 'es_419' : 'en_US'} />
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
 		<meta property="og:type" content="website" />
@@ -32,6 +36,7 @@ const socialImage = 'https://cmylqqaypknpci5z.public.blob.vercel-storage.com/ima
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 		<GoogleTag placement="head" />
+		<slot name="structured-data" />
 	</head>
 	<body
 		class="min-h-full overflow-x-clip bg-ink bg-[radial-gradient(ellipse_at_top_left,rgba(107,72,233,0.42),transparent_52%),radial-gradient(ellipse_at_80%_20%,rgba(219,39,119,0.22),transparent_46%),radial-gradient(ellipse_at_bottom,rgba(8,145,178,0.16),transparent_40%)] font-sans font-semibold text-white antialiased"

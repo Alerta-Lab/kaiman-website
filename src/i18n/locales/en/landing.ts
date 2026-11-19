@@ -2,7 +2,7 @@ import type { LandingCopy } from '../es/landing';
 
 export const landing = {
 	meta: {
-		title: 'Kaiman',
+		title: 'Kaiman | AI Marketing for Your Business',
 		description:
 			'Kaiman is an artificial intelligence platform that learns about your business, understands your brand, and helps you create strategies, campaigns, images, videos, websites, and more.',
 	},
@@ -490,7 +490,7 @@ export const landing = {
 			},
 			{
 				q: 'What does the free trial include?',
-				a: 'It includes a 14-day free trial to create an account and review the product. Available credits are confirmed when you register on the platform.',
+				a: 'The free trial includes 14 days and 300 credits to explore Kaiman’s features and create content for your business.',
 			},
 			{
 				q: 'Can I connect my social networks to Kaiman?',

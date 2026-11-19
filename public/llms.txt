@@ -1,0 +1,22 @@
+# Kaiman
+
+> Kaiman is an AI marketing platform that learns about a business and its brand to help create strategies, campaigns, images, videos, presentations and websites.
+
+Kaiman offers a 14-day free trial with 300 credits. The website is available in Spanish and English.
+
+## Product
+
+- [Español](https://www.kaimanstudio.ai/es/): Información del producto, planes y preguntas frecuentes.
+- [English](https://www.kaimanstudio.ai/en/): Product overview, plans and frequently asked questions.
+- [Create an account](https://app.kaimanstudio.ai/auth/register): Start a free trial.
+
+## Blog
+
+- [Blog en español](https://www.kaimanstudio.ai/es/blogs): Artículos sobre marketing e inteligencia artificial.
+- [English blog](https://www.kaimanstudio.ai/en/blogs): Articles about marketing and artificial intelligence.
+- [Sitemap](https://www.kaimanstudio.ai/sitemap.xml): Public pages and published articles.
+
+## Legal
+
+- [Privacy policy](https://www.kaimanstudio.ai/en/privacidad)
+- [Terms of service](https://www.kaimanstudio.ai/en/terminos)

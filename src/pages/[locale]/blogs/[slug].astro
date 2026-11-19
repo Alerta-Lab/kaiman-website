@@ -1,5 +1,6 @@
 ---
 import ArticleView from '../../../components/blog/organisms/ArticleView.astro';
+import { blogAuthor } from '../../../lib/blog-author';
 import PublicFooter from '../../../components/blog/organisms/PublicFooter.astro';
 import PublicHeader from '../../../components/blog/organisms/PublicHeader.astro';
 import { isLocale, locales, type Locale } from '../../../i18n';
@@ -64,7 +65,7 @@ const jsonLd = {
 	keywords: post.tags.length
 		? post.tags.map((tag) => (locale === 'en' && tag.nameEn ? tag.nameEn : tag.name)).join(', ')
 		: undefined,
-	author: { '@type': 'Organization', name: 'Kaiman Studio' },
+	author: blogAuthor,
 };
 Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=86400');
 ---

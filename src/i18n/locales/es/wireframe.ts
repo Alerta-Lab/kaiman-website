@@ -10,6 +10,7 @@ export const wireframe = {
 			'Kaiman es una plataforma de inteligencia artificial que aprende sobre tu negocio, entiende tu marca y utiliza ese conocimiento para ayudarte a crear estrategias, campañas, imágenes, videos, sitios web y mucho más.',
 		body2: 'Todo con la personalidad de tu marca y el conocimiento de tu negocio.',
 		cta: 'Comienza tu prueba gratis',
+		trial: 'Prueba gratis 14 días · 300 créditos',
 		secondaryCta: 'Descubre cómo funciona',
 		note: 'Planes desde $49 al mes · Creado por Alerta, una agencia creativa multicultural',
 		promptTitle: 'Empecemos a crear.',
@@ -379,19 +380,19 @@ export const wireframe = {
 			},
 			{
 				q: '¿Kaiman funciona en español?',
-				a: 'Los detalles sobre idiomas disponibles se confirmarán aquí.',
+				a: 'Sí. Puedes usar Kaiman en español y en inglés.',
 			},
 			{
 				q: '¿Cómo funcionan los créditos?',
-				a: 'Los detalles sobre el uso de créditos se confirmarán aquí.',
+				a: 'Los créditos se utilizan al ejecutar las funciones de creación de Kaiman. El consumo depende de la función y de las opciones que elijas. Tu prueba gratis incluye 300 créditos para explorar la plataforma durante 14 días.',
 			},
 			{
 				q: '¿Puedo manejar más de una marca o negocio desde mi cuenta?',
-				a: 'Los detalles sobre límites multi-marca por plan se confirmarán aquí.',
+				a: 'Sí. Starter incluye 1 marca, Pro incluye 3 y Business incluye 5. Puedes elegir el plan que corresponda a los negocios o marcas que necesitas gestionar.',
 			},
 			{
 				q: '¿Qué incluye la prueba gratis?',
-				a: 'Incluye 14 días de prueba gratis para crear una cuenta y revisar el producto. El detalle de créditos disponibles se confirma al registrarte en la plataforma.',
+				a: 'La prueba gratis incluye 14 días y 300 créditos para explorar las funciones de Kaiman y crear contenido para tu negocio.',
 			},
 			{
 				q: '¿Puedo conectar mis redes sociales a Kaiman?',

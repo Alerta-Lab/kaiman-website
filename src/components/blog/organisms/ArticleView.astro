@@ -1,5 +1,6 @@
 ---
 import { ArrowLeft } from 'lucide-react';
+import { blogAuthor } from '../../../lib/blog-author';
 import type { Locale } from '../../../i18n';
 import { blogCategoryPath, blogIndexPath, blogTagPath } from '../../../lib/blog-paths';
 import { renderArticleMarkdown } from '../../../features/posts/article-faq';
@@ -39,6 +40,7 @@ const backLabel = locale === 'en' ? 'Back to blog' : 'Volver al blog';
 		))}
 	</div>
 	<h1 class="font-headline text-4xl font-bold leading-[1.05] tracking-tight text-black md:text-6xl">{post.title}</h1>
+	<p class="mt-4 text-sm text-black/75">{locale === 'es' ? 'Por' : 'By'} {blogAuthor.name}</p>
 	<p class="mt-gap-block max-w-[42rem] text-xl leading-relaxed text-black/75">{post.excerpt}</p>
 	{post.coverUrl && (
 		<figure>

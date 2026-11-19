@@ -8,6 +8,7 @@ export const wireframe = {
 			'Kaiman is an AI platform that learns about your business, understands your brand, and uses that knowledge to help you create strategies, campaigns, images, videos, websites, and more.',
 		body2: 'Everything with your brand personality and knowledge of your business.',
 		cta: 'Start your free trial',
+		trial: '14-day free trial · 300 credits',
 		secondaryCta: 'See how it works',
 		note: 'Plans from $49 a month · Built by Alerta, a multicultural creative agency',
 		promptTitle: "Let's start creating.",
@@ -377,19 +378,19 @@ export const wireframe = {
 			},
 			{
 				q: 'Does Kaiman work in Spanish?',
-				a: 'Details on available languages will be confirmed here.',
+				a: 'Yes. You can use Kaiman in Spanish and English.',
 			},
 			{
 				q: 'How do credits work?',
-				a: 'Details on credit use will be confirmed here.',
+				a: 'Credits are used when you run Kaiman’s creation features. Usage depends on the feature and options you choose. Your free trial includes 300 credits to explore the platform for 14 days.',
 			},
 			{
 				q: 'Can I manage more than one brand or business from my account?',
-				a: 'Details on multi-brand limits by plan will be confirmed here.',
+				a: 'Yes. Starter includes 1 brand, Pro includes 3, and Business includes 5. Choose the plan that fits the businesses or brands you need to manage.',
 			},
 			{
 				q: 'What does the free trial include?',
-				a: 'It includes a 14-day free trial to create an account and review the product. Available credits are confirmed when you register on the platform.',
+				a: 'The free trial includes 14 days and 300 credits to explore Kaiman’s features and create content for your business.',
 			},
 			{
 				q: 'Can I connect my social networks to Kaiman?',
