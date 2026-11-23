@@ -2,6 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { renderArticleMarkdown } from './article-faq';
 
 describe('article FAQ', () => {
+	it('supports unnumbered Q/A, multiple answer paragraphs and unpunctuated closing CTA', async () => {
+		const html = await renderArticleMarkdown('__FAQ__\n\n__Q: ¿Cuándo empezar?__\n\nA: En horas.\n\nOtro párrafo de la respuesta.\n\n__Q: ¿Es automático?__\n\nA: Sí.\n\n__CLOSING CTA — HOOK LINE__\n\n*Una invitación.*\n\n__CLOSING CTA — HEADLINE__\n\n__Prueba Kaiman__', 'es');
+		expect(html.match(/<details/g)).toHaveLength(2);
+		expect(html).toContain('<summary>¿Cuándo empezar?');
+		expect(html).toContain('Otro párrafo de la respuesta.</p></div></details>');
+		expect(html).not.toContain('A: En horas.');
+		expect(html.indexOf('class="article-cta"')).toBeGreaterThan(html.lastIndexOf('</details>'));
+	});
 	it('renders numbered FAQ entries as disclosures without swallowing the CTA', async () => {
 		const html = await renderArticleMarkdown('__FAQ:__\n\n__Q1: ¿Cómo funciona?__\n\nLa primera respuesta.\n\n__Q2: ¿Cuánto cuesta?__\n\nLa segunda respuesta.\n\n__CLOSING CTA — HOOK LINE:__\n\nEl cierre.', 'es');
 		expect(html.match(/<details/g)).toHaveLength(2);

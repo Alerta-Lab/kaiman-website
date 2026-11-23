@@ -166,6 +166,9 @@ export const admin = {
 		updateError: 'Error al actualizar la lista.',
 	},
 	editor: {
+		confirmTitle: 'Confirmar acción',
+		confirmAction: 'Continuar',
+		cancelConfirmation: 'Cancelar',
 		newTitle: 'Nuevo artículo',
 		editTitle: 'Editar artículo',
 		cancel: 'Cancelar',

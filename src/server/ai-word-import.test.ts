@@ -3,6 +3,26 @@ import { buildWordPreview, fieldMappingIssue, splitWordBlocks } from './ai-word-
 import { postInputSchema } from '../features/posts/post.schema';
 
 describe('Word AI mapping', () => {
+	it('preserves questions, answers and linked paragraphs even if AI marks them as labels', () => {
+		const input = splitWordBlocks('__TITLE__\n\nTítulo\n\n[Kaiman](https://kaimanstudio.ai) explica el flujo.\n\n__FAQ__\n\n__Q: ¿Cuándo empezar?__\n\nA: Hoy.\n\n__Q: ¿Es automático?__\n\nA: Sí.');
+		const result = buildWordPreview(input, { topics: [{ label: 'Tema', versions: [{ locale: 'es', start: 0, end: input.length - 1 }] }] }, [{ fields: [{ field: 'title', blocks: [1] }], labels: [0, 2, 4, 5, 6, 7] }]);
+		const { markdown } = result.topics[0].versions[0];
+		for (const i of [2, 4, 5, 6, 7]) expect(markdown).toContain(input[i]);
+	});
+	it('uses explicit source labels to correct swapped image fields without depending on colons', () => {
+		const input = splitWordBlocks('# \\[ESPAÑOL\\]\n\n__TITLE__\n\nTítulo original\n\n__KEY TAKEAWAY__\n\nTexto original.\n\n__SECTION 1 — Un título útil__\n\nPárrafo.\n\n__IN\\-ARTICLE IMAGE — PROMPT__\n\nPrompt estilo Midjourney: Una imagen.\n\n__IN\\-ARTICLE IMAGE — ALT TEXT__\n\nDescripción accesible\n\n__IN\\-ARTICLE IMAGE — CAPTION__\n\n*Leyenda editorial*\n\n__FAQ__\n\n__Q: ¿Funciona?__\n\nA: Sí.\n\n__CLOSING CTA — HOOK LINE__\n\nInvitación.\n\n__CLOSING CTA — HEADLINE__\n\nProbar Kaiman');
+		const result = buildWordPreview(input, { topics: [{ label: 'Tema', versions: [{ locale: 'es', start: 0, end: input.length - 1 }] }] }, [{ fields: [{ field: 'title', blocks: [1] }, { field: 'bodyCaption', blocks: [9] }], labels: [0, 3, 16] }]);
+		const version = result.topics[0].versions[0];
+		expect(version.title).toBe('Título original');
+		expect(version.bodyPrompt).toBe('Prompt estilo Midjourney: Una imagen.');
+		expect(version.bodyAlt).toBe('Descripción accesible');
+		expect(version.bodyCaption).toBe('Leyenda editorial');
+		expect(version.markdown).toContain('## Un título útil');
+		expect(version.markdown).toContain('Texto original.');
+		expect(version.markdown).toContain('__Q: ¿Funciona?__');
+		expect(version.markdown).toContain('<!-- kaiman:cta-hook-line -->');
+		expect(version.markdown).not.toMatch(/TITLE|KEY TAKEAWAY|IN.*ARTICLE IMAGE|Midjourney/);
+	});
  const blocks=splitWordBlocks('# Batch\n\nTITLE:\n\nEnglish title\n\nEnglish paragraph.\n\nVERSIÓN EN ESPAÑOL\n\nTítulo español\n\nPárrafo español.\n\nPrompt de imagen');
  const structure={topics:[{label:'Tema',versions:[{locale:'en',start:1,end:3},{locale:'es',start:4,end:7}]}]};
  const fields=[{fields:[{field:'title',blocks:[1]}],labels:[0]},{fields:[{field:'title',blocks:[1]},{field:'bodyPrompt',blocks:[3]}],labels:[0]}];

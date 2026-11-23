@@ -1,14 +1,19 @@
-import { cleanEditorialMarkdown } from './editorial-markers';
+import { cleanEditorialMarkdown, closingCtaPart, editorialLabel } from './editorial-markers';
 import type { ImportLocale } from './word-import';
 import { renderMarkdown } from '../../lib/markdown';
 import { signupUrl } from '../../lib/plans';
 
 const ctaMarker = (block: string, part: 'hook-line' | 'headline') => {
-	const original = part === 'hook-line' ? 'HOOK LINE' : 'HEADLINE';
-	return new RegExp(`^(?:(?:__|\\*\\*)CLOSING CTA\\s*[—–-]\\s*${original}\\s*:(?:__|\\*\\*)|<!--\\s*kaiman:cta-${part}\\s*-->)$`, 'i').test(block.trim());
+	return closingCtaPart(block) === part || block.trim() === `<!-- kaiman:cta-${part} -->`;
 };
 
-/** Render explicitly numbered questions under an FAQ heading as native disclosures. */
+const faqQuestion = (block: string) => /^(?:Q|P|Pregunta|Question)\s*\d*\s*:\s*(.+)$/i.exec(editorialLabel(block));
+const answerText = (block: string) => block
+	.replace(/^(?:__|\*\*)(?:A|R|Respuesta|Answer)\s*:\s*(?:__|\*\*)\s*/i, '')
+	.replace(/^((?:__|\*\*)?)(?:A|R|Respuesta|Answer)\s*:\s*/i, '$1');
+const faqBoundary = (block: string) => !!faqQuestion(block) || !!closingCtaPart(block) || /^<!--\s*kaiman:cta-/.test(block.trim()) || /^#{1,6}\s/.test(block) || /^SECTION\s+\d+\b/i.test(editorialLabel(block));
+
+/** Render numbered or unnumbered Q/A entries without consuming the following section. */
 export async function renderArticleMarkdown(markdown: string, locale: ImportLocale) {
 	const blocks = markdown.replace(/\r\n/g, '\n').split(/\n\s*\n/);
 	const chunks: string[] = [];
@@ -37,23 +42,33 @@ export async function renderArticleMarkdown(markdown: string, locale: ImportLoca
 			inFaq = false;
 			continue;
 		}
-		if (/^(?:__|\*\*)FAQ\s*:?(?:__|\*\*)\s*$/i.test(block.trim()) || /^#{1,6}\s+(?:preguntas frecuentes|frequently asked questions|faq)\s*:?\s*$/i.test(block.trim())) {
+		if (/^(?:preguntas frecuentes|frequently asked questions|faq)$/i.test(editorialLabel(block))) {
 			inFaq = true;
 			ordinary.push(block);
 			continue;
 		}
-		if (inFaq && (/^#{1,6}\s/.test(block) || /^(?:__|\*\*)CLOSING CTA\b/i.test(block))) inFaq = false;
-		const question = inFaq && /^(?:__|\*\*)\s*(?:Q|P|Pregunta|Question)\s*\d+\s*:\s*(.+?)(?:__|\*\*)\s*$/i.exec(block.trim());
+		if (inFaq && !faqQuestion(block) && faqBoundary(block)) inFaq = false;
+		const question = inFaq && faqQuestion(block);
 		const answer = blocks[i + 1];
-		if (!question || !answer || /^(?:__|\*\*)\s*(?:(?:Q|P|Pregunta|Question)\s*\d+\s*:|CLOSING CTA\b)/i.test(answer.trim()) || /^#{1,6}\s/.test(answer)) {
+		if (!question || !answer || faqBoundary(answer)) {
 			ordinary.push(block);
 			continue;
 		}
 		await flush();
 		const escapedQuestion = question[1].replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-		const answerHtml = await renderMarkdown(answer);
+		const answers = [answerText(answer)];
+		let end = i + 2;
+		let answerFence = (answer.match(/^\s*(?:`{3,}|~{3,})/gm) ?? []).length % 2 === 1;
+		while (end < blocks.length) {
+			const next = blocks[end];
+			if (!answerFence && faqBoundary(next)) break;
+			answers.push(next);
+			if ((next.match(/^\s*(?:`{3,}|~{3,})/gm) ?? []).length % 2) answerFence = !answerFence;
+			end++;
+		}
+		const answerHtml = await renderMarkdown(answers.join('\n\n'));
 		chunks.push(`<details class="article-faq"><summary>${escapedQuestion}<span aria-hidden="true">+</span></summary><div>${answerHtml}</div></details>`);
-		i++;
+		i = end - 1;
 	}
 	await flush();
 	return chunks.join('\n');

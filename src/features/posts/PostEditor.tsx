@@ -1,3 +1,5 @@
+import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
+import { useConfirmDialog } from '../../components/admin/useConfirmDialog';
 import {
 	Bold,
 	ChevronDown,
@@ -168,6 +170,7 @@ export function PostEditor({
 	const [translationGroupId, setTranslationGroupId] = useState(initialGroupId);
 	const [notice, setNotice] = useState<Notice | null>(null);
 	const [busy, setBusy] = useState(false);
+	const confirmation = useConfirmDialog();
 	const [idea, setIdea] = useState('');
 	const [generatedDraft, setGeneratedDraft] = useState('');
 	const [tagSearches, setTagSearches] = useState<Record<ContentLocale, string>>({ es: '', en: '' });
@@ -294,7 +297,7 @@ export function PostEditor({
 			return;
 		}
 		const activeHasContent = Boolean(draft.title || draft.excerpt || draft.markdown);
-		if (activeHasContent && !confirm(copy.confirmTranslate)) return;
+		if (activeHasContent && !(await confirmation.confirm(copy.confirmTranslate))) return;
 
 		setBusy(true);
 		showNotice({ tone: 'info', title: copy.translating });
@@ -356,7 +359,7 @@ export function PostEditor({
 			showNotice({ tone: 'info', title: copy.saveBeforeClassify });
 			return;
 		}
-		if (!confirm(copy.confirmClassify)) return;
+		if (!(await confirmation.confirm(copy.confirmClassify))) return;
 		setBusy(true);
 		showNotice({ tone: 'info', title: copy.classifying });
 		const response = await safeFetch(`/api/admin/posts/${draft.id}/classify`, { method: 'POST' });
@@ -379,7 +382,7 @@ export function PostEditor({
 	};
 
 	const remove = async () => {
-		if (!draft.id || !confirm(copy.confirmDelete)) return;
+		if (!draft.id || !(await confirmation.confirm(copy.confirmDelete, true))) return;
 		setBusy(true);
 		const response = await safeFetch(`/api/admin/posts/${draft.id}`, { method: 'DELETE' });
 		if (response.ok) location.href = '/admin/posts';
@@ -751,6 +754,17 @@ export function PostEditor({
 				</div>
 			</form>
 
+			<ConfirmDialog
+				open={Boolean(confirmation.pending)}
+				title={confirmation.pending?.danger ? copy.deleteArticle : copy.confirmTitle}
+				description={confirmation.pending?.description ?? ''}
+				items={[]}
+				danger={confirmation.pending?.danger}
+				confirmLabel={confirmation.pending?.danger ? copy.deleteArticle : copy.confirmAction}
+				cancelLabel={copy.cancelConfirmation}
+				onCancel={confirmation.onCancel}
+				onConfirm={confirmation.onConfirm}
+			/>
 			<Toast
 				open={Boolean(notice)}
 				tone={notice?.tone}

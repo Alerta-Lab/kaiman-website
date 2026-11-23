@@ -2,6 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { cleanEditorialMarkdown } from './editorial-markers';
 
 describe('editorial markers', () => {
+	it('supports the November Word labels without colons and preserves section titles', () => {
+		const source = '# \\[ESPAÑOL\\]\n\n__TITLE__\n\n__KEY TAKEAWAY__\n\nTexto original.\n\n__SECTION 2 — Un título real__\n\n__PULL QUOTE__\n\n*La cita.*\n\n__IN\\-ARTICLE IMAGE — CAPTION__\n\nPrompt estilo Midjourney: instrucciones técnicas --ar 16:9';
+		const result = cleanEditorialMarkdown(source, 'es');
+		expect(result).toContain('## Un título real');
+		expect(result).toContain('Texto original.');
+		expect(result).toContain('*La cita.*');
+		expect(result).not.toMatch(/ESPAÑOL|TITLE|KEY TAKEAWAY|SECTION 2|PULL QUOTE|IN.*ARTICLE IMAGE|Midjourney/);
+	});
 	it('removes production labels while preserving content and localizing FAQ', () => {
 		const source = '__SECTION 1 — KEY POINTS:__\n\n- Consejo útil\n\n__STAT HIGHLIGHT:__\n\nUn dato.\n\n__FAQ:__\n\n__Q1: ¿Cómo funciona?__\n\nRespuesta.';
 		const result = cleanEditorialMarkdown(source, 'es');

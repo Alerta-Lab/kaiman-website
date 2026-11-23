@@ -29,9 +29,9 @@ export function ConfirmDialog({ open, title, description, items, warning, confir
 			<div className="flex max-h-[90dvh] flex-col p-6">
 				<h2 id={titleId} className="font-headline text-xl font-bold">{title}</h2>
 				<p id={descriptionId} className="mt-3 text-sm font-medium leading-relaxed text-black/80">{description}</p>
-				<ul className="mt-4 max-h-64 list-disc space-y-2 overflow-y-auto rounded-lg bg-primary-100/60 py-3 pl-8 pr-4 text-sm text-black">
+				{items.length > 0 && <ul className="mt-4 max-h-64 list-disc space-y-2 overflow-y-auto rounded-lg bg-primary-100/60 py-3 pl-8 pr-4 text-sm text-black">
 					{items.map((item, index) => <li key={index}>{item}</li>)}
-				</ul>
+				</ul>}
 				{warning && <p className="mt-4 rounded-lg bg-error-100 p-3 text-sm font-semibold text-error-700">{warning}</p>}
 				<div className="mt-6 flex flex-wrap justify-end gap-3">
 					<button type="button" autoFocus onClick={onCancel} className="min-h-11 rounded-lg border border-black/20 px-4 font-bold text-black hover:bg-primary-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">{cancelLabel}</button>

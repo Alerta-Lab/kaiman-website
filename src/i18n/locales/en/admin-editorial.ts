@@ -168,6 +168,9 @@ export const admin = {
 		updateError: 'Could not refresh the list.',
 	},
 	editor: {
+		confirmTitle: 'Confirm action',
+		confirmAction: 'Continue',
+		cancelConfirmation: 'Cancel',
 		newTitle: 'New article',
 		editTitle: 'Edit article ({locale})',
 		reviewMultiWord: 'Review Word with multiple articles',

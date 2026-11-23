@@ -1,3 +1,5 @@
+import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
+import { useConfirmDialog } from '../../components/admin/useConfirmDialog';
 import { ExternalLink, Eye, Languages, Save, Sparkles } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Toast, type ToastTone } from '../../components/blog/molecules/Toast';
@@ -84,6 +86,7 @@ export function PostEditor({
 	});
 	const [notice, setNotice] = useState<Notice | null>(null);
 	const [busy, setBusy] = useState(false);
+	const confirmation = useConfirmDialog();
 	const [brief, setBrief] = useState('');
 	const [tagSearch, setTagSearch] = useState('');
 	const [approved, setApproved] = useState(Boolean(initial.editorial?.approvedAt));
@@ -235,7 +238,7 @@ export function PostEditor({
 			showNotice({ tone: 'info', title: copy.saveBeforeClassify });
 			return;
 		}
-		if (!confirm(copy.confirmClassify)) return;
+		if (!(await confirmation.confirm(copy.confirmClassify))) return;
 		setBusy(true);
 		showNotice({ tone: 'info', title: copy.classifying });
 		const response = await safeFetch(`/api/admin/posts/${initial.id}/classify`, { method: 'POST' });
@@ -252,7 +255,7 @@ export function PostEditor({
 			showNotice({ tone: 'info', title: copy.briefTooShort });
 			return;
 		}
-		if ((data.title || data.markdown || data.excerpt) && !confirm(copy.confirmGenerate)) return;
+		if ((data.title || data.markdown || data.excerpt) && !(await confirmation.confirm(copy.confirmGenerate))) return;
 		setBusy(true);
 		showNotice({ tone: 'info', title: copy.generatingDraft });
 		const response = await safeFetch('/api/admin/posts/generate', {
@@ -374,7 +377,7 @@ export function PostEditor({
 	};
 
 	const remove = async () => {
-		if (!initial.id || !confirm(copy.confirmDelete)) return;
+		if (!initial.id || !(await confirmation.confirm(copy.confirmDelete, true))) return;
 		setBusy(true);
 		const response = await safeFetch(`/api/admin/posts/${initial.id}`, { method: 'DELETE' });
 		if (response.ok) location.href = '/admin/posts';
@@ -750,6 +753,17 @@ export function PostEditor({
 					)}
 				</section>
 			)}
+			<ConfirmDialog
+				open={Boolean(confirmation.pending)}
+				title={confirmation.pending?.danger ? copy.deleteArticle : copy.confirmTitle}
+				description={confirmation.pending?.description ?? ''}
+				items={[]}
+				danger={confirmation.pending?.danger}
+				confirmLabel={confirmation.pending?.danger ? copy.deleteArticle : copy.confirmAction}
+				cancelLabel={copy.cancelConfirmation}
+				onCancel={confirmation.onCancel}
+				onConfirm={confirmation.onConfirm}
+			/>
 			<Toast
 				open={Boolean(notice)}
 				tone={notice?.tone}
