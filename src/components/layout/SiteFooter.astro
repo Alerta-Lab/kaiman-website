@@ -1,5 +1,5 @@
 ---
-import { ArrowUp, Mail, MapPin, Phone } from 'lucide-react';
+import { ArrowUp, Mail, Phone } from 'lucide-react';
 import { SocialIcon } from 'react-social-icons';
 import { ChatOrb } from '../chat/ChatOrb';
 import { getLanding, type Locale } from '../../i18n';
@@ -67,10 +67,6 @@ const legalLinks = [
 
 		<div class="grid grid-cols-2 gap-x-6 gap-y-10 border-t border-white/10 pt-12 sm:grid-cols-3 lg:grid-cols-4 lg:gap-12">
 			<div class="col-span-2 flex flex-col gap-3 sm:col-span-1">
-				<p class="inline-flex items-start gap-2 text-sm text-pretty text-neutral-300">
-					<MapPin size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
-					{copy.footer.address}
-				</p>
 				<a class="inline-flex items-center gap-2 text-sm text-neutral-300 hover:underline hover:underline-offset-4" href={`mailto:${copy.footer.email}`}>
 					<Mail size={16} aria-hidden="true" />
 					{copy.footer.email}

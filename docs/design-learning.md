@@ -12,6 +12,11 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-25 — Blog titles sentence case + sin dirección
+
+- 20 posts (ES/EN): `title` y `seo_title` a sentence case (solo mayúscula inicial; IA/TikTok/etc. preservados).
+- Footer landing/blog y legales: eliminada la dirección `535 5th Ave…`.
+
 ### 2026-11-25 — Hero por locale
 
 - Assets en `public/hero/{es|en}/output-1..3`. EN PNG ~2MB → JPEG 800w (~142–216KB).
@@ -27,7 +32,7 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ### 2026-11-16 — Políticas legales completas
 
-- `/privacidad` y `/terminos`: documentos seccionados ES/EN (Alerta Creative, cookies/GTM-GA-Ads, prueba 14 días, créditos, IA). Componente `LegalDocument.astro`.
+- `/privacidad` y `/terminos`: documentos seccionados ES/EN (Alerta, cookies/GTM-GA-Ads, prueba 14 días, créditos, IA). Componente `LegalDocument.astro`.
 
 ### 2026-11-16 — Ads compliance: legal + trial 14d
 

@@ -1,5 +1,5 @@
 ---
-import { Mail, MapPin, Phone } from 'lucide-react';
+import { Mail, Phone } from 'lucide-react';
 import { SocialIcon } from 'react-social-icons';
 import { getLanding, type Locale } from '../../../i18n';
 import { blogCategoryPath, blogIndexPath } from '../../../lib/blog-paths';
@@ -112,10 +112,6 @@ const headingClass =
 			</nav>
 			<div class="flex flex-col gap-1" aria-labelledby="footer-contact">
 				<p id="footer-contact" class={headingClass}>{copy.footer.contact}</p>
-				<p class="inline-flex min-h-11 items-start gap-2 text-sm font-medium text-pretty text-black/80">
-					<MapPin size={16} className="mt-0.5 shrink-0 text-primary-800" aria-hidden="true" />
-					<span>{copy.footer.address}</span>
-				</p>
 				<a class={`${linkClass} gap-2`} href={`mailto:${copy.footer.email}`}>
 					<Mail size={16} aria-hidden="true" />
 					{copy.footer.email}

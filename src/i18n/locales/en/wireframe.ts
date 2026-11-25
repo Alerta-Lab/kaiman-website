@@ -347,7 +347,7 @@ export const wireframe = {
 		rightNote: 'One subscription for a fraction of the cost. And it understands your business.',
 	},
 	playbooks: {
-		title: 'Strategies for your industry.',
+		title: 'Strategies for your industry',
 		body: 'Real marketing plays for businesses like yours. Run them easily and efficiently in Kaiman.',
 		items: [
 			{ industry: 'Restaurants', title: 'Seasonal menu launches and special-date promotions' },

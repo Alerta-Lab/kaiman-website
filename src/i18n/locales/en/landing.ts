@@ -1,4 +1,4 @@
-import type { LandingCopy } from '../es/landing';
+import type { LandingCopy } from './es/landing';
 
 export const landing = {
 	meta: {
@@ -355,7 +355,7 @@ export const landing = {
 		],
 	},
 	finder: {
-		title: 'How many pieces do you need each month',
+		title: 'How many pieces do you need each month?',
 		intro:
 			'Enter images, video clips, scripts, audio minutes, slides, and websites. The result is an approximate estimate of credits and of the plan that could cover that volume.',
 		disclaimer:
@@ -526,7 +526,6 @@ export const landing = {
 		contact: 'Contact',
 		alerta: 'Alerta',
 		instagram: 'Instagram',
-		address: '535 5th Ave, New York NY 10017',
 		email: 'info@kaimanstudio.ai',
 		phone: '+1 (586) 202-4830',
 		studio: 'Kaiman Studio',
@@ -559,12 +558,12 @@ export const landing = {
 			'How Kaiman Studio and this site handle personal data, cookies, analytics, and contact rights.',
 		updated: 'Last updated: November 16, 2026',
 		intro:
-			'This policy explains how Alerta Creative (“we”) handles personal information when you visit kaimanstudio.ai, use materials related to Kaiman Studio, or contact us. The product with user accounts is provided at app.kaimanstudio.ai; additional notices may apply there when you create or use an account.',
+			'This policy explains how Alerta (“we”) handles personal information when you visit kaimanstudio.ai, use materials related to Kaiman Studio, or contact us. The product with user accounts is provided at app.kaimanstudio.ai; additional notices may apply there when you create or use an account.',
 		sections: [
 			{
 				heading: '1. Who we are',
 				paragraphs: [
-					'Kaiman Studio is an AI marketing software product operated in connection with Alerta Creative. Contact: info@kaimanstudio.ai · 535 5th Ave, New York, NY 10017 · +1 (586) 202-4830.',
+					'Kaiman Studio is an AI marketing software product operated in connection with Alerta. Contact: info@kaimanstudio.ai · +1 (586) 202-4830.',
 					'Sites covered by this policy: the public site kaimanstudio.ai (landing, blog, and informational pages) and, where we receive or process data to or from the product, app.kaimanstudio.ai.',
 				],
 			},
@@ -638,7 +637,7 @@ export const landing = {
 		],
 		contactHeading: '11. Contact',
 		contactBody:
-			'Privacy and personal data: info@kaimanstudio.ai. Postal address: 535 5th Ave, New York, NY 10017. Phone: +1 (586) 202-4830.',
+			'Privacy and personal data: info@kaimanstudio.ai. Phone: +1 (586) 202-4830.',
 	},
 	terms: {
 		title: 'Terms of service',
@@ -690,7 +689,7 @@ export const landing = {
 				heading: '6. Content and intellectual property',
 				paragraphs: [
 					'You retain rights in materials you submit to Kaiman (brands, text, images, and so on), and you grant us a limited license to process them only as needed to provide the service.',
-					'Kaiman, Kaiman Studio, the brand, software, and site materials are owned by Alerta Creative or its licensors. No license is granted except as needed to use the service under these terms.',
+					'Kaiman, Kaiman Studio, the brand, software, and site materials are owned by Alerta or its licensors. No license is granted except as needed to use the service under these terms.',
 					'AI outputs may not be unique. You are responsible for reviewing, editing, and deciding public use of those outputs, and for obtaining permissions when required.',
 				],
 			},
@@ -729,7 +728,7 @@ export const landing = {
 		],
 		contactHeading: '12. Contact',
 		contactBody:
-			'Questions about these terms or contracting: info@kaimanstudio.ai · 535 5th Ave, New York, NY 10017 · +1 (586) 202-4830. Platform: app.kaimanstudio.ai.',
+			'Questions about these terms or contracting: info@kaimanstudio.ai · +1 (586) 202-4830. Platform: app.kaimanstudio.ai.',
 	},
 	notFound: {
 		title: 'This page is not here',

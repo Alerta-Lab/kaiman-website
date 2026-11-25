@@ -349,7 +349,7 @@ export const wireframe = {
 		rightNote: 'Una sola suscripción por una fracción del costo. Y además entiende tu negocio.',
 	},
 	playbooks: {
-		title: 'Estrategias para tu industria.',
+		title: 'Estrategias para tu industria',
 		body: 'Verdaderas jugadas de marketing para negocios como el tuyo. Desarróllalas de manera fácil y eficiente en Kaiman.',
 		items: [
 			{ industry: 'Restaurantes', title: 'Lanzamiento de menús de temporada y promociones para fechas especiales' },
