@@ -34,7 +34,7 @@ Acción solicitada al PM/backend: incorporar el catálogo público confirmado a 
 | --- | --- | ---: | ---: | ---: | ---: |
 | Starter | start | 49 | 500 | 1 | 1 GB |
 | Pro | pro | 99 | 1500 | 3 | 3 GB |
-| Business | scale | 199 | 2500 | 5 | 5 GB |
+| Business | scale | 199 | 3300 | 5 | 5 GB |
 
 Confirmar la tabla contra el catálogo vigente de facturación antes de indexarla. La respuesta al visitante debe distinguir suscripciones de packs extra y usar los nombres comerciales. La prueba gratis publicada es de 14 días y 300 créditos.
 

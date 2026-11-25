@@ -19,7 +19,7 @@ export const plans = [
 	{
 		id: 'scale',
 		monthlyUsd: 199,
-		credits: 2500,
+		credits: 3300,
 		seats: 5,
 		storageGb: 5,
 		brands: 5,

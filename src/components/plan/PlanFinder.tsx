@@ -70,6 +70,7 @@ function Slider({
 }
 
 export function PlanFinder({ copy, planNames }: PlanFinderProps) {
+	const maxPlanCredits = Math.max(...plans.map((plan) => plan.credits));
 	const [image, setImage] = useState(10);
 	const [video, setVideo] = useState(10);
 	const [script, setScript] = useState(5);
@@ -166,7 +167,7 @@ export function PlanFinder({ copy, planNames }: PlanFinderProps) {
 								{result.price} {copy.perMonth}
 							</p>
 						) : (
-							<p className="text-base text-pretty text-neutral-200">{copy.enterprise}</p>
+							<p className="text-base text-pretty text-neutral-200">{copy.enterprise.replace('{credits}', maxPlanCredits.toLocaleString('en-US'))}</p>
 						)}
 						<p className="mt-4 text-sm text-neutral-300">{copy.creditsLabel}</p>
 						<p className="font-display text-3xl font-semibold">{credits.toLocaleString('en-US')}</p>

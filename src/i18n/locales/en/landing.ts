@@ -380,7 +380,7 @@ export const landing = {
 		planLabel: 'Reference plan for this volume',
 		unitLabel: 'Reference cost per credit on that plan',
 		enterprise:
-			'This volume exceeds the 2,500 credits of the Business plan. Enterprise is built to fit.',
+			'This volume exceeds the {credits} credits of the Business plan. Enterprise is built to fit.',
 		perMonth: 'per month',
 		cta: 'Get this plan',
 	},
