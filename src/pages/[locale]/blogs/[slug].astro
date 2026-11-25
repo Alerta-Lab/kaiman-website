@@ -1,6 +1,7 @@
 ---
 import ArticleView from '../../../components/blog/organisms/ArticleView.astro';
 import { blogAuthor } from '../../../lib/blog-author';
+import { cleanMetadataValue } from '../../../features/posts/metadata-values';
 import PublicFooter from '../../../components/blog/organisms/PublicFooter.astro';
 import PublicHeader from '../../../components/blog/organisms/PublicHeader.astro';
 import { isLocale, locales, type Locale } from '../../../i18n';
@@ -51,7 +52,7 @@ const jsonLd = {
 	'@context': 'https://schema.org',
 	'@type': 'BlogPosting',
 	headline: post.title,
-	description: post.seoDescription,
+	description: cleanMetadataValue(post.seoDescription, 'seoDescription'),
 	inLanguage: locale,
 	datePublished: post.publishedAt?.toISOString(),
 	dateModified: post.updatedAt.toISOString(),

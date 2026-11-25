@@ -252,6 +252,7 @@ export const wireframe = {
 	},
 	tools: {
 		title: 'A full marketing team in one platform.',
+		examplesTitle: 'Examples of what you can do with Kaiman',
 		body1: 'Kaiman was built to help small and mid-size businesses do better marketing, more efficiently.',
 		body2:
 			'That is why it brings strategy, creativity, production, and distribution together in one platform, without requiring you to become an expert in every tool.',
@@ -267,7 +268,7 @@ export const wireframe = {
 			{ title: 'Edit photos, video, and audio.', body: '', image: '7' },
 			{ title: 'Analyze your market and find business opportunities.', body: '', image: '8' },
 		],
-		categoriesTitle: 'Tools to generate:',
+		categoriesTitle: 'Seven generation types:',
 		categories: [
 			{ id: 'image', label: 'Images' },
 			{ id: 'video', label: 'Videos' },
@@ -327,7 +328,7 @@ export const wireframe = {
 		leftPrice: 'Over $300',
 		leftPer: '/month',
 		leftNote:
-			'Eight accounts, eight bills, and your brand explained from scratch every time. And without Brand Understanding guiding your marketing.',
+			'Multiple accounts, multiple bills, and your brand explained from scratch every time. And without Brand Understanding guiding your marketing.',
 		rightLabel: 'Your marketing with Kaiman',
 		rightItems: [
 			'Image and text generation',

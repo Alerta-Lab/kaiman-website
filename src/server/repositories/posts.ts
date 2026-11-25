@@ -1,8 +1,10 @@
-import { and, desc, eq, ilike, inArray, or, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, or, sql } from 'drizzle-orm';
 import { randomUUID } from 'node:crypto';
 import { postInputSchema, slugify } from '../../features/posts/post.schema';
 import { getDb, requireDb } from '../db/client';
 import type { Classification } from '../classify-post';
+import { normalizeSearchText } from '../../lib/search-text';
+import { accentInsensitiveLike } from '../search';
 import { categories, postTags, posts, tags, type Category, type ContentLocale, type Post, type Tag } from '../db/schema';
 
 export type PostWithTags = Post & { tags: Tag[]; category: Category | null };
@@ -78,13 +80,13 @@ export async function listPublishedPosts(
 	if (!db) {
 		const demo = locale === 'en' ? demoPostEn : demoPost;
 		const matchesTag = !options.tag || demo.tags.some((tag) => tag.slug === options.tag);
-		const q = options.query?.toLowerCase();
-		const matchesQuery = !q || `${demo.title} ${demo.excerpt}`.toLowerCase().includes(q);
+		const q = normalizeSearchText(options.query ?? '');
+		const matchesQuery = !q || normalizeSearchText(`${demo.title} ${demo.excerpt}`).includes(q);
 		return matchesTag && matchesQuery && !options.category ? [demo] : [];
 	}
 	const filters = [eq(posts.status, 'published'), eq(posts.locale, locale)];
-	if (options.query) {
-		filters.push(or(ilike(posts.title, `%${options.query}%`), ilike(posts.excerpt, `%${options.query}%`))!);
+	if (options.query?.trim()) {
+		filters.push(or(accentInsensitiveLike(posts.title, options.query), accentInsensitiveLike(posts.excerpt, options.query))!);
 	}
 	if (options.tag) {
 		const tagged = await db
@@ -163,8 +165,8 @@ export async function listAllPosts(
 	if (!db) {
 		const demo = [demoPost, demoPostEn].filter((post) => {
 			if (!query) return true;
-			const haystack = `${post.title} ${post.excerpt} ${post.slug}`.toLowerCase();
-			return haystack.includes(query.toLowerCase());
+			const haystack = normalizeSearchText(`${post.title} ${post.excerpt} ${post.slug}`);
+			return haystack.includes(normalizeSearchText(query));
 		});
 		const total = demo.length;
 		const totalPages = total === 0 ? 0 : Math.ceil(total / pageSize);
@@ -173,7 +175,7 @@ export async function listAllPosts(
 	}
 
 	const where = query
-		? or(ilike(posts.title, `%${query}%`), ilike(posts.slug, `%${query}%`), ilike(posts.excerpt, `%${query}%`))
+		? or(accentInsensitiveLike(posts.title, query), accentInsensitiveLike(posts.slug, query), accentInsensitiveLike(posts.excerpt, query))
 		: undefined;
 
 	const [totalRow] = await db.select({ count: sql<number>`count(*)::int` }).from(posts).where(where);

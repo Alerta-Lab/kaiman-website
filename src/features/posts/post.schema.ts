@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { cleanMetadataValue } from './metadata-values';
 
 export const slugify = (value: string) =>
 	value
@@ -16,8 +17,8 @@ export const postInputSchema = z.object({
 	markdown: z.string().trim().min(20),
 	status: z.enum(['draft', 'published']).default('draft'),
 	locale: z.enum(['es', 'en']).default('es'),
-	seoTitle: z.string().trim().min(3),
-	seoDescription: z.string().trim().min(20),
+	seoTitle: z.string().trim().transform(value => cleanMetadataValue(value, 'seoTitle')).pipe(z.string().min(3)),
+	seoDescription: z.string().trim().transform(value => cleanMetadataValue(value, 'seoDescription')).pipe(z.string().min(20)),
 	coverUrl: z.url().or(z.string().regex(/^\/blog-generated\/[0-9a-f-]+\.webp$/)).or(z.literal('')).optional(),
 	coverAlt: z.string().trim().max(160).optional(),
 	tags: z.array(z.string().trim().min(2).max(50)).max(8).default([]),

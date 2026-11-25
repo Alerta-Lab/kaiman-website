@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import GoogleTag from '../components/common/GoogleTag.astro';
 import type { Locale } from '../i18n';
+import { cleanMetadataValue } from '../features/posts/metadata-values';
 
 interface Props {
 	title: string;
@@ -18,8 +19,8 @@ interface Props {
 }
 
 const {
-	title,
-	description,
+	title: rawTitle,
+	description: rawDescription,
 	locale = 'es',
 	image,
 	canonical = new URL(Astro.url.pathname, Astro.site).toString(),
@@ -29,6 +30,8 @@ const {
 	alternateEn = null,
 	atmosphere = 'light',
 } = Astro.props;
+const title = cleanMetadataValue(rawTitle, 'seoTitle');
+const description = cleanMetadataValue(rawDescription, 'seoDescription');
 const night = atmosphere === 'night';
 const defaultImage = new URL('/og-default.png', Astro.site).toString();
 const socialImage = image ? new URL(image, Astro.site).toString() : defaultImage;

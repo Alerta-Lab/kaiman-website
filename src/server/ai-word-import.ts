@@ -4,6 +4,7 @@ import { z } from 'zod';
 import type { ImportedTopic, ImportedVersion, ImportLocale } from '../features/posts/word-import';
 import { closingCtaPart, editorialMarker, editorialMetadataField } from '../features/posts/editorial-markers';
 import { getEnv } from './env';
+import { cleanMetadataValue } from '../features/posts/metadata-values';
 
 const metadataFields = ['title', 'slug', 'excerpt', 'seoTitle', 'seoDescription', 'coverAlt', 'coverCaption', 'coverPrompt', 'bodyAlt', 'bodyCaption', 'bodyPrompt'] as const;
 const structureSchema = z.object({ topics: z.array(z.object({ label: z.string(), versions: z.array(z.object({ locale: z.enum(['es', 'en']), start: z.number().int(), end: z.number().int() })) })) });
@@ -72,7 +73,7 @@ export function buildWordPreview(blocks: string[], rawStructure: unknown, rawFie
     if(labels.has(local) && !field && assigned.has(local+1) && /^.{1,100}:$/.test(plain(block)) && !/^(?:Q|P|A|R|Question|Pregunta|Answer|Respuesta)\s*\d*\s*:/i.test(plain(block))){excludedBlocks.push(block);continue}
     if(field){
      if(field==='bodyPrompt' && !version.markdown.includes('[IMAGEN_INTERIOR]')) version.markdown += `${version.markdown?'\n\n':''}[IMAGEN_INTERIOR]`;
-     version[field] += `${version[field]?'\n\n':''}${plain(block)}`;
+     version[field] += `${version[field]?'\n\n':''}${cleanMetadataValue(plain(block), field)}`;
     }else {
      const marker = editorialMarker(block, part.locale);
      if (marker !== null) {

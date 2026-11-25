@@ -254,6 +254,7 @@ export const wireframe = {
 	},
 	tools: {
 		title: 'Todo un equipo de marketing en una sola plataforma.',
+		examplesTitle: 'Ejemplos de lo que puedes hacer con Kaiman',
 		body1: 'Kaiman fue creado para ayudar a pequeñas y medianas empresas a hacer mejor marketing, de manera más eficiente.',
 		body2:
 			'Por eso reúne estrategia, creatividad, producción y distribución en una sola plataforma, sin que tengas que convertirte en experto en cada herramienta.',
@@ -269,7 +270,7 @@ export const wireframe = {
 			{ title: 'Editar fotos, video y audio.', body: '', image: '7' },
 			{ title: 'Analizar tu mercado y encontrar oportunidades de negocio.', body: '', image: '8' },
 		],
-		categoriesTitle: 'Herramientas para generar:',
+		categoriesTitle: 'Siete tipos de generación:',
 		categories: [
 			{ id: 'image', label: 'Imágenes' },
 			{ id: 'video', label: 'Videos' },
@@ -329,7 +330,7 @@ export const wireframe = {
 		leftPrice: 'Más de $300',
 		leftPer: '/mes',
 		leftNote:
-			'Ocho cuentas, ocho facturas y tu marca explicada desde cero cada vez. Y sin Brand Understanding guiando tu marketing.',
+			'Varias cuentas, varias facturas y tu marca explicada desde cero cada vez. Y sin Brand Understanding guiando tu marketing.',
 		rightLabel: 'Tu marketing con Kaiman',
 		rightItems: [
 			'Generación de imágenes y textos',
