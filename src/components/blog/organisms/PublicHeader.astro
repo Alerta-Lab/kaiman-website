@@ -1,8 +1,9 @@
 ---
-import { Menu, Search, X } from 'lucide-react';
+import { ArrowLeft, Menu, Search, X } from 'lucide-react';
 import { localeLabels, locales, type Locale } from '../../../i18n';
 import { blogCategoryPath, blogIndexPath, blogSearchPath, swapBlogLocalePath } from '../../../lib/blog-paths';
 import { listPublishedCategories, categoryDisplayName } from '../../../server/repositories/posts';
+import { localeUrl } from '../../../lib/locale-url';
 
 interface Props {
 	locale: Locale;
@@ -11,6 +12,7 @@ interface Props {
 
 const { locale, languagePaths } = Astro.props;
 const home = blogIndexPath(locale);
+const landing = localeUrl(locale);
 const search = blogSearchPath(locale);
 const categories = (await listPublishedCategories(locale)).slice(0, 6);
 const login = 'https://app.kaimanstudio.ai/auth/login';
@@ -19,6 +21,7 @@ const focusRing = 'focus-visible:outline focus-visible:outline-2 focus-visible:o
 const copy =
 	locale === 'en'
 		? {
+				landing: 'Kaiman home',
 				search: 'Search articles',
 				enter: 'Log in',
 				language: 'Language',
@@ -27,6 +30,7 @@ const copy =
 				menu: 'Blog menu',
 			}
 		: {
+				landing: 'Ir a Kaiman',
 				search: 'Buscar artículos',
 				enter: 'Ingresar',
 				language: 'Idioma',
@@ -63,6 +67,9 @@ const copy =
 						))}
 					</div>
 				)}
+				<a href={landing} class:list={['flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-primary-200 px-4 text-sm font-bold text-primary-800 hover:bg-primary-100', focusRing]}>
+					<ArrowLeft aria-hidden="true" size={16} /> {copy.landing}
+				</a>
 				<a href={login} class:list={['flex min-h-11 w-full items-center justify-center rounded-lg bg-primary px-4 text-sm font-bold text-white hover:bg-primary-700', focusRing]}>{copy.enter}</a>
 				<div class="flex items-stretch gap-2">
 					<div role="group" aria-label={copy.language} class="flex shrink-0 gap-2">
@@ -79,6 +86,9 @@ const copy =
 			</div>
 		</details>
 		<div class="hidden items-center gap-4 md:flex">
+			<a href={landing} class:list={['inline-flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap text-sm font-bold text-primary-800 hover:underline hover:underline-offset-4', focusRing]}>
+				<ArrowLeft aria-hidden="true" size={16} /> {copy.landing}
+			</a>
 			<div class="flex items-center gap-3" role="group" aria-label={copy.language}>
 				{
 					locales.map((code) => {
