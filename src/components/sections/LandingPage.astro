@@ -62,11 +62,11 @@ const audiencePhotos: Record<string, string> = {
 	creators: asset('/audiences/sofia.png'),
 };
 
-const tourMedia = [
-	asset('/hero/output-1.jpg'),
-	asset('/hero/output-2.png'),
-	asset('/hero/output-3.jpg'),
-] as const;
+const tourMedia = (
+	locale === 'en'
+		? ['/hero/en/output-1.jpg', '/hero/en/output-2.jpg', '/hero/en/output-3.jpg']
+		: ['/hero/es/output-1.jpg', '/hero/es/output-2.png', '/hero/es/output-3.jpg']
+).map((src) => asset(src)) as [string, string, string];
 
 const origenLead = copy.origin.paragraphs[0] ?? '';
 const origenRest = copy.origin.paragraphs.slice(1);
@@ -908,7 +908,7 @@ const origenChapterLabel = locale === 'en' ? 'Origin' : 'Origen';
 			</aside>
 			<div class:list={['flex min-h-0 flex-col py-6 lg:justify-center lg:py-12', gutter]}>
 				<div class="h-full min-h-0 w-full">
-					<PieceGallery client:visible copy={copy.salsana} />
+					<PieceGallery client:visible locale={locale} copy={copy.salsana} />
 				</div>
 			</div>
 		</div>

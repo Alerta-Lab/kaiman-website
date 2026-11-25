@@ -6,12 +6,14 @@ import {
 	type PointerEvent as ReactPointerEvent,
 } from 'react';
 import { createPortal } from 'react-dom';
-import { galleryItems, type GalleryOrientation } from '../../data/gallery';
+import { getGalleryItems, type GalleryOrientation } from '../../data/gallery';
+import type { Locale } from '../../i18n';
 import type { LandingCopy } from '../../i18n/locales/es/landing';
 import { signupUrl } from '../../lib/plans';
 
 type PieceGalleryProps = {
 	copy: LandingCopy['salsana'];
+	locale?: Locale;
 };
 
 const aspectClass: Record<GalleryOrientation, string> = {
@@ -25,7 +27,7 @@ function clamp(value: number, min: number, max: number) {
 	return Math.min(max, Math.max(min, value));
 }
 
-export function PieceGallery({ copy }: PieceGalleryProps) {
+export function PieceGallery({ copy, locale = 'es' }: PieceGalleryProps) {
 	const [openId, setOpenId] = useState<string | null>(null);
 	const [portalReady, setPortalReady] = useState(false);
 	const viewportRef = useRef<HTMLDivElement>(null);
@@ -41,6 +43,7 @@ export function PieceGallery({ copy }: PieceGalleryProps) {
 		moved: boolean;
 	} | null>(null);
 
+	const galleryItems = getGalleryItems(locale);
 	const openItem = galleryItems.find((item) => item.id === openId);
 
 	useEffect(() => {

@@ -12,6 +12,11 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-25 — Hero por locale
+
+- Assets en `public/hero/{es|en}/output-1..3`. EN PNG ~2MB → JPEG 800w (~142–216KB).
+- Wireframe/Landing/gallery resuelven rutas según `locale`.
+
 ### 2026-11-16 — Legal: ancho de lectura
 
 - `LegalDocument`: `max-w-3xl` / `lg:max-w-4xl` + más padding X (`px-6` → `sm:px-10` → `lg:px-12`).
