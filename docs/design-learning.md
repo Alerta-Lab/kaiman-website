@@ -12,6 +12,10 @@ Living notes. Append a dated entry whenever visual direction, tokens, layout, or
 
 ## Entries
 
+### 2026-11-25 — Shell 1920px
+
+- Contenedor padre wireframe (`shell`): `max-w-[1920px]` (antes 1600).
+
 ### 2026-11-25 — Blog titles sentence case + sin dirección
 
 - 20 posts (ES/EN): `title` y `seo_title` a sentence case (solo mayúscula inicial; IA/TikTok/etc. preservados).
