@@ -58,11 +58,23 @@ const audienceFeaturePhotos = Object.fromEntries(
 	audienceIds.map((id) => [id, resolveAudienceAsset('features', id)]),
 ) as Record<AudienceId, string | null>;
 
-const heroOutputs = [
-	asset('/hero/output-1.jpg'),
-	asset('/hero/output-2.png'),
-	asset('/hero/output-3.jpg'),
-];
+const resolveHeroOutput = (n: 1 | 2 | 3): string => {
+	const dir = path.join(process.cwd(), 'public/hero', locale);
+	for (const ext of ['jpg', 'jpeg', 'png', 'webp'] as const) {
+		if (fs.existsSync(path.join(dir, `output-${n}.${ext}`))) {
+			return asset(`/hero/${locale}/output-${n}.${ext}`);
+		}
+	}
+	const fallback = path.join(process.cwd(), 'public/hero/es');
+	for (const ext of ['jpg', 'jpeg', 'png', 'webp'] as const) {
+		if (fs.existsSync(path.join(fallback, `output-${n}.${ext}`))) {
+			return asset(`/hero/es/output-${n}.${ext}`);
+		}
+	}
+	return asset(`/hero/${locale}/output-${n}.jpg`);
+};
+
+const heroOutputs = [1, 2, 3].map((n) => resolveHeroOutput(n as 1 | 2 | 3));
 
 const heroModes = [
 	{ id: 'image', label: wf.hero.modes.image, Icon: ImageIcon, active: true },
