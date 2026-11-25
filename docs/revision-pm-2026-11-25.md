@@ -9,7 +9,7 @@ Fecha de verificación: 25 de noviembre de 2026.
 - La búsqueda pública y administrativa normaliza mayúsculas y acentos en ambos lados. PostgreSQL usa normalización Unicode nativa, sin instalar extensiones ni cambiar el esquema. Los caracteres `%` y `_` se buscan literalmente.
 - Ayuda conduce a las preguntas frecuentes del idioma actual, en la misma pestaña.
 - La landing distingue los siete tipos de generación de los ejemplos de capacidades comerciales. Se retiró la referencia numérica a ocho cuentas y facturas de la comparación de herramientas.
-- Se mantienen los códigos existentes: Starter `start`, Pro `pro` y Business `scale`. Son identificadores del catálogo, no los nombres que deben mostrarse al visitante.
+- Los enlaces públicos de registro usan Starter `start`, Pro `pro` y Business `business`. Business conserva `scale` como identificador interno del catálogo; el helper compartido traduce ese identificador a `business` tanto en la URL como en la cookie de selección. No se renombran los identificadores de facturación.
 
 ## Registro en el frontend del software
 
